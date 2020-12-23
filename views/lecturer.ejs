@@ -1,0 +1,38 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= user.accountType %> |
+            <%= user.name %>
+    </title>
+    <link href="/admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="/wc3.css" rel="stylesheet">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
+    <script src="/socket.io.js" defer></script>
+    <script type="module" src="/lecturer.js" defer></script>
+</head>
+
+<body>
+    <div class="accInfo">
+        <output class="myData" style="display:none"><%=user._id %></output>
+        <output class="myData" style="display:none"><%=user.name %></output>
+        <output class="myData" style="display:none"><%=user.accountType%></output>
+        <output class="myData" style="display:none"><%=user.platform%></output>
+        <output class="myData" style="display:none"><%=user.level %></output>
+    </div>
+    <br>
+    <div class="chat">
+        <input type="text" id="receiverId" placeholder="Receiver ID"><br>
+        <output id="messageIn"></output><br>
+        <textarea id="messageOut" cols="30" rows="1" placeholder="message..."></textarea><br>
+        <input type="button" id="send" value="SEND" class="button">
+    </div>
+    <br>
+    <span><h4><%=user.name %></h4></span><br><br>
+    <div id="TT"></div>
+
+</body>
+
+</html>

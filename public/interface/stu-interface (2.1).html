@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Student's Interface 2</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="wc3.css">
+	<link rel="stylesheet" href="w3-theme-blue.css">
+	<link rel="icon" type="image/png" href="images/icon.png">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+	
+
+	<style type="text/css">
+
+		/* width */
+		::-webkit-scrollbar {
+		    width: 10px;
+		}
+
+		/* Track */
+		::-webkit-scrollbar-track {
+		    box-shadow: inset 0 0 5px grey; 
+		    border-radius: 10px;
+		}
+		 
+		/* Handle */
+		::-webkit-scrollbar-thumb {
+		    background: #074b83; 
+		    border-radius: 10px;
+		}
+
+		/* Handle on hover */
+		::-webkit-scrollbar-thumb:hover {
+		    background: #2196f3; 
+		}
+
+		/* poppins-regular - latin */
+		@font-face {
+		  font-family: 'Poppins';
+		  font-style: normal;
+		  font-weight: 400;
+		  src: url('../fonts/poppins-v13-latin-regular.eot'); /* IE9 Compat Modes */
+		  src: local('Poppins Regular'), local('Poppins-Regular'),
+		       url('../fonts/poppins-v13-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+		       url('../fonts/poppins-v13-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+		       url('../fonts/poppins-v13-latin-regular.woff') format('woff'), /* Modern Browsers */
+		       url('../fonts/poppins-v13-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+		       url('../fonts/poppins-v13-latin-regular.svg#Poppins') format('svg'); /* Legacy iOS */
+		}
+
+		* {
+    		box-sizing: border-box;
+		}
+		body, h1{
+			font-family: 'Poppins', sans-serif;
+			font-weight:bold;
+			line-height: 12pt;
+			background-color:#f2f9fe;
+		}
+		/*nav{
+			max-height:64px;*/
+			/*box-shadow: 0px 0px 10px 0px black;*/
+			/*border-bottom: solid 1.5px;
+			border-color: #dddddd;
+			width: 100%;
+
+		}*/
+
+
+		
+		#get-timetable{
+			float: right;
+			border-radius: 8px;
+			margin: auto;
+			letter-spacing: 3.74px;
+			font-size:10px;
+		}
+		#logo{
+			width: 35px;
+			height: 35px;
+			margin:auto;
+
+		}
+
+		h1{
+			font-size: 24px;
+			font-weight: normal;
+			letter-spacing: 7px;
+		}
+
+		@media screen and (max-width: 768px) {
+		    h1 {
+		       letter-spacing: 3px;
+		    }
+		    .arrow{
+		    	margin-left: -10px
+		    }
+		}
+
+		@media screen and (max-height: 600px) {
+		    h1 {
+		       letter-spacing: 1px;
+		    }
+		    .arrow{
+		    	margin-left: -10px
+		    }
+		}
+
+		@media screen and (min-height: 770px) {
+		    html,body{ 
+                height: 100%; 
+            }
+           	#main-container{
+           		height: 100%;
+           	}
+
+		}
+
+		.arrow{
+			border-width: 2px;
+			  /*border-color: rgb(0, 0, 0);*/
+			  /*border-style: solid;*/
+			  border-radius: 50%;
+			  /*background-color: rgb(0, 0, 0);*/
+			  opacity: 0.90;
+			  width: 46px;
+			  height: 46px;
+			  z-index: 6;
+		}
+
+		table{
+			white-space: nowrap;
+			overflow: hidden; 
+			text-overflow: ellipsis;
+			line-height:18px;
+			border-color: #f2f9fe; 
+		}
+		p{
+			line-height: 22px;
+		}
+		.cell{
+			width: 128px;
+			height: 77px
+		}
+		.lect-venue{
+			font-weight: lighter; 
+			line-height: 16px;
+			display: inline-block; 
+			margin-top: 3px
+		}
+		.sticky {
+	    position: -webkit-sticky;
+	    position: sticky;
+		}
+		
+		
+	</style>
+</head>
+<body>
+	<div id="loader" class="w3-container w3-display-container w3-display-middle">
+		<p class="w3-animate-spin w3-blue w3-display-middle">&#xe5d5;</p>
+	</div>
+
+	<script type="text/javascript">
+		
+		let loader = document.getElementById('loader');
+		window.addEventListener('load', function(){
+			loader.style.display = 'none';
+		})
+
+	</script>
+
+	<div id='main-container'>
+		<!--<nav class="w3-container w3-bar w3-padding-16">
+			  <a href="#" class="w3-bar-item" style="margin: auto; padding: 0px"><img id="logo" src="images/logo.png"></a>
+			    <a href="#" class="w3-bar-item w3-btn w3-theme-action "  id="get-timetable">GET TIMETABLE</a>
+			
+		</nav>-->
+		<nav class="w3-theme-dark w3-card w3-display-container" style="height: 108px; border-radius: 0px">
+                <div class="w3-display-bottommiddle">
+                    <button class="w3-button w3-bar-item" id="tt-nav" style="width: 150px; border-bottom: 2px solid white; font-weight: normal;">Timetable</button>
+                </div>  
+		</nav>
+
+
+		<div class="w3-row" style="margin-top: 2rem;height:100%">
+			<div class="w3-quarter w3-container w3-hide-small" style="margin-top: 2rem">
+		  		<div class="w3-card-4 w3-round-large w3-animate-top w3-theme-d5" style="/*box-shadow: none; border-color:#dfe1e5;border-radius:8px;border-style:solid;border-width:1px*/">
+
+			
+
+					<div class="w3-container" style="font-size: 14px; font-weight: lighter">
+					  <p class="w3-small" ><span style="font-weight: bold;">Welcome {{name}}</span><br> You can view the most recent timetable by clicking on the get timetable button</p>
+					  <hr>
+					  <p class="w3-small">Department: {{department}} <br> Specialty: {{specialty}}<br>Level: {{level}}</p>
+					</div>
+
+			<!--<button class="w3-button w3-block w3-dark-grey">+ Connect</button>-->
+
+				</div>
+
+			</div>
+			
+			<div class="w3-half w3-container" id="table-container">
+		  		<div class=""><h1 style="margin-bottom: 1rem; font-family:'Poppins'">WEEKLY SCHEDULE</h1></div>
+					<div class="w3-small w3-text-gray" style="font-weight: bold; margin-bottom: 0.3rem; margin-top: 18px">UPLOADED:</div>
+					<div class="w3-card w3-round-large w3-theme-l4 w3-display-container" style="/*box-shadow: none;* border-color:#dfe1e5;border-radius:8px;border-style:solid;border-width:1px*/">
+						<div class="" style="overflow: auto;">
+							
+							<table class="w3-table w3-bordered w3-border-blue">
+									
+								<tr style="border-bottom:1px solid #f2f9fe">
+								    <th class="w3-small">TIME</th>
+								    <th class="w3-small">MONDAY</th>
+								    <th class="w3-small">TUESDAY</th>
+								    <th class="w3-small">WEDNESDAY</th>
+								    <th class="w3-small">THURSDAY</th>
+								    <th class="w3-small">FRIDAY</th>
+								    <th class="w3-small">SATURDAY</th>
+								</tr>	
+									
+								<tr style="border-bottom:1px solid #f2f9fe">
+								   	<td class="w3-small sticky"><br>08:00</td>
+								    <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute; background-color: #ffffff; padding: 8px; left:0%; top: 80%"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+								    <td class="w3-small">{{}}<br><span class="w3-small lect-venue" >{{monday}} V:{{}}</span></td>
+								     <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; right: 2rem; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+								     <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+								     <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+								     <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+								</tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky">09:50</td>
+							      <td></td>
+							      <td></td>
+							      <td class="w3-small">BREAK</td>
+							      <td></td>
+							      <td></td>
+							      <td></td>
+							    </tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky"><br>10:10</td>
+							      <td class="w3-small w3-tooltip cell" style="margin:auto;">WINDOWS SERVER<br><span class="w3-small lect-venue" style="font-weight: lighter;">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; right: 20% background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							    </tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky">12:00</td>
+							      <td></td>
+							      <td></td>
+							      <td class="w3-small">BREAK</td>
+							      <td></td>
+							      <td></td>
+							      <td></td>
+							    </tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky"><br>13:00</td>
+							      <td class="w3-small">MATHEMATICS 1<br><span class="w3-small lect-venue" style="font-weight: lighter;">Mr Njikang Francis<br> Venue: A244</span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							    </tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky">14:50</td>
+							      <td></td>
+							      <td></td>
+							      <td class="w3-small">BREAK</td>
+							      <td></td>
+							      <td></td>
+							      <td></td>
+							    </tr>
+							   <tr style="border-bottom:1px solid #f2f9fe">
+							      <td class="w3-small sticky"><br>15:10</td>
+							      <td class="w3-small ">MATHEMATICS 1<br><span class="w3-small lect-venue" style="font-weight: lighter;">Mr Njikang Francis<br> Venue: A244</span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							       <td class="w3-small w3-tooltip cell">WINDOWS SERVER<br style=""><span class="w3-small lect-venue">Mr Njikang Francis<br> Venue: A244<br></span><span class=" w3-card-4 w3-round w3-text w3-text-blue" style="z-index:6; position: absolute;top: 80%; background-color: #ffffff; padding: 8px"><em>Course:Windows Server<br>Lecturer: Mr Francis Njikang<br>Venue: Room A244</em></span></td>
+							    </tr>
+							</table>
+						</div>
+							<!--<button class="w3-button w3-display-left w3-round arrow w3-theme-action" style="margin-left: -20px"  onclick="">&#10094;</button>
+							<button class="w3-button w3-display-right w3-round arrow w3-theme-action" style="margin-right: -20px" onclick="">&#10095;</button>-->
+
+					</div>
+				</div>
+				<div class="w3-quarter w3-container w3-hide-small">
+				</div>
+		</div>
+		<footer class="w3-container w3-theme-l4" style="padding:16px; margin-top: 4rem">
+  			<p class="w3-tiny">&copy; copyright 2020</p>
+		</footer>
+	</div>
+</body>
+</html>

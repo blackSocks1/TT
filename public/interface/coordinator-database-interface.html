@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Coordinator Database Interface</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="wc3.css">
+	<link rel="stylesheet" href="w3-theme-blue.css">
+	<link rel="icon" type="image/png" href="images/icon.png">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" type="text/css" href="admin.css">
+	<style type="text/css">
+		html,body{
+			height: 100%;
+			box-sizing: border-box;
+			font-family: 'Poppins', sans-serif;
+			background-color:#f2f9fe;
+		}
+		.inputField{
+			margin: 8px;
+			padding: 8px;
+			border-top:1px;
+			border-bottom: 0px;
+			border-left: 0px;
+			border-right: 0px;
+			border-color: #f2f9fe;
+			border-style: solid;
+		}
+		.inputField input{
+			float: right;
+		}
+		.w3-card{
+			border-radius: 8px;
+		}
+		#selection-container input{
+			margin-left: 8px
+		}
+		#course-input-container input{
+			border: 0px
+		}
+		#lecturer-input-container input{
+			border: 0px
+		}
+		.page-indicator{
+			width: 150px; 
+			border-bottom: 2px solid white; 
+			font-weight: normal
+		}
+	</style>
+</head>
+<body>
+	<nav class="w3-theme-dark w3-card w3-display-container" style="height: 108px; border-radius: 0px">
+	                <div class="w3-display-bottommiddle">
+	                    <button class="w3-button w3-bar-item " id="tt-nav" onclick="showTimetable();" style="">Timetable</button>
+	                    <button class="w3-button w3-bar-item page-indicator" id="d-nav" onclick="showDatabase();" style="">Database</button>
+	                </div>  
+	</nav>
+	<div id="database-int">
+		<header>
+			<!--<div id="tool-bar w3-container">
+				<a href="" style="font-size:24px"><i class="material-icons">refresh</i></a>
+				<a href="" style="font-size:24px"><i class="material-icons">delete</i></a>
+				<a href="" style="font-size:24px"><i class="material-icons">content_copy</i></a>
+				<a href="" style="font-size:24px"><i class="material-icons">select_all</i></a>
+				<a href="" style="font-size:24px"><i class="material-icons">undo</i></a>
+				<a href="" style="font-size:24px"><i class="material-icons">remove</i></a>
+			</div>-->
+			<!--<div id="tab-bar" class="w3-container w3-margin">
+				<button class="w3-button w3-theme-action">Timetable</button>
+				<button class="w3-button w3-theme-action">Database</button>
+			</div>-->
+			
+			<div id="selection-container" class="w3-container w3-bar w3-margin">
+				<input class="w3-bar-item" list="specialties" type="text" placeholder="Specialties">
+			 	<input class="w3-bar-item" list="level" type="text" placeholder="Level">
+			 	<input class="w3-bar-item" list="semester" type="text" placeholder="Semester">
+			 	<button class="w3-bar-item w3-right w3-theme-action w3-button w3-margin-right" id="lect-list-btn" style="display: inline-block;"onclick="showLectList();" >Lecturer List</button>
+			 	<button class="w3-bar-item w3-right w3-theme-action w3-button w3-margin-right" id="course-list-btn" style="display: none;" onclick="showCourseList();">Course List</button>
+			</div>
+		</header>
+		<main>
+			<div id="course-input-container" class="w3-container w3-row w3-margin" style="height: 100%">
+				<div class="w3-half w3-container">
+					<div class="w3-container w3-card w3-theme-l4 w3-round w3-padding " style="width: 500px">
+						<h3>Add Course</h3>
+						<div class="inputField w3-panel"><span>Title</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Short Name</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Code</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Credit</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Type</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Allocated Time</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Lecturer</span>
+						<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Time-left</span>
+						<input type="text" name=""></div>
+						<div align="center">
+							<button class="w3-button w3-theme-action">Add Course</button>
+						</div>
+					</div>
+				</div>
+				<div class="w3-container w3-half w3-card w3-theme-l4 w3-padding">
+					<h3>Course-List</h3>
+					<div class="w3-container">
+						<ul>
+							<li class="w3-panel"> none</li>
+						</ul>
+					</div align="center">
+					<button class="w3-button w3-theme-action">Edit Course</button>
+					<button class="w3-button w3-theme-action">Delete Course</button>
+				</div>
+			</div>
+			<div id="lecturer-input-container" class="w3-row w3-container w3-margin" style="height: 100%; display:none;">
+				<div class="w3-half w3-container">
+					<div class="w3-container w3-card w3-theme-l4 w3-round w3-padding " style="width: 500px">
+						<h3>Add Lecturer</h3>
+						<div class="inputField w3-panel"><span>Name</span>
+							<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Id</span>
+							<input type="text" name=""></div>
+						<div class="inputField w3-panel"><span>Course List</span>
+							<input type="text" name=""></div>
+						<div align="center">
+							<button class="w3-button w3-theme-action">Add Lecturer</button></div>
+					</div>
+				</div>
+				
+				
+				<div class="w3-half w3-card w3-theme-l4 w3-padding">
+					<h3>Lecturer-List</h3>
+					<div class="w3-container">
+						<ul>
+							<li class="w3-panel"> none</li>
+						</ul>
+					</div>
+					<div>
+						<button class="w3-button w3-theme-action">Edit Lecturer</button>
+						<button class="w3-button w3-theme-action">Delete Lecturer</button>
+					</div>
+				</div>
+			</div>
+		</main>
+		<script type="text/javascript">
+			function showLectList(){
+				lect_button = document.getElementById('lect-list-btn');
+				lect_container = document.getElementById("lecturer-input-container");
+				course_button = document.getElementById('course-list-btn');
+				course_container = document.getElementById("course-input-container")
+				lect_button.style.display = 'none';
+				lect_container.style.display = 'block';
+				course_button.style.display = 'inline-block';
+				course_container.style.display = 'none';
+			}
+
+			function showCourseList(){
+				lect_button = document.getElementById('lect-list-btn');
+				lect_container = document.getElementById("lecturer-input-container");
+				course_button = document.getElementById('course-list-btn');
+				course_container = document.getElementById("course-input-container");
+				lect_button.style.display = 'inline-block';
+				lect_container.style.display = 'none';
+				course_button.style.display = 'none';
+				course_container.style.display = 'block';
+			}
+		</script>
+	</div>
+	<div id="timetable-int" style="display: none;">
+
+		<header>
+		<div id="selection-container" class="w3-container w3-bar w3-margin">
+				<input class="w3-bar-item" list="specialties" type="text" placeholder="Specialties">
+			 	<input class="w3-bar-item" list="level" type="text" placeholder="Level">
+			 	<input class="w3-bar-item" list="semester" type="text" placeholder="Semester">
+			 	<button class="w3-bar-item w3-button w3-margin-left w3-theme-action" id="a-t-button" style="display: inline-block">timetable</button>
+		 	<button class="w3-bar-item w3-margin-right w3-button w3-right w3-theme-action" id="a-t-button" style="display: inline-block" onclick="showAvailTime()">availability timetable</button>
+		</div>
+	</header>
+	<main class="w3-row w3-container" >
+		
+
+			<div id="timetable-container" class="w3-container w3-card w3-white w3-margin-top " style="width: 100%; float: left;">
+	  			 <table class="admin_TT w3-responsive">
+        <span><h4>Admin Time Table</h4></span>
+        <tr>
+            <th>TIME</th>
+            <th>MONDAY </th>
+            <th>TUESDAY </th>
+            <th>WEDNESDAY</th>
+            <th>THURSDAY </th>
+            <th>FRIDAY </th>
+            <th>SATURDAY </th>
+            <th>SUNDAY </th>
+        </tr>
+        <tr>
+            <td>
+                Start Time: <input class="admin_time" type="time" value=08:00><br> Stop Time: <input class="admin_time" type="time" value=09:50>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Start Time: <input class="admin_time" type="time" value=10:10><br> Stop Time: <input class="admin_time" type="time" value=12:00>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Start Time: <input class="admin_time" type="time" value=13:00><br> Stop Time: <input class="admin_time" type="time" value=14:50>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Start Time: <input class="admin_time" type="time" value=15:10><br> Stop Time: <input class="admin_time" type="time" value=17:00>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+            <td>
+                <form class='cell'>
+                    <br>
+                    <input list="Courses" type="text" placeholder="Course name">
+                    <br>
+                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <br>
+                    <input list="Rooms" type="text" placeholder="Room/Hall">
+                    <br>
+                    <input type="checkbox" class="form-check-input" />Joint Class
+                </form>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <input class="button" id="send_button" type="button" value="Send" disabled> <input class="button" id="Validate" type="button" value="Validate">
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="student"></div>
+    <br>
+    <hr><br>
+
+    <div class="lecturers"></div>
+			</div>
+			<div class="w3-container w3-margin-top w3-padding" style="width: 33.3%; float: left;">
+				<div id="a-t-container"  class="w3-container w3-card w3-white" style="display: none;">
+		  			<input type="text" name="">
+					<button style="" class="w3-button"><i class="material-icons">search</i></button>
+					<button class="w3-button" style="float: right;" onclick="hideAvailTime()"><i class="material-icons" >clear</i></button>
+					<div><span>Lecturer Name:{{Lecturer name}}</span></div>
+					<div class="w3-text-blue"><h3 style="">availability timetable</h3></div>
+					<div class="w3-small w3-text-gray" style="font-weight: bold; margin-bottom: 0.3rem; margin-top: 18px">UPLOADED:</div>
+					<div class="w3-round-large w3-white">
+					<div class="w3-responsive">
+						
+						<table class="">
+	
+							  <tr class="w3-text-blue">
+						      <th class="w3-small">TIME</th>
+						      <th class="w3-small">MONDAY</th>
+						      <th class="w3-small">TUESDAY</th>
+						      <th class="w3-small">WEDNESDAY</th>
+						      <th class="w3-small">THURSDAY</th>
+						      <th class="w3-small">FRIDAY</th>
+						      <th class="w3-small">SATURDAY</th>
+						    </tr>	
+			
+						    <tr>
+						      <td><br>08:00</td>
+						      <td class="avail-timetabe-cell w3-hover-blue" onclick="change_color()"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						    </tr>
+						     <tr>
+						      <td><br>10:00</td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						    </tr>
+						     <tr>
+						      <td><br>13:00</td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						    </tr>
+						     <tr>
+						      <td><br>15:00</td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						      <td class="avail-timetabe-cell w3-hover-blue"></td>
+						   </tr>
+
+						</table>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			function showAvailTime(){
+				avail = document.getElementById('a-t-container');
+				main = document.getElementById('timetable-container');
+                button = document.getElementById('a-t-button');
+                button.style.display = 'none';
+				main.style.width = '66.7%';
+				avail.style.display = 'block';
+			}
+			function hideAvailTime(){
+				avail = document.getElementById('a-t-container');
+				main = document.getElementById('timetable-container');
+                button = document.getElementById('a-t-button');
+                button.style.display = 'block';
+				avail.style.display = 'none';
+				main.style.width = "100%"
+			}
+		</script>
+	</main>
+
+	</div>
+	<script type="text/javascript">
+		function showTimetable(){
+		database = document.getElementById('database-int');
+		timetable = document.getElementById('timetable-int');
+		database.style.display = 'none';
+		timetable.style.display = 'block';
+		document.getElementById('d-nav').setAttribute("class","w3-button w3-bar-item");
+		document.getElementById('tt-nav').setAttribute("class", "w3-button w3-bar-item page-indicator");
+	}
+	function showDatabase(){
+		database = document.getElementById('database-int');
+		timetable = document.getElementById('timetable-int');
+		database.style.display = 'block';
+		timetable.style.display = 'none';
+		document.getElementById('d-nav').setAttribute("class","w3-button w3-bar-item page-indicator");
+		document.getElementById('tt-nav').setAttribute("class", "w3-button w3-bar-item");
+	}
+	</script>
+</body>
+</html>

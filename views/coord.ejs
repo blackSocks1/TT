@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/wc3.css" rel="stylesheet">
+    <link href="/admin.css" rel="stylesheet">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
+    <script src="/socket.io.js" defer></script>
+    <script type="module" src="/coord.js" defer></script>
+    <title>Coordinator Interface</title>
+</head>
+
+<body>
+    <div class="levelNav">
+
+    </div>
+
+    <div class="datalist">
+        <datalist id="Courses">
+        </datalist>
+
+        <datalist id="Lecturers">
+        </datalist>
+
+        <datalist id="Venues">
+        </datalist>
+
+        <datalist id="Levels">
+        </datalist>
+    </div>
+
+    <div class="accInfo">
+    </div>
+
+    <br>
+    <div>
+        <input list="Levels" type="text" id="level" placeholder="level"><br><br>
+    </div>
+    <div id="coordinatorTT"></div>
+
+    <br>
+    <hr>
+    <br>
+
+    <div class="student"></div>
+</body>
+
+</html>
