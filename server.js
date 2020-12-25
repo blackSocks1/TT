@@ -3,8 +3,9 @@ const _ = require('lodash');
 const Socket = require('socket.io');
 const express = require('express');
 const cors = require('cors');
-const https = require('https-server');
-
+const https = require('https');
+const path = require('path');
+const fs = require('fs');
 
 // environment variables
 require("dotenv").config();
@@ -17,18 +18,15 @@ const coordinatorRoutes = require("./routes/coordinatorRoutes");
 
 const app = express();
 
-const server = app.listen(process.env.HTTP_PORT, process.env.HOST, () => {
-    console.log(`Server listening to requests on port ${process.env.HTTP_PORT}`);
-});
-
 const options = {
-    key : "Root",
-    pass : "Root123"
+  key : fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),    
+  cert : fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
 };
 
-const httpsServer = https.createServer(options,app);
+const server = https.createServer(options, app);
+// server.listen(process.env.PORT, ()=> console.log(`HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`));
 
-httpsServer.listen(process.env.HTTPS_PORT, process.env.HOST)
+server.listen(process.env.PORT, process.env.HOST, ()=> console.log(`HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`));
 
 // connection to db
 // const dbURI = `mongodb+srv://${db.Uname}:${db.pass}@cluster0.xevnc.mongodb.net/${db.name}?retryWrites=true&w=majority`;
