@@ -19,14 +19,20 @@ const coordinatorRoutes = require("./routes/coordinatorRoutes");
 const app = express();
 
 const options = {
-  key : fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),    
-  cert : fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
+    key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
 };
 
 const server = https.createServer(options, app);
-// server.listen(process.env.PORT, ()=> console.log(`HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`));
+mongoose.connect('mongodb://localhost/TimeTable', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+}).then(() => {
+    console.log('Connected to db');
+}).catch('error', (error) => console.log('\nError at ', error));
 
-server.listen(process.env.PORT, process.env.HOST, ()=> console.log(`HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`));
+server.listen(process.env.PORT, process.env.HOST, () => console.log(`HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`));
 
 // connection to db
 // const dbURI = `mongodb+srv://${db.Uname}:${db.pass}@cluster0.xevnc.mongodb.net/${db.name}?retryWrites=true&w=majority`;
@@ -40,10 +46,6 @@ server.listen(process.env.PORT, process.env.HOST, ()=> console.log(`HTTPS server
 //     console.log(err);
 // });
 
-mongoose.connect('mongodb://localhost/TimeTable', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(() => {
-    console.log('Connected to db');
-}).catch('error', (error) => console.log('\nError at ', error));
-
 //static files
 app.use(express.static('public'));
 
@@ -52,7 +54,9 @@ app.set('view engine', 'ejs');
 
 // middleware
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+    extended: true
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -76,7 +80,9 @@ app.use((req, res) => {
 });
 
 function FindElement(criteria = '_id', value, source) {
-    return _.find(source, (o) => { return o[criteria] === value; });
+    return _.find(source, (o) => {
+        return o[criteria] === value;
+    });
 }
 
 //socket setup
@@ -106,9 +112,17 @@ io.on('connection', (socket) => {
         if (msg.receiver !== '') {
             connectedUsers.forEach((user) => {
                 if (user.id === msg.receiver) {
-                    io.to(user.networkId).emit('message', { sender: msg.sender, message: msg.message });
+                    io.to(user.networkId).emit('message', {
+                        sender: msg.sender,
+                        message: msg.message
+                    });
                 }
             });
-        } else { socket.broadcast.emit('message', { sender: msg.sender, message: msg.message }); }
+        } else {
+            socket.broadcast.emit('message', {
+                sender: msg.sender,
+                message: msg.message
+            });
+        }
     });
 });

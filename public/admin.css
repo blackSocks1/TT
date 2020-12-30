@@ -22,16 +22,21 @@ input {
 
 input[type=text]:disabled {
     border: none;
-    text-align: center;
     background-color: white;
     border-bottom: 2px solid rgb(191, 0, 0);
-    color: rgb(191, 0, 0);
+}
+
+input[type=time]:disabled {
+    border: none;
+    background-color: white;
+    border-bottom: 2px solid gray;
 }
 
 .cell {
     width: 95%;
 }
 
+/* pagination styles */
 .pagination {
     display: inline-block;
 }

@@ -4,7 +4,7 @@ const router = require('express').Router();
 const coordinatorController = require('../controllers/coordinatorController');
 
 router.get('/coord', (req, res) => {
-    res.render('coord');
+  res.render('coord');
 });
 
 //gets
@@ -24,5 +24,9 @@ router.post('/TT-upCourses', coordinatorController.updateCourses);
 router.post('/TT-upLecturers', coordinatorController.updateLecturers);
 
 router.post('/TT-upVenues', coordinatorController.updateVenues);
+
+router.post('/getMyDefaults', coordinatorController.getMyDefaults);
+
+router.post('/setMyDefaults', coordinatorController.setMyDefaults);
 
 module.exports = router;
