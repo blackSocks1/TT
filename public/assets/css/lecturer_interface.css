@@ -1,0 +1,212 @@
+* {
+  box-sizing: border-box;
+}
+
+nav.timetableNav {
+  background: #0a4c9b;
+}
+
+nav div.container-fluid {
+  width: 80%;
+}
+
+nav div.container-fluid ul.navbar-nav li.nav-item a.nav-link {
+  color: white;
+  font-size: 16px;
+}
+
+nav div.container-fluid ul.navbar-nav li.active {
+  color: white;
+  font-size: 16px;
+  border-bottom: 4px solid grey;
+}
+
+nav div.container-fluid ul.navbar-nav li.nav-item:hover {
+  border-bottom: 4px solid grey;
+}
+
+div.w3-row {
+  margin-top: 2rem;
+  height: 100%;
+}
+
+div.w3-quarter {
+  margin-top: 2rem;
+}
+
+div.notice {
+  background: #0a4c9b;
+  color: white;
+  border-radius: 10px;
+  margin-top: 5%;
+}
+
+div p {
+  font-size: 16px;
+  font-family: "Poppins";
+}
+
+div p.mt-4 span {
+  font-weight: bold;
+}
+
+/*Timetable*/
+div.timetable {
+  margin-left: 5%;
+  width: 68%;
+}
+
+div.timetable div h1 {
+  font-family: "Poppins";
+}
+
+div.timetable div.w3-small {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  margin-top: 18px;
+}
+
+div.timetable div.w3-card thead {
+  background: #0a4c9b;
+  color: white;
+  border-radius: 15px;
+}
+
+div.timetable div.w3-card {
+  border-radius: 15px;
+}
+
+div.timetable div.w3-card thead th.w3-small {
+  height: 45px;
+}
+
+div.timetable div.w3-card table {
+  text-align: center;
+}
+
+a.paginationButton:hover {
+  cursor: pointer;
+  border: 5px solid #eee;
+  border-radius: 5px;
+}
+
+@media screen and (max-width: 578px) {
+  div.timetable {
+    width: 100%;
+    margin-right: 5%;
+    margin-left: 0;
+  }
+
+  div.timetable div.w3-card {
+    overflow: auto;
+  }
+}
+nav ul.pagination li a {
+  background: #0a4c9b;
+  color: white;
+}
+
+table {
+  border-spacing: 0;
+}
+th,
+td {
+  padding: 0.5em 1em;
+}
+thead tr:first-child th:first-child,
+tbody:first-child tr:first-child td:first-child {
+  border-top-left-radius: 13px;
+}
+thead tr:first-child th:last-child,
+tbody:first-child tr:first-child td:last-child {
+  border-top-right-radius: 13px;
+}
+
+thead + tbody tr:last-child td:first-child,
+tfoot tr:last-child td:first-child {
+  border-bottom-left-radius: 13px;
+}
+thead + tbody tr:last-child td:last-child,
+tfoot tr:last-child td:last-child {
+  border-bottom-right-radius: 13px;
+}
+
+thead + tbody tr td,
+tfoot + tbody tr td,
+tfoot tr td,
+tbody + tbody tr td,
+tr + tr td {
+  border-top: 0;
+}
+
+tr th + th,
+tr td + td {
+  border-left: 0;
+}
+
+/*Available Timetable*/
+div.availTimetable {
+  width: 100%;
+}
+
+div.availTimetable div h1 {
+  font-family: "Poppins";
+}
+
+div.availTimetable div.w3-small {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  margin-top: 18px;
+}
+
+div.availTimetable div.w3-card thead {
+  background: #0a4c9b;
+  color: white;
+  border-radius: 15px;
+}
+
+div.availTimetable div.w3-card {
+  border-radius: 15px;
+}
+
+div.availTimetable div.w3-card thead th.w3-small {
+  height: 45px;
+}
+
+div.availTimetable div.w3-card table {
+  text-align: center;
+}
+
+@media screen and (max-width: 578px) {
+  div.availTimetable {
+    width: 100%;
+    margin-right: 5%;
+    margin-left: 0;
+  }
+
+  div.availTimetable div.w3-card {
+    overflow: auto;
+  }
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #0a4c9b;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #0a4c9b;
+}

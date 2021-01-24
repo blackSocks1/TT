@@ -1,11 +1,4 @@
-//models
-const schemas = require('../models/schemas');
-const Lecturer = schemas.Lecturer;
-const Course = schemas.Course;
-const Student = schemas.Student;
-const Level = schemas.Level;
-const Coordinator = schemas.Coordinator;
-
+const { Oath } = require("../myFunctions/npmFunctions");
 
 // module.exports.signupGet = (req, res) => {
 //     res.render('signup');
@@ -32,63 +25,48 @@ const Coordinator = schemas.Coordinator;
 // }
 
 let authController = {
-
   login: async (req, res) => {
     let person = req.body;
-    let user;
-
-    if (person._id.slice(0, 1) === "L") {
-      person.accountType = "lecturer";
-    } else if (person._id.slice(0, 1) === "s") {
-      person.accountType = "student";
-    } else if (person._id.slice(0, 1) === "c") {
-      person.accountType = "coordinator";
-    }
-
-    if (person.accountType === 'lecturer') {
-      user = await Lecturer.findOne({
-        _id: person._id
-      });
-    } else if (person.accountType === 'coordinator') {
-      user = await Coordinator.findOne({
-        _id: person._id
-      });
-    } else {
-      user = await Student.findOne({
-        _id: person._id
-      });
-    }
+    let user = await Oath(person);
 
     if (user) {
-      if (person.platform === "web" && person.accountType === 'coordinator') {
+      res.locals.user = user;
+
+      if (person.platform === "web" && person.accountType === "coordinator") {
         user.platform = "web";
-        res.locals.user = user;
-        res.redirect('coord');
-        // res.render('coord');
-      } else if (person.platform === "web" && person.accountType === 'lecturer') {
+        res.render("coord");
+      } else if (person.platform === "web" && person.accountType === "lecturer") {
         user.platform = "web";
-        res.locals.user = user;
-        console.log("2");
-        res.render('lecturer');
-      } else if (person.platform === "web" && person.accountType === 'student') {
+        res.render("lecturer");
+      } else if (person.platform === "web" && person.accountType === "student") {
         user.platform = "web";
-        res.locals.user = user;
-        console.log("3");
-        res.render('student');
+        res.render("student");
       } else if (person.platform === "mobile") {
         user.platform = "mobile";
         res.end(JSON.stringify(user));
       } else {
-        res.end(JSON.stringify(undefined));
+        res.end(
+          JSON.stringify({
+            _id: person._id,
+            password: person.password,
+            found: false,
+          })
+        );
       }
       // console.log(user)
     } else {
-      res.end(JSON.stringify(undefined));
+      res.end(
+        JSON.stringify({
+          _id: person._id,
+          password: person.password,
+          found: false,
+        })
+      );
     }
   },
   signUp: () => {},
   signIn: () => {},
   logOut: () => {},
-}
+};
 
 module.exports = authController;

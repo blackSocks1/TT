@@ -1,0 +1,92 @@
+*{
+	box-sizing: border-box;
+	margin: 0;
+}
+
+div a{
+	color: white;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+div a:hover{
+	font-size: 21px;
+	color: #008778;
+}
+
+div.container-signup,div.container-login{
+	margin-top: 4%;
+	float: right;
+}
+
+div.container-slidetext{
+	margin-top: 8%;
+	margin-left: 3%;
+	float: left;
+	width: 100%;
+}
+
+p{
+	font-size: 65px;
+	color: white;
+}
+
+div i{
+	float: right;
+	cursor: pointer;
+	color: #008778;
+}
+
+.head{
+	color: #008778;
+	padding: 5px;
+}
+
+.remember{
+	color: #008778;
+}
+
+#container{
+	position: absolute;
+	width: 100%;
+	top: 1%;
+	height: auto;
+}
+
+.iconU,.iconP{
+	color: #008778;
+	position: absolute;
+}
+
+input[type=text],input[type=password]{
+	border: none;
+	border-bottom: 1px solid #008778;
+	outline: 0 none;
+}
+
+#card{
+	padding: 25px 25px;
+}
+
+#signup,#login{
+	background-color: #008778;
+	color: white;
+}
+
+@media screen and (max-width: 570px){
+	div.container-slidetext-t{
+		width: 100%;
+	}
+
+	div p{
+		font-size: 9vw;
+	}
+
+	div.container-signup-s,div.container-login-l{
+		margin-top: 14%;
+	}
+
+	button#login,button#signup{
+		margin-left: 10%;
+	}
+}

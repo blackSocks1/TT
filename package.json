@@ -1,7 +1,7 @@
 {
   "name": "websockets",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
@@ -26,11 +26,11 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/DrDoGood/tt.git"
+    "url": ""
   },
   "bugs": {
-    "url": "https://gitlab.com/DrDoGood/tt/issues"
+    "url": ""
   },
-  "homepage": "https://gitlab.com/DrDoGood/tt#readme",
+  "homepage": "",
   "description": ""
 }

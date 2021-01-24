@@ -3,115 +3,115 @@
 table,
 th,
 td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    text-align: center;
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
 }
 
 th,
 td {
-    padding: 15px;
+  padding: 15px;
 }
 
 input {
-    border: none;
-    border-bottom: 2px solid gray;
-    text-align: center;
-    outline: none;
+  border: none;
+  border-bottom: 2px solid gray;
+  text-align: center;
+  outline: none;
 }
 
-input[type=text]:disabled {
-    border: none;
-    background-color: white;
-    border-bottom: 2px solid rgb(191, 0, 0);
+input[type="text"]:disabled {
+  border: none;
+  background-color: white;
+  border-bottom: 2px solid rgb(191, 0, 0);
 }
 
-input[type=time]:disabled {
-    border: none;
-    background-color: white;
-    border-bottom: 2px solid gray;
+input[type="time"]:disabled {
+  border: none;
+  background-color: white;
+  border-bottom: 2px solid gray;
 }
 
 .cell {
-    width: 95%;
+  width: 95%;
 }
 
-/* pagination styles */
+/* pagination styles
 .pagination {
-    display: inline-block;
+  display: inline-block;
 }
 
 .pagination a {
-    color: black;
-    float: left;
-    padding: 8px 16px;
-    text-decoration: none;
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
 }
 
-.pagination a.onScreen {
-    color: #08303d;
-    background-color: white;
-    text-align: center;
-    padding: 5px 10px;
-    margin: 2px 2px;
-    border-radius: 4px;
-    border: 2px solid #08303d;
+.pagination a.active {
+  color: #08303d;
+  background-color: white;
+  text-align: center;
+  padding: 5px 10px;
+  margin: 2px 2px;
+  border-radius: 4px;
+  border: 2px solid #08303d;
 }
 
 .pagination a:hover {
-    cursor: pointer;
-    border: 5px solid #eee;
-    border-radius: 5px;
+  cursor: pointer;
+  border: 5px solid #eee;
+  border-radius: 5px;
 }
 
-.pagination a.onScreen:hover {
-    color: white;
-    background-color: #08303d;
+.pagination a.active:hover {
+  color: white;
+  background-color: #08303d;
 }
 
 .pagination a:hover:not(.onScreen) {
-    background-color: #ddd;
-}
+  background-color: #ddd;
+} */
 
 form input:hover {
-    color: rgb(77, 96, 189);
-    border-bottom: 2px solid rgb(77, 96, 189);
+  color: rgb(77, 96, 189);
+  border-bottom: 2px solid rgb(77, 96, 189);
 }
 
 form input:focus {
-    color: orangered;
-    border-bottom: 2px solid rgb(77, 96, 189);
+  color: orangered;
+  border-bottom: 2px solid rgb(77, 96, 189);
 }
 
 hr {
-    width: 75%;
+  width: 75%;
 }
 
 .tdCell,
 .timeSection {
-    width: 150px;
-    height: 50px;
+  width: 150px;
+  height: 50px;
 }
 
 .button {
-    color: #08303d;
-    background-color: white;
-    text-align: center;
-    padding: 10px 15px;
-    margin: 4px 2px;
-    border-radius: 4px;
-    border: 2px solid #08303d;
+  color: #08303d;
+  background-color: white;
+  text-align: center;
+  padding: 10px 15px;
+  margin: 4px 2px;
+  border-radius: 4px;
+  border: 2px solid #08303d;
 }
 
 .button:hover {
-    color: white;
-    background-color: #08303d;
-    border: 2px solid #eee;
-    position: relative;
-    top: -5px;
+  color: white;
+  background-color: #08303d;
+  border: 2px solid #eee;
+  position: relative;
+  top: -5px;
 }
 
 .button:disabled {
-    color: #555555;
-    border-bottom: 5px solid red;
+  color: #555555;
+  border-bottom: 5px solid red;
 }

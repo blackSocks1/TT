@@ -1,9 +1,7 @@
 // const importGlobal = require('import-global');
 const extendSchema = require("mongoose-extend-schema");
-const {
-  functions
-} = require('lodash');
-const mongoose = require('mongoose');
+const { functions } = require("lodash");
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // function extendSchema (Schema, definition, options){
@@ -24,177 +22,210 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   _id: {
     type: String,
-    required: true
+    required: true,
   },
+
   name: {
     type: String,
-    required: true
+    required: true,
   },
+
   accountType: {
     type: String,
-    required: true
+    required: true,
   },
+
   platform: String,
+
   TT: [],
 });
 
 const LecturerSchema = extendSchema(UserSchema, {
-  avail_TT: {
-    default: [],
-    currentAvail: []
-  },
-  temp_TT: [],
-  schedule: [] // ,you:[]
+  avail: { weekAvail: [], defaultAvail: [] },
 });
 
 const StudentSchema = extendSchema(UserSchema, {
   specialty: {
     type: String,
-    required: true
+    ref: "specialty",
+    required: true,
   },
+
   level: {
     type: Schema.Types.String,
-    ref: "level"
-  }
+    ref: "level",
+    required: true,
+  },
 });
 
 const CoordinatorSchema = extendSchema(LecturerSchema, {
   TT_Defaults: {
     week: {},
-    periods: []
-  }
+    periods: [],
+  },
+
+  specialties: [
+    {
+      type: Schema.Types.String,
+      ref: "specialty",
+    },
+  ],
+  lastSeen: Number,
+  TTdrafts: [],
 });
 
-const AdminSchema = extendSchema(UserSchema, {
+const AdminSchema = new Schema({
   _id: {
     type: String,
-    required: true
+    required: true,
   },
+
   name: {
     type: String,
-    required: true
+    required: true,
   },
+
   sysDefaults: {
-    sysPeriods: [],
-    sysWeekDays: Number,
-    sysBreaks: []
-  }
+    periods: [],
+    pauses: [],
+    weekDays: Number,
+  },
 });
 
 const CourseSchema = new Schema({
   _id: {
     type: String,
-    required: true
+    required: true,
   },
+
   name: {
     type: String,
-    required: true
+    required: true,
   },
+
   timeAlloc: {
     type: Number,
-    required: true
+    required: true,
   },
+
   interTimeAlloc: Number,
+
   timeLeft: Number,
-  specialty: {
+
+  level: {
     type: Schema.Types.String,
-    ref: "specialty"
-  }
+    ref: "level",
+    required: true,
+  },
 });
 
 const LevelSchema = new Schema({
   _id: {
     type: String, // l1, l2, l3,
-    required: true
+    required: true,
   },
+
   TT: [],
+
   notifications: {
     permanent: [],
-    temporary: []
+    temporary: [],
   },
+
   specialty: {
     type: Schema.Types.String,
-    ref: "specialty"
+    ref: "specialty",
+    required: true,
   },
-  students: [{
-    type: Schema.Types.String,
-    ref: "student"
-  }]
+
+  courses: [
+    {
+      type: Schema.Types.String,
+      ref: "course",
+    },
+  ],
+
+  students: [
+    {
+      type: Schema.Types.String,
+      ref: "student",
+    },
+  ],
 });
 
 const SpecialtySchema = new Schema({
   _id: {
     type: String, // SWE, NWS, TEL, CMA, EPS
-    required: true
+    required: true,
   },
-  courses: [{
+
+  coordinator: {
     type: Schema.Types.String,
-    ref: "course"
-  }], // array of course objects ['SWE-subject_code': {name: 'Klog', credit_val: 'credit_val', time_alloc:'time_alloc', time_left: 'time_left'}, ...]
-  levels: [{
-    type: Schema.Types.String,
-    ref: "level"
-  }] // array of levels together with list of students for each level {l1 : ['Aaron Jack', 'Mary Palmer', 'Matt Watson', 'Abu Muhammad'], ...}
+    ref: "coordinator",
+    required: true,
+  },
+
+  levels: [
+    {
+      type: Schema.Types.String,
+      ref: "level",
+    },
+  ],
 });
 
 const CycleSchema = new Schema({
   _id: {
     type: String, // HND, BTS, Bachelor, Licence
-    required: true
+    required: true,
   },
   department: {
     type: Schema.Types.String,
-    ref: "department"
+    ref: "department",
   },
-  specialties: [{
-    type: Schema.Types.String,
-    ref: "specialty"
-  }]
+  specialties: [
+    {
+      type: Schema.Types.String,
+      ref: "specialty",
+    },
+  ],
 });
 
 const DepartmentSchema = new Schema({
   _id: {
     type: String, // Industrial & Tech, Commercial
-    required: true
+    required: true,
   },
-  cycles: [{
-    type: Schema.Types.String,
-    ref: "cycle"
-  }]
+  cycles: [
+    {
+      type: Schema.Types.String,
+      ref: "cycle",
+    },
+  ],
 });
 
 const VenueSchema = new Schema({
   _id: {
     type: String,
-    required: true
+    required: true,
   },
-  state: [],
-  capacity: Number,
-  effective: Number
+  capacity: {
+    type: Number,
+    required: true,
+  },
+  programs: [], // collection of programs
+  longTermPrograms: [],
 });
 
-const DefaultSchema = new Schema({
-  _id: { // _id here would be Main to say main default for entire system
-    type: String,
-    required: true
-  },
-  data: {
-    time: [],
-    noCells: Number
-  }
-});
-
-const Default = mongoose.model('default', DefaultSchema);
-const Venue = mongoose.model('venue', VenueSchema);
-const Department = mongoose.model('department', DepartmentSchema);
-const Cycle = mongoose.model('cycle', CycleSchema);
-const Admin = mongoose.model('admin', AdminSchema);
-const Coordinator = mongoose.model('coordinator', CoordinatorSchema);
-const Student = mongoose.model('student', StudentSchema);
-const Lecturer = mongoose.model('lecturer', LecturerSchema);
-const Course = mongoose.model('course', CourseSchema);
-const Level = mongoose.model('level', LevelSchema)
-const Specialty = mongoose.model('specialty', SpecialtySchema);
+const Venue = mongoose.model("venue", VenueSchema);
+const Department = mongoose.model("department", DepartmentSchema);
+const Cycle = mongoose.model("cycle", CycleSchema);
+const Admin = mongoose.model("admin", AdminSchema);
+const Coordinator = mongoose.model("coordinator", CoordinatorSchema);
+const Student = mongoose.model("student", StudentSchema);
+const Lecturer = mongoose.model("lecturer", LecturerSchema);
+const Course = mongoose.model("course", CourseSchema);
+const Level = mongoose.model("level", LevelSchema);
+const Specialty = mongoose.model("specialty", SpecialtySchema);
 
 module.exports = {
   Department,
@@ -207,5 +238,4 @@ module.exports = {
   Lecturer,
   Course,
   Venue,
-  Default
 };

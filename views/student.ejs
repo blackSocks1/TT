@@ -1,40 +1,93 @@
-<html lang="en">
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, innitial-scale=1.0" />
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css" />
+    <link rel="icon" type="image/png" href="assets/images/icon.png" />
+    <link rel="stylesheet" type="text/css" href="assets/css/wc3.css" />
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/student_interface.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="js/socket.io.js" defer></script>
+    <script type="module" src="js/student.js" defer></script>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= user.accountType %> |
-            <%= user.name %> |
-                <%= user.level %>
-    </title>
-    <link href="/admin.css" rel="stylesheet">
-    <link rel="stylesheet" href="/wc3.css" rel="stylesheet">
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
-    <script src="/socket.io.js" defer></script>
-    <script type="module" src="/student.js" defer></script>
-</head>
-
-<body>
+    <title><%= user.accountType %> | <%= user.name %> | <%= user.level %></title>
+  </head>
+  <body>
     <div class="accInfo">
-        <output class="myData" style="display:none;"><%=user._id %></output>
-        <output class="myData" style="display:none;"><%=user.name %></output>
-        <output class="myData" style="display:none;"><%=user.accountType%></output>
-        <output class="myData" style="display:none;"><%=user.platform%></output>
-        <output class="myData" style="display:none;"><%=user.level %></output></div>
-    <br>
-    <div class="chat">
-        <input type="text" id="receiverId" placeholder="Receiver ID"><br>
-        <output id="messageIn"></output><br>
-        <textarea id="messageOut" cols="30" rows="1" placeholder="message..."></textarea><br>
-        <input type="button" id="send" value="SEND" class="button">
+      <output class="myData" style="display: none"><%=user._id %></output>
+      <output class="myData" style="display: none"><%=user.level %></output>
     </div>
-    <br>
-    <hr>
 
-    <div id="timetable" class="TT"></div>
+    <nav class="navbar navbar-expand-lg timetableNav">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="assets/images/icon.png" alt="" width="60" height="40" />
+        </a>
 
-</body>
-</body>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fa fa-bars" style="color: white; font-size: 24px"></i>
+        </button>
 
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav ms-auto p-2 bd-highlight">
+            <a class="nav-link" aria-current="page" id="timetable" href="#">Timetable</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="w3-row">
+      <div class="w3-quarter w3-container w3-hide-small">
+        <div class="w3-card-4 w3-round-large w3-animate-top">
+          <div class="w3-container notice">
+            <p class="mt-4">
+              <span>Welcome <%= user.name %></span><br />
+              You can view the most recent timetable by clicking on the get timetable button
+            </p>
+            <hr />
+            <p class="mb-5">Specialty: <%= user.specialty %> <br />Level: <%= user.level %></p>
+            <hr />
+            <p class="mt-4" id="periodInfo"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-half w3-container timetable">
+        <div><h1>WEEKLY SCHEDULE</h1></div>
+        <div class="w3-small w3-text-grey">UPLOADED :</div>
+
+        <div class="w3-card w3-display-container">
+          <div class="table-responsive" id="displayTTContainer"></div>
+        </div>
+
+        <!-- <nav id="pagination" aria-label="Page navigation example"></nav> -->
+      </div>
+    </div>
+
+    <div class="w3-container">
+      <hr />
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, id voluptatibus! Aliquid,
+        aliquam. Vero a magnam tempora pariatur repudiandae eius labore nam nemo soluta esse
+        reprehenderit perspiciatis molestias, eveniet cumque. Lorem ipsum dolor sit amet
+        consectetur, adipisicing elit. Nobis, veniam nisi voluptatum earum illo consequatur quisquam
+        ullam laborum ipsum in velit saepe nostrum provident et doloribus culpa beatae consectetur
+        eveniet! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis omnis, assumenda
+        mollitia nobis quis nihil quos. Consectetur sint laudantium aperiam qui doloremque quod
+        explicabo consequuntur tempora, at facere veritatis velit!
+      </p>
+    </div>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
