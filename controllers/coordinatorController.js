@@ -1,50 +1,33 @@
 //models
 const schemas = require("../models/schemas");
-const { findElement } = require("../myFunctions/npmFunctions");
+const { findElement } = require("../myFunctions/npm_fx");
 
 let coordinatorController = {
   // updates
   updateTT: async (req, res) => {
     let data = req.body;
-    let levelId = data.level;
+    let group_id = data.group_id;
     let newTT = data.TT;
 
-    let level = await schemas.Level.findOne({ _id: levelId });
-    let answer = findElement("week", newTT.week, level.TT);
+    let group = await schemas.Group.findOne({ _id: group_id });
+    let answer = findElement("week", newTT.week, group.TT);
 
     if (answer) {
       let oldTT = answer.element;
-      let allTTs = [];
-
-      // assigning newPeriods to periods and incoming uDate to current uDate
-      // setting old TT last mod date to previous  and vice versa
-
-      for (let TT of level.TT) {
-        if (TT.week.firstDay === newTT.week.firstDay) {
-          allTTs.push({
-            week: newTT.week,
-            periods: [...newTT.periods],
-            oldPeriods: [...oldTT.periods],
-            oDate: oldTT.uDate,
-            uDate: newTT.uDate,
-          });
-        } else {
-          allTTs.push(TT);
-        }
-      }
-
-      level.TT = [...allTTs];
-    } else if (level.TT.length === 5) {
-      level.TT.shift();
-      level.TT.push({
+      group.TT[answer.index] = {
         week: newTT.week,
-        periods: newTT.periods,
+        periods: [...newTT.periods],
+        oldPeriods: [...oldTT.periods],
+        oDate: oldTT.uDate,
         uDate: newTT.uDate,
-        oldPeriods: [],
-        oDate: "",
-      });
+      };
+
+      group.markModified("TT");
     } else {
-      level.TT.push({
+      if (group.TT.length === 5) {
+        group.TT.shift();
+      }
+      group.TT.push({
         week: newTT.week,
         periods: newTT.periods,
         uDate: newTT.uDate,
@@ -53,7 +36,7 @@ let coordinatorController = {
       });
     }
 
-    level.TT = Array.from(level.TT).sort((a, b) => {
+    group.TT = Array.from(group.TT).sort((a, b) => {
       // return (a.name === b.name) ? 0 : a.name < b.name ? -1 : 1;
       if (a.week.firstDay === b.week.firstDay) {
         return 0;
@@ -62,66 +45,58 @@ let coordinatorController = {
       }
     });
 
-    await level.save();
-    res.end(
-      JSON.stringify({
-        status: "Ok!",
-      })
-    );
+    await group.save();
+    res.json(newTT);
   },
 
-  updateCourses: async (req, res) => {
-    let data = req.body;
-    let courseDb = data.courseDb;
+  updateCourse: async (req, res) => {
+    let { course } = req.body;
 
-    for (course of courseDb) {
-      let result = await schemas.Course.findOne({ _id: course._id });
-      result.timeLeft = course.timeInWeek;
-      await result.save();
-    }
-    res.end();
+    let result = await schemas.Course.findOne({ _id: course._id });
+    result.time.left = course.time.left;
+    result.time.week = course.time.week;
+
+    result.markModified("time");
+
+    await result.save();
+
+    res.json(result);
   },
 
   updateLecturers: async (req, res) => {
-    let lecturerBD = req.body;
+    let lecturerBD = req.body.lecturers;
+    let coord_id = req.body.coord_id;
+
+    // let coord = findElement("_id", coord_id, lecturerBD);
+    // if (coord) {
+    //   let index = coord.index;
+    //   coord = coord.element;
+    //   lecturerBD.splice(index, 1);
+    //   let db_coord = await schemas.Coordinator.findOne({ _id: coord._id });
+    // }
 
     for (let lecturer of lecturerBD) {
-      let result = await schemas.Lecturer.findOne({ _id: lecturer._id });
+      // we're fetching the lecturer form schemas[lecturer.accountType] because a lecturer could also be a coordinator
+
+      let result = await schemas[lecturer.accountType].findOne({ _id: lecturer._id });
       let answer = findElement("week", lecturer.week, result.TT);
 
       if (answer) {
         let oldTT = answer.element;
-        let allTTs = [];
+        result.TT[answer.index] = {
+          week: lecturer.week,
+          periods: [...lecturer.periods],
+          oldPeriods: [...oldTT.periods],
+          oDate: oldTT.uDate,
+          uDate: lecturer.uDate,
+        };
 
-        // assigning newPeriods to periods and incoming uDate to current uDate
-        // setting old TT last mod date to previous and vice versa
-
-        for (let TT of result.TT) {
-          if (TT.week.firstDay === lecturer.week.firstDay) {
-            console.log("updating");
-            allTTs.push({
-              week: lecturer.week,
-              periods: [...lecturer.periods],
-              oldPeriods: [...oldTT.periods],
-              oDate: oldTT.uDate,
-              uDate: lecturer.uDate,
-            });
-          } else {
-            allTTs.push(TT);
-          }
+        result.markModified("TT");
+      } else {
+        if (result.TT.length === 5) {
+          result.TT.shift();
         }
 
-        result.TT = [...allTTs];
-      } else if (result.TT.length === 5) {
-        result.TT.shift();
-        result.TT.push({
-          week: lecturer.week,
-          periods: lecturer.periods,
-          uDate: lecturer.uDate,
-          oldPeriods: [],
-          oDate: "",
-        });
-      } else {
         result.TT.push({
           week: lecturer.week,
           periods: lecturer.periods,
@@ -152,64 +127,71 @@ let coordinatorController = {
 
       await result.save();
     }
-    res.end();
+
+    res.json(lecturerBD);
   },
 
-  updateVenues: async (req, res) => {
-    let venueDb = req.body.venues;
-    let week = req.body.week;
-    for (let venue of venueDb) {
-      let dbVenue = await schemas.Venue.findOne({ _id: venue._id });
+  updateVenue: async (req, res) => {
+    let { week, venue } = req.body;
 
-      let newProgram = findElement("week", week, dbVenue.programs);
-      if (newProgram) {
-        dbVenue.programs[newProgram.index] = venue.programs[newProgram.index];
-      } else {
-        if (dbVenue.programs.length === 2) {
-          dbVenue.programs.shift();
-        }
-        dbVenue.programs.push(findElement("week", week, venue.programs).element);
+    // for (let venue of venueDb) {
+    let dbVenue = await schemas.Venue.findOne({ _id: venue._id });
+    console.log(dbVenue._id);
+
+    let newProgram = findElement("week", week, dbVenue.programs);
+
+    if (newProgram) {
+      dbVenue.programs[newProgram.index] = venue.programs[newProgram.index];
+    } else {
+      if (dbVenue.programs.length === 2) {
+        dbVenue.programs.shift();
       }
-      dbVenue.save();
+      dbVenue.programs.push(findElement("week", week, venue.programs).element);
     }
+    dbVenue.save();
+    // }
+    res.json(venue);
   },
 
   // gets
   getSpecialties: (req, res) => {
     schemas.Specialty.find({})
       .populate("courses")
-      .exec((err, result) => res.end(JSON.stringify(result)));
+      .exec((err, result) => res.json(result));
   },
 
   getLecturers: async (req, res) => {
     let coord = await schemas.Coordinator.findOne({ _id: req.body._id });
     let lecturers = await schemas.Lecturer.find({});
     lecturers.push(coord);
-    res.end(JSON.stringify(lecturers));
+    res.json(lecturers);
   },
 
   getVenues: async (req, res) => {
     let venues = await schemas.Venue.find({});
-    res.end(JSON.stringify(venues));
+    res.json(venues);
   },
 
-  getLevels: async (req, res) => {
+  getGroups: async (req, res) => {
     let coord = req.body;
     let specialties = await schemas.Specialty.find({ coordinator: coord._id });
-    let levelsToSend = [];
+    let groupsToSend = [];
 
     for (let specialty of specialties) {
       for (let level of specialty.levels) {
-        level = await schemas.Level.findOne({ _id: level }).populate("courses");
-        levelsToSend.push({
-          _id: level._id,
-          students: level.students.length,
-          TT: level.TT,
-          courses: level.courses,
-        });
+        let groups = await schemas.Group.find({ level }).populate("courses", "_id name group time");
+        for (let group of groups) {
+          groupsToSend.push({
+            _id: group._id,
+            students: group.students.length,
+            TT: group.TT,
+            courses: group.courses,
+            campus: group.campus,
+          });
+        }
       }
     }
-    res.end(JSON.stringify(levelsToSend));
+    res.json(groupsToSend);
   },
 
   getMyDefaults: async (req, res) => {

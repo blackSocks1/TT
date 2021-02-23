@@ -1,0 +1,42 @@
+<html lang="en">
+  <%- include('partials/authHeader.ejs') -%>
+
+  <body>
+    <!--container signup-->
+    <div class="container container-signup container-signup-s" id="container-signup">
+      <div class="w3-container">
+        <div class="w3-round-large w3-animate-top">
+          <div class="card" id="card">
+            <div class="card-body">
+              <div class="card-title text-center mb-5 head">
+                <h3>Token Validation</h3>
+              </div>
+
+              <form class="form" action="/signup" method="POST">
+                <div class="form-group mb-5">
+                  <i class="fa fa-coin iconP iconP-p"></i>
+                  <input
+                    type="text"
+                    class="text-center w-100"
+                    name="token"
+                    placeholder="token..."
+                  />
+                </div>
+                <br />
+
+                <div class="d-grid gap-2 mb-5 submit">
+                  <button class="btn rounded-3" type="submit">Verify Token</button>
+                </div>
+              </form>
+            </div>
+            <!-- div card-body -->
+          </div>
+          <!-- div whole card -->
+        </div>
+      </div>
+      <!-- w3 animated container signup -->
+    </div>
+  </body>
+
+  <%- include('partials/authFooter.ejs') -%>
+</html>

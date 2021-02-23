@@ -8,19 +8,37 @@
     <link rel="stylesheet" type="text/css" href="assets/css/wc3.css" />
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/lecturer_interface.css" />
-    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
     <script src="js/socket.io.js" defer></script>
-    <script type="module" src="js/lecturer.js" defer></script>
+    <script type="module" src="js/lecturerMain.js" defer></script>
 
-    <title><%= user.accountType %> | <%= user.name %> | <%= user.level %></title>
+    <title><%= user.accountType %> | <%= user.name %></title>
   </head>
   <body onload="myFunction()">
     <div class="accInfo">
       <output class="myData" style="display: none"><%=user._id %></output>
       <output class="myData" style="display: none"><%=user.name %></output>
     </div>
+
+    <!-- <nav id="paginationStyled" aria-label="Page navigation example">
+      <ul class="pagination justify-content-center mt-2">
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav> -->
 
     <nav class="navbar navbar-expand-lg timetableNav">
       <div class="container-fluid">
@@ -69,32 +87,12 @@
         </div>
       </div>
 
-      <div class="w3-round-large w3-animate-right">
-        <div class="w3-half w3-container timetable">
-          <div><h1>WEEKLY SCHEDULE</h1></div>
-          <div class="w3-small w3-text-grey">UPLOADED :</div>
+      <div class="w3-half w3-container timetable">
+        <h1>WEEKLY SCHEDULE</h1>
 
-          <div class="w3-card w3-display-container">
-            <div class="table-responsive" id="displayTTContainer"></div>
-          </div>
-
-          <!-- <nav id="pagination" aria-label="Page navigation example">
-        	<ul class="pagination justify-content-center mt-2">
-			    <li class="page-item">
-			      <a class="page-link" href="#" aria-label="Previous">
-			        <span aria-hidden="true">&laquo;</span>
-			      </a>
-			    </li>
-			    <li class="page-item"><a class="page-link" href="#">1</a></li>
-			    <li class="page-item"><a class="page-link" href="#">2</a></li>
-			    <li class="page-item"><a class="page-link" href="#">3</a></li>
-			    <li class="page-item">
-			      <a class="page-link" href="#" aria-label="Next">
-			        <span aria-hidden="true">&raquo;</span>
-			      </a>
-			    </li>
-		  	</ul>
-        </nav> -->
+        <div class="w3-card w3-display-container ttDiv">
+          <div class="table-responsive" id="displayTTContainer"></div>
+          <div id="TTnavSection"></div>
         </div>
       </div>
     </div>
@@ -103,295 +101,40 @@
       <div class="w3-round-large w3-animate-right">
         <div class="w3-container availTimetable">
           <div class="text-center"><h1>AVAILABILITY TIMETABLE</h1></div>
-          <div class="w3-small w3-text-grey">UPLOADED :</div>
 
-          <div class="w3-card w3-display-container">
-            <div class="table-responsive" id="AvailTTContainer">
-              <!-- <table class="table table-bordered" style="color: black">
-                <thead class="">
-                  <tr>
-                    <th class="w3-small">TIME</th>
-                    <th class="w3-small">MONDAY</th>
-                    <th class="w3-small">TUESDAY</th>
-                    <th class="w3-small">WEDNESDAY</th>
-                    <th class="w3-small">THURSDAY</th>
-                    <th class="w3-small">FRIDAY</th>
-                    <th class="w3-small">SATURDAY</th>
-                  </tr>
-                </thead>
-
-                <tr>
-                  <td class="w3-small sticky"><br />08:00 - 9:50</td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <select name="" id="">
-                      <option value="A" selected></option>
-                      <option value="N\A"></option>
-                    </select>
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="text-center" colspan="7">BREAK</td>
-                </tr>
-
-                <tr>
-                  <td class="w3-small sticky"><br />10:10 - 12:00</td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="text-center" colspan="7">BREAK</td>
-                </tr>
-
-                <tr>
-                  <td class="w3-small sticky"><br />13:00 - 14:50</td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="text-center" colspan="7">BREAK</td>
-                </tr>
-
-                <tr>
-                  <td class="w3-small sticky"><br />15:10 - 17:00</td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="text-center" colspan="7">BREAK</td>
-                </tr>
-
-                <tr>
-                  <td class="w3-small sticky"><br />18:00 - 19:50</td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                  <td class="w3-small cell">
-                    <input class="form-check-input mb-2" type="checkbox" /> Available<br /><input
-                      class="form-check-input"
-                      type="checkbox"
-                    />
-                    Not Available
-                  </td>
-                </tr>
-              </table> -->
-            </div>
+          <div class="w3-card w3-display-container ttDiv">
+            <div class="table-responsive" id="availTTContainer"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="w3-container">
-      <hr />
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, id voluptatibus! Aliquid,
-        aliquam. Vero a magnam tempora pariatur repudiandae eius labore nam nemo soluta esse
-        reprehenderit perspiciatis molestias, eveniet cumque. Lorem ipsum dolor sit amet
-        consectetur, adipisicing elit. Nobis, veniam nisi voluptatum earum illo consequatur quisquam
-        ullam laborum ipsum in velit saepe nostrum provident et doloribus culpa beatae consectetur
-        eveniet! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis omnis, assumenda
-        mollitia nobis quis nihil quos. Consectetur sint laudantium aperiam qui doloremque quod
-        explicabo consequuntur tempora, at facere veritatis velit!
-      </p>
+    <hr />
+    <br /><br />
+
+    <div id="snackbar"></div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalHeader">Modal Header</h2>
+          <span class="close" id="modalClose">&times;</span>
+        </div>
+
+        <div class="modal-body" id="modalBody"></div>
+
+        <div class="modal-footer">
+          <h3 id="modalFooter">Modal Footer</h3>
+        </div>
+      </div>
     </div>
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/lecturer_interface.js"></script>
     <script src="assets/jquery/jquery.min.js"></script>
   </body>
+
+  <%- include('partials/authFooter') -%>
 </html>

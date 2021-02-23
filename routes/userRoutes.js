@@ -4,10 +4,7 @@ const userController = require("../controllers/userController");
 
 // post
 router.post("/getTT", userController.getTT);
-router.post("/resetAvail", userController.resetAvail);
 router.post("/getMyInfo", userController.getMyInfo);
-
-// get
-router.get("/getTT", userController.getTTGetMethod);
+router.post("/getAccType", userController.getAccType);
 
 module.exports = router;

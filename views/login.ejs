@@ -1,304 +1,70 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, innitial-scale=1.0" />
-    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css" />
-    <link rel="icon" type="image/png" href="assets/images/icon.png" />
-    <link rel="stylesheet" type="text/css" href="assets/css/wc3.css" />
-    <link rel="stylesheet" type="text/css" href="assets/css/signin.css" />
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <title>Log In / Register</title>
-  </head>
+<html lang="en">
+  <%- include('partials/authHeader.ejs') -%>
+
   <body>
-    <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-inner">
-        <div class="carousel-item active" data-bs-interval="3000">
-          <img src="assets/images/student-21.png" alt="..." />
-        </div>
-        <div class="carousel-item" data-bs-interval="3000">
-          <img src="assets/images/student-3.png" alt="..." />
-        </div>
-        <div class="carousel-item" data-bs-interval="3000">
-          <img src="assets/images/student-41.png" alt="..." />
-        </div>
-        <div class="carousel-item" data-bs-interval="3000">
-          <img src="assets/images/student-51.png" alt="..." />
-        </div>
-      </div>
-    </div>
+    <!--container login-->
+    <div class="container container-login container-login-l" id="container-login">
+      <div class="w3-container">
+        <div class="w3-round-large w3-animate-top">
+          <div class="card" id="card">
+            <div class="card-body">
+              <div class="card-title text-center mb-5 head">
+                <h3>Log In</h3>
+              </div>
 
-    <div id="container">
-      <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">
-            <img src="assets/images/icon.png" alt="" width="30" height="24" />
-          </a>
-
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <i class="fa fa-bars" style="color: white; font-size: 24px"></i>
-          </button>
-
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav ms-auto p-2 bd-highlight">
-              <a
-                class="nav-link"
-                aria-current="page"
-                id="signupLink"
-                href="#"
-                onclick="displaySignup()"
-                >Sign In</a
-              >
-              <a class="nav-link" id="loginLink" href="#" onclick="displayLogin()">Log In</a>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div class="container container-slidetext container-slidetext-t" id="container-slidetext">
-        <div id="carouseSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            <div class="carousel-item active" data-bs-interval="4000">
-              <p id="p1">Welcome to the future</p>
-            </div>
-            <div class="carousel-item" data-bs-interval="4000">
-              <p id="p2">Your future depend on what you do now</p>
-            </div>
-            <div class="carousel-item" data-bs-interval="4000">
-              <p id="p3">Don't spend your time on irrelevant thing</p>
-            </div>
-            <div class="carousel-item" data-bs-interval="4000">
-              <p id="p4">The real magic is work...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--container slidetext-->
-
-      <div
-        class="container container-signup container-signup-s"
-        id="container-signup"
-        style="display: none"
-      >
-        <div class="w3-container">
-          <div class="w3-round-large w3-animate-top">
-            <div class="card" id="card">
-              <div><i class="fa fa-close" id="close1"></i></div>
-              <div class="card-body">
-                <div class="card-title text-center mb-5 head">
-                  <h3>Registration</h3>
+              <form name="logInForm" action="/login" method="POST">
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <!-- <input type="text" class="text-center w-100" id="username" name="username" autocomplete="off" placeholder="Username..."> -->
+                  <input
+                    type="text"
+                    class="text-center w-100"
+                    placeholder="User ID"
+                    name="_id"
+                    required
+                  />
+                  <div class="_id error"></div>
                 </div>
 
-                <form class="form">
-                  <div class="form-group mb-5">
-                    <i class="fa fa-user iconU iconU-u"></i>
-                    <input
-                      type="text"
-                      class="text-center w-100"
-                      id="username"
-                      name="username"
-                      autocomplete="off"
-                      placeholder="Username..."
-                    />
-                  </div>
+                <div class="form-group mb-4">
+                  <i class="fa fa-key iconP iconP-p"></i>
+                  <input
+                    type="password"
+                    class="text-center w-100"
+                    id="password"
+                    name="password"
+                    placeholder="Password..."
+                  />
+                  <div class="password error"></div>
 
-                  <div class="form-group mb-5">
-                    <i class="fa fa-key iconP iconP-p"></i>
-                    <input
-                      type="password"
-                      class="text-center w-100"
-                      id="password"
-                      name="password"
-                      placeholder="Password..."
-                    />
-                  </div>
-                  <br />
-
-                  <div class="d-grid gap-2 mb-5 submit">
-                    <button class="btn rounded-3" type="submit" id="signup">Register</button>
-                  </div>
-                </form>
-              </div>
-              <!-- div card-body -->
-            </div>
-            <!-- div whole card -->
-          </div>
-        </div>
-        <!-- w3 animated container signup -->
-      </div>
-      <!--container signup-->
-
-      <div
-        class="container container-login container-login-l"
-        id="container-login"
-        style="display: none"
-      >
-        <div class="w3-container">
-          <div class="w3-round-large w3-animate-top">
-            <div class="card" id="card">
-              <div><i class="fa fa-close" id="close2"></i></div>
-              <div class="card-body">
-                <div class="card-title text-center mb-5 head">
-                  <h3>Log In</h3>
+                  <input
+                    class="input-field"
+                    type="text"
+                    name="platform"
+                    value="web"
+                    style="display: none"
+                  />
                 </div>
 
-                <form name="logInForm" action="/login" method="POST">
-                  <div class="form-group mb-5">
-                    <i class="fa fa-user iconU iconU-u"></i>
-                    <!-- <input type="text" class="text-center w-100" id="username" name="username" autocomplete="off" placeholder="Username..."> -->
-                    <input
-                      type="text"
-                      class="text-center w-100"
-                      placeholder="User ID"
-                      name="_id"
-                      required
-                    />
-                  </div>
+                <div class="form-check mb-5 remember">
+                  <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" /> Remember Me
+                  </label>
+                </div>
 
-                  <div class="form-group mb-4">
-                    <i class="fa fa-key iconP iconP-p"></i>
-                    <input
-                      type="password"
-                      class="text-center w-100"
-                      id="password"
-                      name="password"
-                      placeholder="Password..."
-                    />
-                    <input
-                      class="input-field"
-                      type="text"
-                      name="platform"
-                      value="web"
-                      style="display: none"
-                    />
-                  </div>
-
-                  <div class="form-check mb-5 remember">
-                    <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" /> Remember Me
-                    </label>
-                  </div>
-
-                  <div class="d-grid gap-2 mb-5 submit">
-                    <button class="btn rounded-3" type="submit" id="login">Log In</button>
-                  </div>
-                </form>
-              </div>
-              <!-- div card-body -->
+                <div class="d-grid gap-2 mb-5 submit">
+                  <button class="btn rounded-3" type="submit" id="login">Log In</button>
+                </div>
+              </form>
             </div>
-            <!-- div whole card -->
+            <!-- div card-body -->
           </div>
+          <!-- div whole card -->
         </div>
-        <!-- w3 animated container signup -->
       </div>
-      <!--container login-->
+      <!-- w3 animated container signup -->
     </div>
-    <!--container navbar,slidetext,signup,login-->
-
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-
-    <script type="text/javascript">
-      close1 = document.querySelector("#close1");
-      close1.addEventListener("click", function () {
-        signupContainer = document.getElementById("container-signup");
-        text = document.getElementById("container-slidetext");
-        signupLink = document.getElementById("signupLink");
-        loginLink = document.getElementById("loginLink");
-        signupContainer.style.display = "none";
-        text.style.width = "100%";
-        signupLink.style.fontSize = "21px";
-        loginLink.style.fontSize = "21px";
-        signupLink.style.color = "white";
-      });
-
-      close2 = document.querySelector("#close2");
-      close2.addEventListener("click", function () {
-        loginContainer = document.getElementById("container-login");
-        text = document.getElementById("container-slidetext");
-        loginLink = document.getElementById("loginLink");
-        signupLink = document.getElementById("signupLink");
-        loginContainer.style.display = "none";
-        text.style.width = "100%";
-        loginLink.style.fontSize = "21px";
-        signupLink.style.fontSize = "21px";
-        loginLink.style.color = "white";
-      });
-
-      function displaySignup() {
-        text = document.getElementById("container-slidetext");
-        signupContainer = document.getElementById("container-signup");
-        loginContainer = document.getElementById("container-login");
-        signupLink = document.getElementById("signupLink");
-        loginLink = document.getElementById("loginLink");
-        close = document.getElementById("close");
-        p1 = document.getElementById("p1");
-        p2 = document.getElementById("p2");
-        p3 = document.getElementById("p3");
-        p4 = document.getElementById("p4");
-        text.style.width = "45%";
-        signupContainer.style.display = "block";
-        signupContainer.style.width = "45%";
-        loginContainer.style.display = "none";
-        signupLink.style.color = "#008778";
-        signupLink.style.fontSize = "21px";
-        loginLink.style.color = "white";
-        loginLink.style.fontSize = "18px";
-        x = window.matchMedia("(max-width: 570px)");
-        responsive(x);
-        x.addListener(responsive);
-
-        function responsive(x) {
-          if (x.matches) {
-            text.style.width = "100%";
-            signupContainer.style.width = "100%";
-          } else {
-            text.style.width = "45%";
-            signupContainer.style.width = "45%";
-          }
-        }
-      }
-
-      function displayLogin() {
-        text = document.getElementById("container-slidetext");
-        loginContainer = document.getElementById("container-login");
-        signupContainer = document.getElementById("container-signup");
-        loginLink = document.getElementById("loginLink");
-        signupLink = document.getElementById("signupLink");
-        close = document.getElementById("close");
-        p1 = document.getElementById("p1");
-        p2 = document.getElementById("p2");
-        p3 = document.getElementById("p3");
-        p4 = document.getElementById("p4");
-        text.style.width = "45%";
-        loginContainer.style.display = "block";
-        loginContainer.style.width = "45%";
-        signupContainer.style.display = "none";
-        loginLink.style.color = "#008778";
-        loginLink.style.fontSize = "21px";
-        signupLink.style.color = "white";
-        signupLink.style.fontSize = "17px";
-        x = window.matchMedia("(max-width: 570px)");
-        responsive(x);
-        x.addListener(responsive);
-
-        function responsive(x) {
-          if (x.matches) {
-            text.style.width = "100%";
-            loginContainer.style.width = "100%";
-          } else {
-            text.style.width = "45%";
-            loginContainer.style.width = "45%";
-          }
-        }
-      }
-    </script>
   </body>
+
+  <%- include('partials/authFooter.ejs') -%>
 </html>

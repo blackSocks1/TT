@@ -3,9 +3,8 @@ const _ = require("lodash");
 const express = require("express");
 const cors = require("cors");
 const https = require("https");
-const path = require("path");
-const fs = require("fs");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 
 // environment variables
 require("dotenv").config();
@@ -15,147 +14,120 @@ const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const coordinatorRoutes = require("./routes/coordinatorRoutes");
-
-const schemas = require("./models/schemas");
+const lecturerRoutes = require("./routes/lecturerRoutes");
+const socketController = require("./controllers/socketController");
 
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
-const { findElement } = require("./myFunctions/npmFunctions");
 
-// Creating https server
-// const options = {
-//   key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
-//   cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
-// };
-
-// const server = https.createServer(options, app);
-// mongoose
-//   .connect("mongodb://localhost/TimeTable", {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     useFindAndModify: false,
-//   })
-//   .then(() => {
-//     console.log("Connected to db");
-//   })
-//   .catch("error", (error) => console.log("\nError at ", error));
-
-// server.listen(process.env.PORT || 45000, process.env.HOST || "localhost", () =>
-//   console.log(
-//     `HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
-//   )
-// );
-
-// creating http server
-mongoose
-  .connect("mongodb://localhost/TimeTable", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-  })
-  .then(() => {
-    console.log("Connected to db");
-  })
-  .catch("error", (error) => console.log("\nError at ", error));
-
-http.listen(process.env.PORT || 45000, process.env.HOST || "localhost", () =>
-  console.log(
-    `HTTP server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
-  )
-);
-
-// connection to db
-// const dbURI = `mongodb+srv://${db.Uname}:${db.pass}@cluster0.xevnc.mongodb.net/${db.name}?retryWrites=true&w=majority`;
-// mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
-//     console.log('Connected to db');
-//     const port = 45000;
-//     const server = app.listen(port, () => {
-//         console.log(`Server listening to requests on port ${port}`);
-//     });
-// }).catch((err) => {
-//     console.log(err);
-// });
-
-//static files
-app.use(express.static("public"));
-
-// render engine
-app.set("view engine", "ejs");
-
-// middleware
-app.use(cors());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.render("login");
+let chat = io.of("/").on("connection", (socket) => {
+  socketController.handleChat(chat, socket);
 });
 
-// admin routes
-app.use("/admin", adminRoutes);
+(async () => {
+  // Creating https server
+  // const options = {
+  //   key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
+  //   cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
+  // };
 
-// coordinator routes
-app.use("/coord", coordinatorRoutes);
+  // const server = https.createServer(options, app);
+  // mongoose
+  //   .connect("mongodb://localhost/TimeTable", {
+  //     useNewUrlParser: true,
+  //     useUnifiedTopology: true,
+  //     useFindAndModify: false,
+  //   })
+  //   .then(() => {
+  //     console.log("Connected to db");
+  //   })
+  //   .catch("error", (error) => console.log("\nError at ", error));
 
-// auth routes
-app.use(authRoutes);
+  // server.listen(process.env.PORT || 45000, process.env.HOST || "localhost", () =>
+  //   console.log(
+  //     `HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
+  //   )
+  // );
 
-// lecturerRoutes
-app.use(userRoutes);
-
-app.use((req, res) => {
-  res.status(404).render("404");
-});
-
-//socket setup
-var connectedUsers = [];
-
-io.on("connection", (socket) => {
-  // handling disconnections
-  console.log("New socket connection made", socket.id);
-
-  socket.on("disconnect", () => {
-    let person = findElement("networkId", socket.id, connectedUsers);
-    let index = person.index;
-    person = person.element;
-
-    connectedUsers.splice(index, 1);
-    console.log(`${person.name} with socket id ${person.networkId} is now offline.`);
-    console.log(index, connectedUsers);
-  });
-
-  socket.on("book-me", (user) => {
-    user.networkId = socket.id;
-    connectedUsers.push(user);
-    console.log(connectedUsers);
-
-    io.to(socket.id).emit("book-me-res", {
-      message: `${user._id}`,
+  try {
+    await mongoose.connect("mongodb://localhost/TimeTable", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
     });
+
+    console.log("Connected to db");
+
+    // creating http server
+    await http.listen(process.env.PORT || 45000, process.env.HOST || "localhost");
+    console.log(
+      `HTTP server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
+    );
+  } catch (error) {
+    console.log("\nError at ", error);
+  }
+
+  // connection to db
+  // const dbURI = `mongodb+srv://${db.Uname}:${db.pass}@cluster0.xevnc.mongodb.net/${db.name}?retryWrites=true&w=majority`;
+  // mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }).then((result) => {
+  //     console.log('Connected to db');
+  //     const port = 45000;
+  //     const server = app.listen(port, () => {
+  //         console.log(`Server listening to requests on port ${port}`);
+  //     });
+  // }).catch((err) => {
+  //     console.log(err);
+  // });
+
+  //static files
+  app.use(express.static("public"));
+
+  // render engine
+  app.set("view engine", "ejs");
+
+  // middleware
+
+  app.use(cors());
+
+  app.use(
+    express.urlencoded({
+      extended: true,
+    })
+  );
+
+  app.use(express.json());
+  app.use(cookieParser());
+
+  // routes
+
+  app.get("/setCookie", (req, res) => {
+    res.cookie("isEmploye", true);
+    res.end();
   });
 
-  socket.on("message", (msg) => {
-    if (msg.receiver !== "") {
-      connectedUsers.forEach((user) => {
-        if (user.id === msg.receiver) {
-          io.to(user.networkId).emit("message", {
-            sender: msg.sender,
-            message: msg.message,
-          });
-        }
-      });
-    } else {
-      socket.broadcast.emit("message", {
-        sender: msg.sender,
-        message: msg.message,
-      });
-    }
+  app.get("/", (req, res) => {
+    res.render("home", { title: "Home" });
   });
-});
 
-app.use(morgan("dev"));
+  // admin routes
+  app.use("/admin", adminRoutes);
+
+  // coordinator routes
+  app.use("/coord", coordinatorRoutes);
+
+  // lecturer routes
+  app.use("/lecturer", lecturerRoutes);
+
+  // userRoutes
+  app.use("/user", userRoutes);
+
+  // auth routes
+  app.use(authRoutes);
+
+  app.use((req, res) => {
+    res.status(404).render("404");
+  });
+
+  app.use(morgan("dev"));
+})();

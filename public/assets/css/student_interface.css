@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+body {
+  background-color: #f2f2f2;
+}
+
 nav.timetableNav {
   background: #0a4c9b;
 }
@@ -60,28 +64,16 @@ div.timetable div.w3-small {
   margin-top: 18px;
 }
 
-div.timetable div.w3-card thead {
-  background: #0a4c9b;
-  color: white;
+div#displayTTContainer div.w3-card {
   border-radius: 15px;
 }
 
-div.timetable div.w3-card {
-  border-radius: 15px;
-}
-
-div.timetable div.w3-card thead th.w3-small {
+div#displayTTContainer div.w3-card thead th.w3-small {
   height: 45px;
 }
 
-div.timetable div.w3-card table {
+div#displayTTContainer div.w3-card table {
   text-align: center;
-}
-
-a.paginationButton:hover {
-  cursor: pointer;
-  border: 5px solid #eee;
-  border-radius: 5px;
 }
 
 table {
@@ -104,6 +96,7 @@ thead + tbody tr:last-child td:first-child,
 tfoot tr:last-child td:first-child {
   border-bottom-left-radius: 13px;
 }
+
 thead + tbody tr:last-child td:last-child,
 tfoot tr:last-child td:last-child {
   border-bottom-right-radius: 13px;
@@ -123,13 +116,13 @@ tr td + td {
 }
 
 @media screen and (max-width: 578px) {
-  div.timetable {
+  div#displayTTContainer {
     width: 100%;
     margin-right: 5%;
     margin-left: 0;
   }
 
-  div.timetable div.w3-card {
+  div#displayTTContainer div.w3-card {
     overflow: auto;
   }
 }

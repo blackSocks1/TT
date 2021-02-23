@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="/wc3.css" />
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
+    <script src="/js/socket.io.js" defer></script>
+    <script type="module" src="/js/coord.js" defer></script>
+    <title>Coordinator Interface</title>
+  </head>
+
+  <body>
+    <!-- <div class="levelNav"></div> -->
+
+    <div class="datalist">
+      <datalist id="Courses"> </datalist>
+
+      <datalist id="Lecturers"> </datalist>
+
+      <datalist id="Venues"> </datalist>
+
+      <!-- <datalist id="Levels"> </datalist> -->
+    </div>
+
+    <div class="accInfo">
+      <h5><%= user.name %></h5>
+      <output class="myData" style="display: none"><%=user._id %></output>
+    </div>
+
+    <br />
+
+    <select id="Levels"></select>
+
+    <div class="w3-card w3-display-container">
+      <div id="coordinatorTT"></div>
+      <div id="TTnavSection"></div>
+    </div>
+
+    <br />
+    <hr />
+    <p id="periodInfo"></p>
+    <hr />
+    <br />
+    <div class="w3-card w3-display-container">
+      <div class="table-responsive" id="coordDisplayTT"></div>
+      <div id="TTnavSection"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,118 @@
+<html lang="en">
+  <%- include('partials/authHeader') -%>
+
+  <body>
+    <!--container signup-->
+    <div class="container container-signup container-signup-s" id="container-signup">
+      <div class="w3-container">
+        <div class="w3-round-large w3-animate-top">
+          <div class="card" id="card">
+            <div class="card-body">
+              <div class="card-title text-center mb-5 head">
+                <h3>Pre-Registration</h3>
+              </div>
+
+              <form class="form" action="/preregistration" method="POST">
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <input
+                    type="text"
+                    class="text-center w-100"
+                    id="name"
+                    name="name"
+                    autocomplete="off"
+                    placeholder="Full name..."
+                    required
+                  />
+                </div>
+
+                <div class="form-group mb-5">
+                  Date of Birth : <br />
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <input
+                    type="date"
+                    class="text-center w-100"
+                    id="dob"
+                    name="dob"
+                    min="1959-01-01"
+                    max="2009-01-01"
+                    required
+                  />
+                </div>
+                <br />
+
+                <select name="department" id="depart">
+                  <option>depart 1</option>
+                  <option>depart 2</option>
+                  <option>depart 3</option>
+                  <option>depart 4</option>
+                </select>
+                <br />
+                <br />
+                <select name="cycle" id="cycle">
+                  <option>cycle 1</option>
+                  <option>cycle 2</option>
+                  <option>cycle 3</option>
+                  <option>cycle 4</option>
+                </select>
+                <br />
+                <br />
+                <select name="specialty" id="specialty">
+                  <option>specialty 1</option>
+                  <option>specialty 2</option>
+                  <option>specialty 3</option>
+                  <option>specialty 4</option>
+                </select>
+                <br />
+                <br />
+                <select name="level" id="level">
+                  <option>level 1</option>
+                  <option>level 2</option>
+                  <option>level 3</option>
+                  <option>level 4</option>
+                </select>
+                <br />
+                <br />
+
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <input
+                    type="email"
+                    class="text-center w-100"
+                    id="email"
+                    name="email"
+                    placeholder="email"
+                    required
+                  />
+                </div>
+
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <input
+                    type="phoneNum"
+                    class="text-center w-100"
+                    id="phoneNum"
+                    name="phoneNum"
+                    placeholder="Phone number"
+                    required
+                  />
+                </div>
+
+                <br />
+
+                <div class="d-grid gap-2 mb-5 submit">
+                  <button class="btn rounded-3" type="submit" id="signup">Register</button>
+                </div>
+              </form>
+            </div>
+            <!-- div card-body -->
+          </div>
+          <!-- div whole card -->
+        </div>
+      </div>
+      <!-- w3 animated container signup -->
+    </div>
+  </body>
+
+  <%- include('partials/authFooter') -%>
+</html>

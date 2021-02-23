@@ -1,49 +1,84 @@
-import { Lecturer, elementDisabled, hostLink } from "./functions.js";
+import { fx, AvailTT, DisplayTT, User, Week, color } from "./classes.js";
 
-// creating user
-(async () => {
-  // getting user data and constructing user
-  let props = document.querySelectorAll("output.myData");
-  let Me = new Lecturer(props[0].value, props[1].value);
+export class Lecturer extends User {
+  constructor(_id, name) {
+    super(_id, name);
+    this.avail = {};
+    this.availHolder = {};
+    this.tempTT = { week: new Week(), periods: [], uDate: "" };
+    this.schedule = [];
+    this.accountType = "Lecturer";
+  }
 
-  // generating display TT
-  await Me.generateDisplayTT("#displayTTContainer");
-  await Me.generateAvailTT("#AvailTTContainer");
-  Me.connectToSocket(hostLink);
-  // console.log(Me);
+  main = async () => {
+    await this.userInit();
+    this.connectToSocket();
+    this.setUserEventListener();
+    this.setLectecuerEventListeners();
+  };
 
-  // Adding event listeners to display TT
-  document
-    .querySelectorAll("td.period")
-    .forEach((cell) => cell.addEventListener("click", Me.showPeriod));
-  // document.querySelector('#send').addEventListener('click', sendMessage);
-  document.querySelector("#reset").addEventListener("click", Me.resetAvailTT);
-  document.querySelector("#getTT").addEventListener("click", Me.getTT);
+  userInit = async () => {
+    this.sysDefaults = await this.getSysDefaults();
 
-  // fetch lecturer TTs
-  await Me.getTT();
+    this.ownTT = new DisplayTT(
+      "myTT",
+      "#displayTTContainer",
+      this.accountType,
+      "",
+      this.sysDefaults
+    );
 
-  // Making socket connection
-  // let socket;
-  // try {
-  //   socket = io.connect(hostLink);
-  //   Me.socket = socket;
-  //   Me.connected = true;
-  // } catch (err) {
-  //   console.log(err);
-  // } finally {
-  //   if (Me.connected) {
-  //     Me.socket.emit("book-me", Me);
-  //   }
-  // }
+    this.ownTT.show();
 
-  // //Listen for events
-  // socket.on("book-me-res", (res) => {
-  //   let accountInfo = document.querySelector(".accInfo");
-  //   accountInfo.innerHTML += `<strong>${res.message}</strong>`;
-  // });
+    await this.getTT();
 
-  // socket.on("message", (msg) => {
-  //   document.querySelector("#messageIn").innerHTML += `${msg.sender}: ${msg.message}<br>`;
-  // });
-})();
+    this.availTT = new AvailTT("myAvail", "#availTTContainer", this.sysDefaults);
+    this.availTT.show();
+    await this.getMyInfo();
+  };
+
+  setLectecuerEventListeners = () => {
+    // Adding event listeners to avail TT
+    document
+      .querySelector(`#${this.availTT.nav_id}`)
+      .querySelector("#saveAvailOnScreen")
+      .addEventListener("click", this.saveAvailTT);
+  };
+
+  resetTempTT = () => {
+    this.schedule = [];
+    this.avail = JSON.parse(JSON.stringify(this.availHolder));
+    this.tempTT = {
+      week: new Week(),
+      periods: fx.arrayInit("period"),
+      uDate: "",
+    };
+  };
+
+  loadAvail = (avail) => {
+    this.availTT.periods.forEach((period, index) => {
+      if (avail[index] && avail[index].state === "A") {
+        period.checked = true;
+      } else {
+        period.checked = false;
+      }
+    });
+  };
+
+  saveAvailTT = async () => {
+    let avail = this.availTT.compile();
+    let res = await fx.postFetch("/lecturer/saveAvail", {
+      _id: this._id,
+      accountType: this.accountType,
+      avail,
+    });
+
+    if (res.error) {
+      this.showSnackBar(`Availability could not be set because of ${res.error}`);
+    } else {
+      this.loadAvail(res.data);
+      this.showSnackBar(`Availability set with success`);
+    }
+    // console.log(res);
+  };
+}

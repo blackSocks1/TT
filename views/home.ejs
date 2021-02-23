@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <%- include('partials/authHeader.ejs') -%>
+
+  <body>
+    <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="3000">
+          <img src="assets/images/student-21.png" alt="..." />
+        </div>
+        <div class="carousel-item" data-bs-interval="3000">
+          <img src="assets/images/student-3.png" alt="..." />
+        </div>
+        <div class="carousel-item" data-bs-interval="3000">
+          <img src="assets/images/student-41.png" alt="..." />
+        </div>
+        <div class="carousel-item" data-bs-interval="3000">
+          <img src="assets/images/student-51.png" alt="..." />
+        </div>
+      </div>
+    </div>
+
+    <div id="container">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="assets/images/icon.png" alt="" width="30" height="24" />
+          </a>
+
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <i class="fa fa-bars" style="color: white; font-size: 24px"></i>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ms-auto p-2 bd-highlight">
+              <a class="nav-link" aria-current="page" id="" href="/preregistration"
+                >Pre-registration</a
+              >
+              <a class="nav-link" aria-current="page" id="" href="/signup">Sign Up</a>
+              <a class="nav-link" id="loginLink" href="/login">Log In</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container container-slidetext container-slidetext-t" id="container-slidetext">
+        <div id="carouseSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="4000">
+              <p id="p1">Welcome to the future</p>
+            </div>
+            <div class="carousel-item" data-bs-interval="4000">
+              <p id="p2">Your future depend on what you do now</p>
+            </div>
+            <div class="carousel-item" data-bs-interval="4000">
+              <p id="p3">Don't spend your time on irrelevant thing</p>
+            </div>
+            <div class="carousel-item" data-bs-interval="4000">
+              <p id="p4">The real magic is work...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--container slidetext-->
+    </div>
+    <!--container navbar,slidetext,signup,login-->
+  </body>
+
+  <%- include('partials/authFooter.ejs'); -%>
+</html>

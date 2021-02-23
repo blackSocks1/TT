@@ -1,18 +1,28 @@
 // const importG = require('import-global');
-const router = require('express').Router();
-const authController = require('../controllers/authController');
+const router = require("express").Router();
+const authController = require("../controllers/authController");
 
-// post routes
-router.post('/login', authController.login);
+// pre-registration
+router.get("/preregistration", authController.preRegistration_Get); // to get to preregistration page
 
-// router.get('/signup', authController.signupGet);
+router.post("/preregistration", authController.preRegistration_Post); // to submit preregistration data
 
-// router.post('/signup', authController.signupPost);
+// registration
+// router.get("/registration", authController.registration_Get); // for redirect on valid token auth
 
-// router.get('/login', authController.loginGet);
+router.post("/registration", authController.registration_Post); // for registration proper
 
-// router.post('/login', authController.loginPost);
+// signup
+router.get("/signup", authController.signup_Get); // to get token page
 
+router.post("/signup", authController.signup_Post); // to submit token for validation
+
+// login
+router.get("/login", authController.login_Get);
+
+router.post("/login", authController.login_Post);
+
+// logout
 // router.get('/logout', authController.logout);
 
 module.exports = router;

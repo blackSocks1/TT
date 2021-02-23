@@ -1,0 +1,58 @@
+<html lang="en">
+  <%- include('partials/authHeader') -%>
+
+  <body>
+    <!--container signup-->
+    <div class="container container-signup container-signup-s" id="container-signup">
+      <div class="w3-container">
+        <div class="w3-round-large w3-animate-top">
+          <div class="card" id="card">
+            <div class="card-body">
+              <div class="card-title text-center mb-5 head">
+                <h3>Registration</h3>
+              </div>
+
+              <form class="form" action="#" method="">
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <input
+                    type="text"
+                    class="text-center w-100"
+                    id="name"
+                    name
+                    name="name"
+                    autocomplete="off"
+                    placeholder="name..."
+                  />
+                </div>
+
+                <div class="form-group mb-5">
+                  <i class="fa fa-key iconP iconP-p"></i>
+                  <i class="fa fa-mail iconP iconP-p"></i>
+                  <input
+                    type="password"
+                    class="text-center w-100"
+                    id="password"
+                    name="password"
+                    placeholder="Password..."
+                  />
+                  <div class="password error"></div>
+                </div>
+                <br />
+
+                <div class="d-grid gap-2 mb-5 submit">
+                  <button class="btn rounded-3" type="submit" id="signup">Register</button>
+                </div>
+              </form>
+            </div>
+            <!-- div card-body -->
+          </div>
+          <!-- div whole card -->
+        </div>
+      </div>
+      <!-- w3 animated container signup -->
+    </div>
+  </body>
+
+  <%- include('partials/authFooter') -%>
+</html>

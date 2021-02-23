@@ -8,16 +8,18 @@
     <link rel="stylesheet" type="text/css" href="assets/css/wc3.css" />
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/student_interface.css" />
+    <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script src="js/socket.io.js" defer></script>
-    <script type="module" src="js/student.js" defer></script>
+    <script type="module" src="js/Student.js" defer></script>
 
     <title><%= user.accountType %> | <%= user.name %> | <%= user.level %></title>
   </head>
   <body>
     <div class="accInfo">
       <output class="myData" style="display: none"><%=user._id %></output>
-      <output class="myData" style="display: none"><%=user.level %></output>
+      <output class="myData" style="display: none"><%=user.name %></output>
+      <output class="myData" style="display: none"><%=user.group %></output>
     </div>
 
     <nav class="navbar navbar-expand-lg timetableNav">
@@ -55,7 +57,10 @@
               You can view the most recent timetable by clicking on the get timetable button
             </p>
             <hr />
-            <p class="mb-5">Specialty: <%= user.specialty %> <br />Level: <%= user.level %></p>
+            <p class="mb-5">
+              Specialty: <%= user.specialty %> <br />Level: <%= user.level %> <br />Group: <%=
+              user.group %>
+            </p>
             <hr />
             <p class="mt-4" id="periodInfo"></p>
           </div>
@@ -63,31 +68,37 @@
       </div>
 
       <div class="w3-half w3-container timetable">
-        <div><h1>WEEKLY SCHEDULE</h1></div>
-        <div class="w3-small w3-text-grey">UPLOADED :</div>
+        <h1>WEEKLY SCHEDULE</h1>
 
-        <div class="w3-card w3-display-container">
+        <div class="w3-card w3-display-container ttDiv">
           <div class="table-responsive" id="displayTTContainer"></div>
         </div>
-
-        <!-- <nav id="pagination" aria-label="Page navigation example"></nav> -->
       </div>
     </div>
 
-    <div class="w3-container">
-      <hr />
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Harum, id voluptatibus! Aliquid,
-        aliquam. Vero a magnam tempora pariatur repudiandae eius labore nam nemo soluta esse
-        reprehenderit perspiciatis molestias, eveniet cumque. Lorem ipsum dolor sit amet
-        consectetur, adipisicing elit. Nobis, veniam nisi voluptatum earum illo consequatur quisquam
-        ullam laborum ipsum in velit saepe nostrum provident et doloribus culpa beatae consectetur
-        eveniet! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis omnis, assumenda
-        mollitia nobis quis nihil quos. Consectetur sint laudantium aperiam qui doloremque quod
-        explicabo consequuntur tempora, at facere veritatis velit!
-      </p>
+    <hr />
+    <br /><br />
+
+    <div id="snackbar"></div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalHeader">Modal Header</h2>
+          <span class="close" id="modalClose">&times;</span>
+        </div>
+
+        <div class="modal-body" id="modalBody"></div>
+
+        <div class="modal-footer">
+          <h3 id="modalFooter">Modal Footer</h3>
+        </div>
+      </div>
     </div>
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
   </body>
+  <%- include('partials/authFooter') -%>
 </html>
