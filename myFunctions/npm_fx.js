@@ -8,6 +8,9 @@ const hashPassword = async (password) => {
 
 const authUser = async (user) => {
   let dbUser = await getUserCollection(user);
+  if (!dbUser) {
+    return null;
+  }
   return await bcrypt.compare(user.password, dbUser.password);
 };
 
@@ -24,7 +27,13 @@ async function getUserCollection(person) {
     person.accountType = collection = "Admin";
   }
 
-  return await schemas[collection].findOne({ _id: person._id });
+  let dbPerson = await schemas[collection].findOne({ _id: person._id });
+
+  if (dbPerson) {
+    dbPerson.platform = person.platform == "mobile" ? "mobile" : "web";
+  }
+
+  return dbPerson;
 }
 
 const handleErrors = (err) => {

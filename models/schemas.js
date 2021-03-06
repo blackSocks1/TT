@@ -65,15 +65,15 @@ const StudentSchema = extendSchema(UserSchema, {
     required: true,
   },
 
-  level: {
-    type: Schema.Types.String,
-    ref: "level",
-    required: true,
-  },
-
   group: {
     type: Schema.Types.String,
     ref: "group",
+    required: true,
+  },
+
+  level: {
+    type: Schema.Types.String,
+    ref: "level",
     required: true,
   },
 });
@@ -108,7 +108,7 @@ const AdminSchema = new Schema({
   sysDefaults: {
     periods: [],
     pauses: [],
-    weekDays: Number,
+    weekDays: [],
   },
 });
 
@@ -353,6 +353,13 @@ const GroupSchema = new Schema({
   ],
 
   TT: [],
+
+  Att: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "attendance",
+    },
+  ],
 
   notifications: [], // notification : {priority, type(default -> announcement, fees, exam), header, message, }
 });

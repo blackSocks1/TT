@@ -16,7 +16,7 @@
 
     <title><%= user.accountType %> | <%= user.name %></title>
   </head>
-  <body onload="myFunction()">
+  <body>
     <div class="accInfo">
       <output class="myData" style="display: none"><%=user._id %></output>
       <output class="myData" style="display: none"><%=user.name %></output>
@@ -59,21 +59,28 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item normalTimetable">
-              <a class="nav-link" href="#" id="timetable" onclick="displayTimetable()">Timetable</a>
-            </li>
-            <li class="nav-item availableTimetable">
-              <a class="nav-link" href="#" id="availTimetable" onclick="displayAvailTime()"
-                >Availability Timetable</a
-              >
-            </li>
-          </ul>
+          <div class="ownNav" id="mainNav">
+            <!-- <a id="home-link" data-ref="Home">Home</a> -->
+
+            <a class="navLink active" data-navset="mainNav" id="normalTT-link" data-ref="TT"
+              >Timetable</a
+            >
+
+            <a class="navLink" id="availableTT-link" data-navset="mainNav" data-ref="availTT"
+              >Availability</a
+            >
+
+            <a class="navLink" id="Att-link" data-navset="mainNav" data-ref="Att">Attendance</a>
+          </div>
         </div>
       </div>
     </nav>
 
-    <div class="w3-row normalTime">
+    <!-- <div class="w3-row mainNav" id="Home" style="display: block">
+      <h1>Home page</h1>
+
+      <br />
+
       <div class="w3-quarter w3-container w3-hide-small">
         <div class="w3-card-4 w3-round-large w3-animate-top">
           <div class="w3-container notice">
@@ -81,31 +88,66 @@
               <span>Welcome <%= user.name %></span><br />
               You can view the most recent timetable by clicking on the get timetable button
             </p>
-            <hr />
-            <p class="mt-4" id="periodInfo"></p>
           </div>
         </div>
       </div>
+    </div> -->
 
-      <div class="w3-half w3-container timetable">
-        <h1>WEEKLY SCHEDULE</h1>
-
-        <div class="w3-card w3-display-container ttDiv">
-          <div class="table-responsive" id="displayTTContainer"></div>
-          <div id="TTnavSection"></div>
+    <div class="w3-row nav-item" data-navset="mainNav" id="TT" style="display: block">
+      <div class="w3-container w3-animate-right">
+        <div class="w3-round-large">
+          <h1>WEEKLY SCHEDULE</h1>
+          <div class="w3-card w3-display-container ttDiv">
+            <div class="table-responsive" id="displayTTContainer"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="w3-row availTime" style="display: none">
-      <div class="w3-round-large w3-animate-right">
-        <div class="w3-container availTimetable">
-          <div class="text-center"><h1>AVAILABILITY TIMETABLE</h1></div>
+    <div class="w3-row nav-item" data-navset="mainNav" id="availTT">
+      <div class="w3-container w3-animate-right">
+        <div class="text-center"><h1>AVAILABILITY TIMETABLE</h1></div>
 
-          <div class="w3-card w3-display-container ttDiv">
-            <div class="table-responsive" id="availTTContainer"></div>
+        <div class="w3-card w3-round-large ttDiv">
+          <div class="table-responsive" id="availTTContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w3-row nav-item" data-navset="mainNav" id="Att">
+      <div class="container">
+        <select id="Att-group"></select>
+      </div>
+      <hr />
+      <div class="container" id="Att-main">
+        <!-- <div
+        class="modal fade"
+        id="saveModal"
+        tabindex="-1"
+        aria-labelledby="saveModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header" id="header">
+              <h5 class="modal-title" id="saveModalLabel">Description :</h5>
+            </div>
+
+            <form>
+              <div class="modal-body">
+                <textarea placeholder="Type Here..."></textarea>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">
+                  Close
+                </button>
+                <button type="submit" class="btn" id="send">Save</button>
+              </div>
+            </form>
           </div>
         </div>
+      </div> -->
       </div>
     </div>
 
@@ -132,7 +174,7 @@
     </div>
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/lecturer_interface.js"></script>
+    <script src="assets/js/navigation.js"></script>
     <script src="assets/jquery/jquery.min.js"></script>
   </body>
 

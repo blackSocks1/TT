@@ -35,17 +35,28 @@ table.coordTT td {
   text-align: center;
 }
 
-input {
+input.programTT_input {
   border: none;
   border-bottom: 2px solid gray;
   text-align: center;
   outline: none;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
 }
 
-input[type="text"]:disabled {
+input[type="text"].programTT_input:disabled {
   border: none;
   background-color: white;
   border-bottom: 2px solid rgb(191, 0, 0);
+}
+
+input.periodTime,
+input.displayPeriod {
+  text-align: center;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  outline: none; /* very important so that the weird border doesn't appear on click */
 }
 
 input[type="time"]:disabled {
@@ -75,6 +86,10 @@ input[type="time"]:disabled {
 .button:disabled {
   color: #555555;
   border-bottom: 5px solid red;
+}
+
+.button:hover:disabled {
+  color: red;
 }
 
 a.paginationButton {
@@ -107,14 +122,6 @@ td.period:hover {
   border-radius: 5px;
 }
 
-input.displayPeriod,
-input.periodTime {
-  text-align: center;
-  border: none;
-  background-color: white;
-  cursor: pointer;
-}
-
 th.w3-small {
   background-color: #0a4c9b;
   border-color: white;
@@ -129,6 +136,39 @@ th.today {
 
 div.navSection {
   position: sticky;
+}
+
+div.nav-item {
+  display: none;
+}
+
+a.navLink:hover {
+  cursor: pointer;
+}
+
+.ownNav {
+  overflow: hidden;
+  background-color: transparent;
+}
+
+a.navLink {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+a.navLink:hover {
+  color: #2196f3;
+  /* border-bottom: 3px solid red; */
+}
+
+a.navLink.active {
+  border-bottom: 3px solid #2196f3;
 }
 
 .switch {
@@ -187,72 +227,6 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-}
-
-/* The container */
-.container {
-  display: block;
-  position: relative;
-  padding-left: 0px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  font-size: 18px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Hide the browser's default checkbox */
-.container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-}
-
-/* Create a custom checkbox */
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 20px;
-  width: 20px;
-  background-color: #eee;
-}
-
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-  background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.container input:checked ~ .checkmark {
-  background-color: #2196f3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-/* Show the checkmark when checked */
-.container input:checked ~ .checkmark:after {
-  display: block;
-}
-
-/* Style the checkmark/indicator */
-.container .checkmark:after {
-  left: 8px;
-  top: 5px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
 }
 
 /* Popup container - can be anything you want */
@@ -485,4 +459,75 @@ div.modal {
   background-color: black;
   color: white;
   text-align: center;
+}
+
+.toCenter {
+  display: grid;
+  place-items: center;
+}
+
+input[type="search"].search {
+  border-radius: 4px;
+  width: 25%;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+/* When the input field gets focus, change its width to 100% */
+input[type="search"].search:focus {
+  width: 100%;
+}
+
+input[type="text"].AttshortNote {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  width: 20%;
+  text-align: center;
+  border-bottom: 2px solid #08303d;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+input[type="text"].AttshortNote:focus {
+  width: 45%;
+  border-bottom: 2px solid #2196f3;
+}
+
+.myAccordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.AccActive,
+.myAccordion:hover {
+  background-color: #ccc;
+}
+
+.myAccordion:after {
+  content: "\002B";
+  color: #777;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.AccActive:after {
+  content: "\2212";
+}
+
+.AccPanel {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
 }

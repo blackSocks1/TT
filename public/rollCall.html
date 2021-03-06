@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Roll Call</title>
+    <link rel="stylesheet" href="css/rollCallStyle.css" />
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/jquerysctipttop.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card-header" id="header">
+        <div class="card-title" id="class">Class List-<span>SWE2</span></div>
+
+        <!-- <div class="btn-group dropleft" id="dot" style="float: right; cursor: pointer">
+          <div data-toggle="dropdown" aria-expanded="false">Options</div>
+
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Delete</a>
+            <a class="dropdown-item" href="#">Edit</a>
+          </div>
+        </div> -->
+
+        <div id="date"></div>
+      </div>
+
+      <div class="card-body" style="max-height: 550px; overflow: auto">
+        <form>
+          <div class="md-form mt-0">
+            <input
+              class="form-control"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              id="gsearch"
+            />
+          </div>
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <div class="md-form mt-0">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="remark"
+                  autocomplete="off"
+                  placeholder="Remark..."
+                />
+              </div>
+
+              <div class="gsearch">Adam Azim Hamoa Delasap</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Bennie</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Samah</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Benji</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Adamma</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Sidonnie</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Sidonne</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Bernard</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Angella</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Zidane</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Archange</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Samirah</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Antonio</div>
+            </li>
+
+            <li class="list-group-item studentSearch">
+              <input class="form-check-input" type="checkbox" />
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="gsearch">Kiodh</div>
+            </li>
+          </ul>
+
+          <div id="localSearch"></div>
+        </form>
+      </div>
+
+      <div class="card-footer" id="cardFooter">
+        <button
+          type="button"
+          class="btn btn-block"
+          data-toggle="modal"
+          data-target="#saveModal"
+          id="save"
+        >
+          SAVE
+        </button>
+      </div>
+
+      <div
+        class="modal fade"
+        id="saveModal"
+        tabindex="-1"
+        aria-labelledby="saveModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header" id="header">
+              <h5 class="modal-title" id="saveModalLabel">Description :</h5>
+            </div>
+
+            <form>
+              <div class="modal-body">
+                <textarea placeholder="Type Here..."></textarea>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">
+                  Close
+                </button>
+                <button type="submit" class="btn" id="send">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div style="width: 100%;height: 100vh;background-color: grey;"></div> -->
+
+    <script src="js/jquery-3.5.1.slim.min.js"></script>
+
+    <script src="js/jquery-1.12.4.min.js"></script>
+
+    <script src="js/popper.min.js"></script>
+
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/jsLocalSearch.js"></script>
+
+    <script src="js/rollCalljs.js"></script>
+  </body>
+</html>

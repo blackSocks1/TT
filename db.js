@@ -394,43 +394,42 @@ async function createStudents(group_id, num = 5) {
   }
 }
 
-async function modDbData(collection = "Group", attribute = "courses", value = []) {
+async function modDbData(collection = "Group", attribute = "Att", value = []) {
   let group = await schemas[collection].find({});
 
   for (let object of group) {
-    object[attribute] = value;
+    await schemas[collection].update({ _id: object._id }, { $set: { attribute: value } });
     console.log(object);
-    await object.save();
   }
   console.log("All good!");
 }
 
 (async () => {
-  //   let sysAdmin = new schemas.Admin({
-  //     _id: "ROOT",
-  //     name: "ROOT",
-  //     accountType: "Admin",
-  //     sysDefaults: {
-  //       periods: [
-  //         new Period("08:00", "09:50"),
-  //         new Period("10:10", "12:00"),
-  //         new Period("13:00", "14:50"),
-  //         new Period("15:10", "17:00"),
-  //         new Period("17:30", "19:30"),
-  //         new Period("20:00", "21:30"),
-  //       ],
-  //       weekDays: 7,
-  //       pauses: [
-  //         new Pause("Morning Pause", 0),
-  //         new Pause("Long Pause", 1),
-  //         new Pause("Afternoon Pause", 2),
-  //         new Pause("Closing", 3),
-  //         new Pause("Evening Pause", 4),
-  //       ],
-  //     },
-  //   });
-  //   await sysAdmin.save();
-  //   console.log(`${sysAdmin.name} was successfully saved`);
+  // let sysAdmin = new schemas.Admin({
+  //   _id: "ROOT",
+  //   name: "ROOT",
+  //   accountType: "Admin",
+  //   sysDefaults: {
+  //     periods: [
+  //       new Period("08:00", "09:50"),
+  //       new Period("10:10", "12:00"),
+  //       new Period("13:00", "14:50"),
+  //       new Period("15:10", "17:00"),
+  //       new Period("17:30", "19:30"),
+  //       new Period("20:00", "21:30"),
+  //     ],
+  //     weekDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"],
+  //     pauses: [
+  //       new Pause("Morning Pause", 0),
+  //       new Pause("Long Pause", 1),
+  //       new Pause("Afternoon Pause", 2),
+  //       new Pause("Closing", 3),
+  //       new Pause("Evening Pause", 4),
+  //     ],
+  //   },
+  // });
+  // await sysAdmin.save();
+  // console.log(`${sysAdmin.name} was successfully saved`);
   //   // Creating Coordinator
   // let coord = new schemas.Coordinator({
   //   _id: "coord_2",
@@ -467,8 +466,9 @@ async function modDbData(collection = "Group", attribute = "courses", value = []
   //   (notifications = [])
   // );
   // await createCourses("SWE-L1-AKWA");
-  // await createStudents("CMA-L1-AKWA",5);
+  // await createStudents("SWE-L1-LOG", 35);
 })();
+
 // modDbData();
 
 console.log(new Date().toDateString());

@@ -1,53 +1,38 @@
 const { getUserCollection, handleErrors } = require("../myFunctions/npm_fx");
-const preRegStudent = require("../models/preRegStudent");
+const schemas = require("../models/schemas");
+const uniqid = require("uniqid");
 
+/**
+ * Authentication Controller
+ */
 let authController = {
-  // preregistration
-  preRegistration_Get: (req, res) => res.render("preregistration", { title: "Pre-Registration" }),
-
-  preRegistration_Post: async (req, res) => {
-    const { name, dob, department, cycle, specialty, level, email, phoneNum } = req.body;
-
-    try {
-      let preStud = await preRegStudent.create({
-        name,
-        dob,
-        department,
-        cycle,
-        specialty,
-        level,
-        email,
-        phoneNum,
-      });
-
-      res.status(201).json(preStud);
-    } catch (err) {
-      handleErrors(err);
-      res.status(400).json(err);
-    }
-
-    // console.log(preStud);
-    res.end();
-  },
-
-  // registration
-  registration_Post: (req, res) => {},
-
-  // registration_Get: (req, res) => res.render("registration", { title: " Registration" }),
-
   // sign up
-  signup_Get: (req, res) => res.render("signup", { title: "Token Validation" }),
+  signup_Get: (req, res) => res.render("registration", { title: " Registration" }),
 
-  signup_Post: (req, res) => {
-    let { token } = req.body;
+  signup_Post: async (req, res) => {
+    let person = req.body;
 
-    console.log(token);
+    let group = await schemas.Group.findOne({ _id: person.group_id });
+    let level = await schemas.Level.findOne({ _id: group.level });
+    let specialty = await schemas.Specialty.findOne({ _id: level.specialty });
 
-    if (token) {
-      res.render("registration", { title: " Registration" });
-    } else {
-      res.json({ message: `'${token}' is an invalid token!` });
-    }
+    let student = new schemas.Student({
+      _id: uniqid.time("s", `-${group._id}`),
+      name: person.name,
+      specialty,
+      level,
+      group,
+      accountType: "Student",
+    });
+
+    await student.save();
+    group.students.push(student);
+    await group.save();
+    console.log(`${student.name} was registered in ${student.level._id} with id ${student._id}.`);
+
+    res.locals.user = student;
+
+    res.render(student.accountType);
   },
 
   // log in
@@ -56,36 +41,23 @@ let authController = {
   login_Post: async (req, res) => {
     let person = req.body;
     let user = await getUserCollection(person);
-    // console.log(person);
 
     if (user) {
-      res.locals.user = user;
+      // first check if user is already online at login
+      let online = await schemas.OnlineUser.findOne({ online_id: user._id });
 
-      if (person.platform === "web" && person.accountType === "Coordinator") {
-        user.platform = "web";
-        res.render("Coordinator");
-      } else if (person.platform === "web" && person.accountType === "Lecturer") {
-        user.platform = "web";
-        res.render("Lecturer");
-      } else if (person.platform === "web" && person.accountType === "Student") {
-        user.platform = "web";
-        res.render("Student");
-      } else if (person.platform === "web" && person.accountType === "Admin") {
-        user.platform = "web";
-        res.render("Admin");
-      } else if (person.platform === "mobile") {
-        user.platform = "mobile";
-        res.end(JSON.stringify(user));
+      if (!online) {
+        if (person.plaform == "mobile") {
+          res.json(user);
+        } else {
+          // **** to be reviewed since we should never send sensitive data like passwords
+          res.locals.user = user;
+          res.render(user.accountType);
+          // req.session.user = user
+        }
       } else {
-        res.end(
-          JSON.stringify({
-            _id: person._id,
-            password: person.password,
-            found: false,
-          })
-        );
+        res.json({ _id: online.online_id, message: "This user is already online" });
       }
-      // console.log(user)
     } else {
       res.end(
         JSON.stringify({
@@ -98,6 +70,18 @@ let authController = {
   },
 
   logOut: (req, res) => {},
+
+  get_specialties: async (req, res) => {
+    let specialties = await schemas.Specialty.find({})
+      .populate("levels", "_id groups")
+      .populate("groups", "_id");
+
+    let toSend = [];
+    specialties.forEach((spec) => {
+      toSend.push({ _id: spec._id, levels: spec.levels });
+    });
+    res.json(toSend);
+  },
 };
 
 module.exports = authController;

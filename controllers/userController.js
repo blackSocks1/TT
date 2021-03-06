@@ -1,5 +1,5 @@
 const schemas = require("../models/schemas");
-const { Oath } = require("../myFunctions/npm_fx");
+const { getUserCollection } = require("../myFunctions/npm_fx");
 
 let userController = {
   getTT: async (req, res) => {
@@ -47,25 +47,24 @@ let userController = {
           });
         }
 
-        console.log(person._id, TT[TT.length - 1].periods);
-        res.end(JSON.stringify(TT));
+        res.json(TT);
       }
     }
   },
 
   getMyInfo: async (req, res) => {
     let person = req.body;
-    let user = await Oath(person);
+    let user = await getUserCollection(person);
     if (user && user.accountType == "Student") {
       let group = await schemas.Group.findOne({ _id: user.group });
       user.TT = group.TT;
     }
-    res.end(JSON.stringify(user));
+    res.json(user);
   },
 
   getAccType: async (req, res) => {
-    let user = await Oath(req.body);
-    res.end(JSON.stringify(user ? user.accountType : null));
+    let user = await getUserCollection(req.body);
+    res.json(user ? user.accountType : null);
   },
 };
 

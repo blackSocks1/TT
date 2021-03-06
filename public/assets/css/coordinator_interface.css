@@ -144,53 +144,46 @@ tr td + td {
 } */
 
 /*Available Timetable*/
-div.availTimetable {
+div.TT {
   width: 100%;
 }
 
-div.availTimetable div h1 {
+div.TT div h1 {
   font-family: "Poppins";
 }
 
-div.availTimetable div.w3-small {
+div.TT div.w3-small {
   font-weight: bold;
   margin-bottom: 0.3rem;
   margin-top: 18px;
 }
 
-div.availTimetable div.w3-card thead {
+div.TT div.w3-card thead {
   background: #0a4c9b;
   color: white;
   border-radius: 15px;
 }
 
-div.availTimetable div.w3-card {
+div.TT div.w3-card {
   border-radius: 15px;
 }
 
-div.availTimetable div.w3-card thead th.w3-small {
+div.TT div.w3-card thead th.w3-small {
   height: 45px;
 }
 
-div.availTimetable div.w3-card table {
+div.TT div.w3-card table {
   text-align: center;
-}
-
-input {
-  border: none;
-  border-bottom: 2px solid gray;
-  text-align: center;
-  outline: 0 none;
 }
 
 @media screen and (max-width: 578px) {
-  div.availTimetable {
+  div.TT {
     width: 100%;
     margin-right: 5%;
     margin-left: 0;
   }
 
-  div.availTimetable div.w3-card {
+  div.TT div.w3-card {
     overflow: auto;
   }
 }
@@ -215,65 +208,6 @@ input {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #0a4c9b;
-}
-
-/* Switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 49px;
-  height: 24px;
-}
-
-.switch input {
-  display: none;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background-color: #0a4c9b;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #0a4c9b;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
 }
 
 div.progTime div.w3-round-large div.w3-container div.switchDrop {

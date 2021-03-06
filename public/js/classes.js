@@ -4,7 +4,7 @@ import * as fx from "./fx.js";
 export const color = {
   Ok: "gray",
   SuccessGreen: "#4CAF50", // green
-  SuccessBlue: "#2196F3", // ; dodgerblue
+  SuccessBlue: "#2196F3", // dodgerblue --> color of this day
   Info: "#00bcd4",
   Warning: "#ff9800", // orange
   Danger: "#f44336", // red
@@ -20,6 +20,8 @@ export class User {
     this.lastSeen;
     this.platform = "web";
 
+    this.Att = { groups: [], result: [], history: { perso: [], group: [] } };
+
     this.socket;
     this.contacts = [];
     this.chats = [];
@@ -28,11 +30,89 @@ export class User {
 
   main = async () => {};
 
+  take_Att = async () => {
+    let groups = await (await fetch("/Att/getGroups")).json();
+    console.log(groups);
+
+    let Att_results = [];
+    let container = document.querySelector(`#${this.myAttFrom.container_id}`);
+    let all_li = container.querySelectorAll("li");
+
+    all_li.forEach((li) => {
+      Att_results.push({
+        name: li.querySelector("div").innerText,
+        presence: li.querySelector("input[type='checkbox']").checked,
+        remark: li.querySelector("input[type='text']").value,
+      });
+    });
+
+    let note = container.querySelector(".AttshortNote").value.trim();
+
+    let newAtt = {
+      data: Att_results, // {name, presence, remark}
+
+      note,
+
+      type: "Att",
+
+      group_id: "SWE-L1-LOG",
+
+      date: moment()._d.toDateString(),
+
+      time: moment().format("h:mm:ss a"),
+
+      takenBy: this._id,
+
+      owner_id: "SWE-L1-LOG",
+    };
+
+    // console.log("F.E. results", Att_results);
+    // let res = await fx.postFetch("/Att/save", newAtt);
+    // console.log("B.E. results", res);
+
+    // let AttFormContainer = document.querySelector("#Att-container");
+    // AttFormContainer.innerHTML = "";
+
+    let myDataFrom = new DataForm("SWE-L1-LOG", {
+      type: "Att",
+      data: Att_results,
+      note,
+      other: { date: newAtt.date, time: newAtt.time },
+    });
+
+    let DataFormContainer = document.querySelector("#Att-hist-details");
+
+    myDataFrom.show("Att-hist-details");
+
+    document.querySelector(`a[data-ref=${DataFormContainer.parentNode.id}]`).click();
+  };
+
+  compile_Att = () => {};
+
+  view_Att = () => {};
+
+  save_Att = async () => {
+    let today = new Date();
+
+    let Att = {
+      data: [],
+      group_id,
+      date: today.toDateString(),
+      time: `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`,
+      takenBy: { user_id: this._id, accountType: this.accountType },
+    };
+
+    let Att_res = await fx.postFetch("/Att/save", { Att });
+  };
+
   userInit = async () => {};
 
-  // this hostLink is the web address for socket connection
+  /**
+   * method to let a user communicate via sockect.io
+   * @param {String} hostLink link of server to use for sockect connection
+   */
   connectToSocket = async (hostLink = `http://${"localhost"}:${45000}`) => {
-    this.socket = io(hostLink);
+    this.socket = io.connect(hostLink);
 
     this.socket.on("connect", async () => {
       this.socket.emit("/book-me", {
@@ -91,10 +171,11 @@ export class User {
     });
   };
 
+  /**
+   * method to get system default configs
+   */
   getSysDefaults = async () => {
-    // function to get system default configs
     // ******** this would be a post request so that each user can get only data available for his accountType
-
     return await (await fetch("/admin/getSysDefaults")).json();
   };
 
@@ -126,6 +207,12 @@ export class User {
 
   getAccType = async (_id) => await fx.postFetch("/user/getAccType", { _id });
 
+  /**
+   * method to add a new contact to user contact list
+   * @param {String} _id _id of person user you want to save contact
+   * @param {String} name name of person user you want to save contact
+   * @param {String} email email of person user you want to save contact
+   */
   addContact = async (_id, name, email = "") => {
     let accountType = await this.getAccType(_id);
 
@@ -140,9 +227,11 @@ export class User {
     }
   };
 
+  /**
+   * method for adding event listeners to elements prior to user class and children class if called
+   */
   setUserEventListener = () => {
     // adding event listeners to TT elements
-
     document.querySelector("#getTT").addEventListener("click", this.getTT);
 
     // if (this.accountType == "Coordinator") {
@@ -155,10 +244,10 @@ export class User {
     // }
   };
 
-  // user fetching and displaying personal TT
+  /**
+   * method for fetching user personal TT
+   */
   getTT = async () => {
-    // method to get user TT
-
     this.ownTT.TT = await fx.postFetch("/user/getTT", {
       _id: this._id,
       accountType: this.accountType,
@@ -171,9 +260,11 @@ export class User {
     this.showSnackBar("TTs fetched with success");
   };
 
+  /**
+   * method to get the TT of a specific week in order to display it
+   * @param {{}} week
+   */
   selectTT = (week = new Week()) => {
-    // method to get the TT of a specific week
-
     if (this.ownTT.TT.length > 0) {
       let ttOfThisWeek = fx.findElement("week", week, this.ownTT.TT);
 
@@ -189,6 +280,10 @@ export class User {
     }
   };
 
+  /**
+   * Method to display a given message in snack bar
+   * @param {String} message text message to be displayed in snack bar
+   */
   showSnackBar = (message) => {
     let x = document.querySelector("#snackbar");
     x.innerText = message;
@@ -244,6 +339,8 @@ export class Person {
    * As of now, this class is useful for:
    *  - know a person's number seat(s) during programs and as such,
    *  - calculating the actual proportion of seats to venue capacity for a program
+   * @param {String} _id _id of person
+   * @param {Number} seats number of seats the person has for the event
    */
   constructor(_id, seats = 1) {
     this._id = _id; // person id
@@ -254,6 +351,9 @@ export class Person {
 export class Contact {
   /**
    * this class is to store up a user's contacts for chat messaging
+   * @param {String} _id contact _id
+   * @param {String} name contact name
+   * @param {{email:String,accountType:String}} param2 contact email and accounttype
    */
   constructor(_id, name, { email = "", accountType = "" } = { email: "", accountType: "" }) {
     this._id = _id;
@@ -265,9 +365,16 @@ export class Contact {
 
 // Other Data Structures
 export class Week {
+  /**
+   * class to model a week in date time
+   * As of now it's composed of:
+   * - firstDay and
+   * - lastDay
+   * @param {Date} day date of day of year you wish to get week it belongs to
+   */
   constructor(day) {
-    let lastDay;
     let firstDay;
+    let lastDay;
     let dayOfWeek;
 
     if (
@@ -311,6 +418,9 @@ export class Week {
     ).getTime(); // last day of week to programm
   }
 
+  /**
+   * method to have an object with first and lastdays of week in dateString
+   */
   toDateString = () => {
     return {
       firstDay: new Date(this.firstDay).toDateString(),
@@ -321,6 +431,10 @@ export class Week {
   toFullDateString = () =>
     `Week of ${new Date(this.firstDay).toDateString()} to ${new Date(this.lastDay).toDateString()}`;
 
+  /**
+   * - method to have an object with first and last days in substrings
+   * - useful in filling HTML date input fields
+   */
   toSubString = () => {
     return {
       firstDay: new Date(this.firstDay).toISOString().substring(0, 10),
@@ -328,8 +442,10 @@ export class Week {
     };
   };
 
-  // console.log(`Week of ${new Date(this.firstDay)} to ${new Date(this.lastDay)}`);
-
+  /**
+   * method to determine if a day belongs to the instanciated week
+   * @param {Number} day date of day to check in milliseconds
+   */
   has = (day) => {
     if (this.firstDay <= day && day <= this.lastDay) {
       return true;
@@ -341,6 +457,16 @@ export class Week {
     return new Week(new Date(this.firstDay).setDate(new Date(this.firstDay).getDate() + 7 * num));
   };
 
+  /**
+   * method to get time difference between instanciated week and week to compare
+   * @param {{}} week week to compare
+   */
+  getDifference = (week) => {};
+
+  /**
+   * method to get week following date passed in
+   * @param {Date} day
+   */
   getNextWeek = (day) => {
     if (!day) {
       day = new Week().firstDay;
@@ -352,6 +478,18 @@ export class Week {
 export class Period {
   // The period object constructor
 
+  /**
+   * class to model a timetable period
+   * @param {String} courseName
+   * @param {String} courseInfo
+   * @param {String} lecturerName
+   * @param {String} group_id
+   * @param {String} venue_id
+   * @param {String} state
+   * @param {String} lecturer_id
+   * @param {Number} start
+   * @param {Number} stop
+   */
   constructor(
     courseName = "",
     courseInfo = "",
@@ -374,13 +512,27 @@ export class Period {
     this.stop = stop; // period stop time
   }
 
+  /**
+   * method to get a free period
+   */
   empty = () => {
-    return new Period("", "", "", "", "", "", "A", this.start, this.stop);
+    return new Period("", "", "", "", "", "A", "", this.start, this.stop);
   };
 }
 
 export class Event {
-  // the same event can take place at the same time in diff venues
+  /**
+   * class to model school event
+   * @param {String} name event name
+   * @param {Number} start event start date in milliseconds
+   * @param {Number} stop event stop date in milliseconds
+   * @param {[]} personsInCharge array of persons in charge of the event (ushers)
+   * @param {[]} participants array of persons partaking in event
+   * @param {String} venue_id _id of venue concerned
+   * @param {String} venueState state of venue concerned
+   * @param {{ _id: String, name: String }} programmedBy _id and name of person programming the evnet
+   * @param {Number} programmedOn date event was programmed in milliseconds
+   */
   constructor(
     name = "",
     start = new Date().getTime(),
@@ -403,6 +555,9 @@ export class Event {
     this.programmedOn = programmedOn;
   }
 
+  /**
+   * method to get a free event
+   */
   empty = () => {
     return new Event(
       "",
@@ -419,6 +574,11 @@ export class Event {
 }
 
 export class Avail {
+  /**
+   * class to model a lecturer's availability
+   * @param {String} state state of availability
+   * @param {*} param1
+   */
   constructor(
     state = "A",
     { coordinator = { _id: "", name: "" } } = { coordinator: { _id: "", name: "" } }
@@ -439,6 +599,208 @@ export class Pause {
   constructor(name, index) {
     this.name = name;
     this.index = index;
+  }
+}
+
+export class AttForm {
+  /**
+   * @param {String} label AttForm label
+   * @param {String} data AttForm data to manipulate
+   */
+  constructor(label, data = []) {
+    this.label = label;
+    this.data = data;
+  }
+
+  main() {
+    this.searchBar = document.querySelector("#AttForm-search");
+
+    let searchItems = document.querySelectorAll(`div[data-search="${this.searchBar.id}"]`);
+
+    this.searchBar.addEventListener("keyup", () => {
+      let filter = this.searchBar.value.trim();
+      if (filter) {
+        searchItems.forEach((item) => {
+          let originalValue = item.parentNode.querySelector("input.originalValue").value;
+
+          if (originalValue.toUpperCase().indexOf(filter.toUpperCase()) != -1) {
+            item.innerHTML = fx.colorMatches(filter, originalValue, "#2196f3");
+            item.parentNode.style.display = "";
+          } else {
+            item.innerHTML = originalValue;
+            item.parentNode.style.display = "none";
+          }
+        });
+      } else {
+        searchItems.forEach((item) => {
+          item.innerHTML = item.parentNode.querySelector("input.originalValue").value;
+          item.parentNode.style.display = "";
+        });
+      }
+    });
+  }
+
+  /**
+   * @param {String} container_id container div to append AttForm in
+   */
+  show(container_id) {
+    this.container_id = container_id;
+    let container = document.querySelector(`#${this.container_id}`);
+    container.innerHTML = "";
+
+    let AttForm = document.createElement("form");
+    AttForm.setAttribute("id", "AttForm");
+
+    let body = document.createElement("div");
+    let mainDiv = document.createElement("div");
+
+    let searchBar = document.createElement("input");
+    searchBar.setAttribute("class", "form-control search");
+    searchBar.setAttribute("type", "search");
+    searchBar.setAttribute("placeholder", "Search");
+    searchBar.setAttribute("aria-label", "Search");
+    searchBar.setAttribute("id", "AttForm-search");
+
+    mainDiv.appendChild(searchBar);
+    mainDiv.innerHTML += "<hr>";
+    body.appendChild(mainDiv);
+
+    let classListContainer = document.createElement("div");
+
+    classListContainer.setAttribute("class", "card-body");
+    classListContainer.setAttribute("style", "max-height: 550px; overflow: auto");
+
+    let classList = document.createElement("ul");
+    classList.setAttribute("class", "list-group list-group-flush");
+
+    this.data.forEach((elt) => {
+      classList.innerHTML += `
+            <li class="list-group-item studentSearch AttBlock">
+              <input type="checkbox" class="form-check-input"/>
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="" data-search="AttForm-search">${elt.name}</div>
+              <input class="originalValue" type="text" value="${elt.name}" style="display:none;"/>
+            </li>
+    `;
+    });
+
+    classListContainer.appendChild(classList);
+    body.appendChild(classListContainer);
+
+    AttForm.appendChild(body);
+
+    AttForm.innerHTML += `<br>
+    <div class="card-footer w3-center w3-bar">
+      <input placeholder="Short note..." type="text" maxlength=150 class="AttshortNote">
+      <br>
+      <div>
+        <input type="button" class="button" id="saveAtt" value="SAVE">
+      </div>
+    </div>`;
+
+    container.appendChild(AttForm);
+    container.style.display = "block";
+    this.main();
+  }
+}
+
+export class DataForm {
+  constructor(
+    label = "",
+    {
+      type = "",
+      ths = ["name", "presence", "remark"],
+      data = [
+        { name: "adbjdvb gvns wvwjv", presence: "y", remark: "sfv kj" },
+        { name: "nvksnvie rgon sdvnwj", presence: "y", remark: "sfv kj" },
+        { name: "cavn wfnwnfi wgnkwn", presence: "y", remark: "sfv kj" },
+        { name: "Adnvwvdi wnrgiwn", presence: "y", remark: "sfv kj" },
+      ],
+      note = "",
+      other = { date: "", time: "" },
+    }
+  ) {
+    this.label = label;
+    this.type = type;
+    this.ths = ths;
+    this.data = data;
+    this.note = note;
+    this.other = other;
+  }
+
+  /**
+   * @param {String} container_id container div to append AttForm in
+   */
+  show(container_id) {
+    this.container_id = container_id;
+    let container = document.querySelector(`#${this.container_id}`);
+    container.innerHTML = "";
+
+    let dataForm = document.createElement("form");
+
+    if (this.type == "Att") {
+      dataForm.innerHTML = `
+    <div class="card-header" style="text-align:center;">
+      <div class="card-title">
+        <span>${this.other.date}</span>
+        <br>
+        <span>${this.other.time}</span>
+      </div>
+    </div>`;
+    }
+
+    let table = document.createElement("table");
+    table.setAttribute("id", "viewStatTable");
+    table.setAttribute("class", "table table-bordered w3-centered");
+
+    let thead = document.createElement("tr");
+
+    thead.innerHTML += `<th scope="col">S/N</th>`; // serial number header
+
+    this.ths.forEach((th) => {
+      thead.innerHTML += `<th scope="col">${th.toUpperCase()}</th>`;
+    });
+
+    table.appendChild(thead);
+
+    let tbody = document.createElement("tbody");
+
+    this.data.forEach((elt, index) => {
+      let tr = document.createElement("tr");
+
+      tr.innerHTML += `<td>${index + 1}</td>`; // serial number
+
+      this.ths.forEach((th, index) => {
+        tr.innerHTML +=
+          this.type == "Att"
+            ? th == "presence"
+              ? elt[th]
+                ? `<td><div class="color" id="color2"></div></td>`
+                : `<td><div class="color" id="color3"></div></td>`
+              : `<td>${elt[th]}</td>`
+            : `<td>${elt[th]}</td>`;
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    tbody.innerHTML +=
+      this.type == "Att" && this.note
+        ? `<div style="text-align:left;"><b>Note: </b><br><p>${this.note}</p><br></div>`
+        : "";
+
+    table.appendChild(tbody);
+
+    dataForm.appendChild(table);
+
+    container.appendChild(dataForm);
+    container.style.display = "block";
   }
 }
 
@@ -470,15 +832,15 @@ class TT {
 export class DisplayTT extends TT {
   /**
    * TT used by students, lecturers and coords to view their TT schedules
-   * @param {*} _id unique identifier to be given to this TT
-   * @param {*} targetContainer target div in which this TT will place itself
-   * @param {*} userAccountType accountType of user generating this TT
-   * @param {*} purpose reason of use of this TT because a coord has more than one of such
+   * @param {String} _id unique identifier to be given to this TT
+   * @param {String} container_id target div in which this TT will place itself
+   * @param {String} userAccountType accountType of user generating this TT
+   * @param {String} purpose reason of use of this TT because a coord has more than one of such
    * @param {*} sysDefaults data from db needed to generate this TT
    */
   constructor(
     _id,
-    targetContainer,
+    container_id,
     userAccountType = "Student",
     purpose = "userDisplay",
     sysDefaults
@@ -486,7 +848,7 @@ export class DisplayTT extends TT {
     super();
 
     this._id = _id;
-    this.targetContainer = targetContainer;
+    this.container_id = container_id;
     this.userAccountType = userAccountType;
     this.nav_id = `${this._id}-nav`;
     this.pagination_id = `${this._id}-page`;
@@ -499,11 +861,11 @@ export class DisplayTT extends TT {
     this.displayModal = new DisplayModal();
   }
 
+  /**
+   * - Method to set initialize and to set eventlisteners of instantiated object
+   * - Only to be called right at the bottom of the `show()` method of this class
+   */
   main = () => {
-    /**
-     * only to be called right at the bottom of the this.show() method
-     */
-
     let thisTT = document.querySelector(`#${this._id}`);
     this.weekStart = thisTT.querySelector("#firstD");
     this.weekEnd = thisTT.querySelector("#lastD");
@@ -528,14 +890,12 @@ export class DisplayTT extends TT {
     setInterval(this.refresh, 1000);
   };
 
+  /**
+   * method to make this TT visible on screen
+   */
   show = () => {
-    // method to make this TT visible on screen
-
-    let rows = this.sysDefaults.periods.length;
-    let cols = this.sysDefaults.weekDays;
-
     // getting div container to place generated TT in
-    let container = document.querySelector(this.targetContainer);
+    let container = document.querySelector(this.container_id);
     container.innerHTML = "";
 
     // creating table
@@ -550,9 +910,7 @@ export class DisplayTT extends TT {
     let thead = document.createElement("tr");
     thead.innerHTML = `<th class="w3-small"> <span id="firstD"></span> <br> <span id="lastD"></span> </th>`;
 
-    let weekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-    weekDays.forEach((day) => {
+    this.sysDefaults.weekDays.forEach((day) => {
       thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
 
@@ -563,12 +921,13 @@ export class DisplayTT extends TT {
 
     let timer = 0;
     let periodIndex = 0; // Very uselful to get info about a period
-    for (let i = 0; i < rows; i++) {
+
+    for (let i = 0; i < this.sysDefaults.periods.length; i++) {
       // creation of remaining table rows with their data by iteration
       let tr = document.createElement("tr");
       tr.innerHTML = `<td class="w3-small sticky timeSection"> <br> <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].start}"readonly> <br><input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].stop}"readonly></td>`;
 
-      for (let j = 0; j < cols; j++) {
+      for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
         <td class="w3-small period">
 
@@ -591,7 +950,9 @@ export class DisplayTT extends TT {
       // Addition of pauses won't work if system pauses added by admin aren't added at their indices
       if (this.sysDefaults.pauses[i]) {
         let pause = this.sysDefaults.pauses[i];
-        tbody.innerHTML += `<tr><td colspan='${cols + 1}' class="break">${pause.name}</td></tr>`;
+        tbody.innerHTML += `<tr><td colspan='${
+          this.sysDefaults.weekDays.length + 1
+        }' class="break">${pause.name}</td></tr>`;
       }
       timer += 1;
     }
@@ -611,7 +972,7 @@ export class DisplayTT extends TT {
     navSection.appendChild(pagination);
 
     if (this.userAccountType === "Coordinator" && this.purpose === "coordDisplay") {
-      navSection.innerHTML += `<input class="button" id="editPresentTT" type="button" value="Edit" disabled>`;
+      navSection.innerHTML += `<input class="button" id="editPresentTT" type="button" value="EDIT" disabled>`;
     } else {
       navSection.innerHTML += `<input type="button" id="getTT" value="Check TT" class="button">`;
     }
@@ -732,25 +1093,21 @@ export class DisplayTT extends TT {
       }`;
 
       if (!oldPeriod || fx.equalPeriods(period, oldPeriod)) {
+        let date = this.ttOnScreen.oDate
+          ? this.ttOnScreen.oDate
+          : this.ttOnScreen.uDate
+          ? this.ttOnScreen.uDate
+          : "N\\A";
+
         message.body = `
           Course Info : ${period.courseInfo}<br>
           Lecturer Name : ${period.lecturerName}<br>
           Group : ${period.group_id}<br>
           Venue : ${period.venue_id}<br>
-          Programmed on : ${
-            this.ttOnScreen.uDate ? new Date(this.ttOnScreen.uDate).toDateString() : "N\\A"
-          } at ${
-          new Date(this.ttOnScreen.uDate).getHours() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getHours()
-        }:${
-          new Date(this.ttOnScreen.uDate).getMinutes() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getMinutes()
-        }:${
-          new Date(this.ttOnScreen.uDate).getSeconds() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getSeconds()
+          Programmed on : ${new Date(date).toDateString()} at ${
+          new Date(date).getHours() === 0 ? "00" : new Date(date).getHours()
+        }:${new Date(date).getMinutes() === 0 ? "00" : new Date(date).getMinutes()}:${
+          new Date(date).getSeconds() === 0 ? "00" : new Date(date).getSeconds()
         }`;
       } else {
         // logging updated data first
@@ -779,7 +1136,6 @@ export class DisplayTT extends TT {
 
               <br>
               <hr style="color:5px solid gray;">
-              <br>
 
           <span style="color:red">Old Data</span><br>
           <br>
@@ -860,14 +1216,14 @@ export class ProgramTT extends TT {
   /**
    * TT used by coords to program lecturers and groups
    * @param {*} _id unique identifier to be given to this TT
-   * @param {*} targetContainer target div in which this TT will place itself
+   * @param {*} container_id target div in which this TT will place itself
    * @param {*} sysDefaults data from db needed to generate this TT
    */
-  constructor(_id, targetContainer, sysDefaults) {
+  constructor(_id, container_id, sysDefaults) {
     super();
 
     this._id = _id;
-    this.targetContainer = targetContainer;
+    this.container_id = container_id;
     this.nav_id = `${this._id}-nav`;
     this.sysDefaults = sysDefaults;
     // this.pagination_id = `${this._id}-page`;
@@ -953,14 +1309,12 @@ export class ProgramTT extends TT {
     thisTT_nav.querySelector("#clearGroupTT").addEventListener("click", this.clear);
   };
 
+  /**
+   * method to generate coordinator's TT
+   */
   show = () => {
-    // function to generate coordinator's TT
-
-    let rows = this.sysDefaults.periods.length;
-    let cols = this.sysDefaults.weekDays;
-
     // container div where TT will be inserted
-    let container = document.querySelector(this.targetContainer);
+    let container = document.querySelector(this.container_id);
 
     let table = document.createElement("table");
     table.setAttribute("id", this._id);
@@ -970,16 +1324,14 @@ export class ProgramTT extends TT {
 
     thead.innerHTML = `<th class="w3-small"><input type="date" id="weekStart" placeholder="week start"><br><input type="date" id="weekEnd" placeholder="week end" readonly></th>`;
 
-    let weekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-    weekDays.forEach((day) => {
+    this.sysDefaults.weekDays.forEach((day) => {
       thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
 
     table.appendChild(thead);
 
     let timer = 0;
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < this.sysDefaults.periods.length; i++) {
       let tr = document.createElement("tr");
       tr.innerHTML += `
       <td class="w3-small sticky timeSection">
@@ -989,26 +1341,26 @@ export class ProgramTT extends TT {
         <input class="periodTime" type="time" value="${this.sysDefaults.periods[timer].stop}"readonly>
       </td>`;
 
-      for (let j = 0; j < cols; j++) {
+      for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
               <td>
                 <div class='coordPeriod'>
                   <br>
 
                   <div class="programPopup">
-                    <input list="Courses" type="text" placeholder="Course name">
+                    <input class="programTT_input" list="Courses" type="text" placeholder="Course name">
                     <span class="popuptext"></span>
                   </div>
                   <br>
 
                   <div class="programPopup">
-                    <input list="Lecturers" type="text" placeholder="Lecturer">
+                    <input class="programTT_input" list="Lecturers" type="text" placeholder="Lecturer">
                     <span class="popuptext"></span>
                   </div>
                   <br>
 
                   <div class="programPopup">
-                    <input list="Venues" type="text" placeholder="Venue">
+                    <input class="programTT_input" list="Venues" type="text" placeholder="Venue">
                     <span class="popuptext"></span>
                   </div>
                   <br><br>
@@ -1032,7 +1384,7 @@ export class ProgramTT extends TT {
     navSection.setAttribute("id", `${this.nav_id}`);
 
     navSection.innerHTML = `
-          <input class="button" id="clearGroupTT" type="button" value="Clear"> | <input class="button" id="validateGroupTT" type="button" value="Validate"> | <input class="button" id="sendGroupTT" type="button" value="Send" disabled>`;
+          <input class="button" id="clearGroupTT" type="button" value="CLEAR"> | <input class="button" id="validateGroupTT" type="button" value="VALIDATE"> | <input class="button" id="sendGroupTT" type="button" value="SEND" disabled>`;
 
     container.parentNode.appendChild(navSection);
 
@@ -1201,12 +1553,12 @@ export class AvailTT {
   /**
    * TT used by coords and lecturers to state their availability
    * @param {*} _id unique identifier to be given to this TT
-   * @param {*} targetContainer target div in which this TT will place itself
+   * @param {*} container_id target div in which this TT will place itself
    * @param {*} sysDefaults data from db needed to generate this TT
    */
-  constructor(_id, targetContainer, sysDefaults) {
+  constructor(_id, container_id, sysDefaults) {
     this._id = _id;
-    this.targetContainer = targetContainer;
+    this.container_id = container_id;
     this.nav_id = `${this._id}-nav`;
     this.pagination_id = `${this._id}-page`;
     this.sysDefaults = sysDefaults;
@@ -1228,14 +1580,12 @@ export class AvailTT {
     thisTT_nav.querySelector("#resetAvailTT").addEventListener("click", this.reset);
   };
 
+  /**
+   * method to make avail TT visible (generate) on screen
+   */
   show = () => {
-    // method to make avail TT visible (generate) on screen
-
-    let rows = this.sysDefaults.periods.length;
-    let cols = this.sysDefaults.weekDays;
-
     // getting div container to place generated TT in
-    let container = document.querySelector(this.targetContainer);
+    let container = document.querySelector(this.container_id);
     container.innerHTML = "";
 
     // creating table
@@ -1251,9 +1601,7 @@ export class AvailTT {
 
     thead.innerHTML = `<th class="w3-small"> TIME </th>`;
 
-    let weekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-    weekDays.forEach((day) => {
+    this.sysDefaults.weekDays.forEach((day) => {
       thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
 
@@ -1263,7 +1611,8 @@ export class AvailTT {
     let timer = 0;
     let periodIndex = 0; // Very uselful to get info about a period
     let tbody = document.createElement("tbody");
-    for (let i = 0; i < rows; i++) {
+
+    for (let i = 0; i < this.sysDefaults.periods.length; i++) {
       // creation of remaining table rows with their data by iteration
 
       let tr = document.createElement("tr");
@@ -1273,7 +1622,7 @@ export class AvailTT {
         <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].stop}" readonly>
       </td>`;
 
-      for (let j = 0; j < cols; j++) {
+      for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
         <td><br>
           <label class="switch">
@@ -1281,6 +1630,7 @@ export class AvailTT {
             <span class="slider round"></span>
           </label>
           <output type="text" style="display:none;">${periodIndex}</output>
+          <input class="displayPeriod" type="text" readonly></input>
         </td>`;
         periodIndex++;
       }
@@ -1290,7 +1640,9 @@ export class AvailTT {
       // Addition of pauses won't work if system pauses added by admin aren't added at their indices
       if (this.sysDefaults.pauses[i]) {
         let pause = this.sysDefaults.pauses[i];
-        tbody.innerHTML += `<tr><td colspan='${cols + 1}'>${pause.name}</td></tr>`;
+        tbody.innerHTML += `<tr><td colspan='${this.sysDefaults.weekDays.length + 1}'>${
+          pause.name
+        }</td></tr>`;
       }
       timer += 1;
     }
@@ -1304,7 +1656,7 @@ export class AvailTT {
     navSection.setAttribute("class", "w3-center w3-bar");
     navSection.setAttribute("id", this.nav_id);
 
-    navSection.innerHTML = `<input type="button" id="resetAvailTT" value="RESET A TT" class="button"> | <input type="button" id="saveAvailOnScreen" value="Save" class="button">`;
+    navSection.innerHTML = `<input type="button" id="resetAvailTT" value="RESET" class="button"> | <input type="button" id="saveAvailOnScreen" value="SAVE" class="button">`;
 
     container.parentNode.appendChild(navSection);
     this.main();

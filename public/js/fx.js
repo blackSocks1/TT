@@ -12,6 +12,43 @@ export async function postFetch(url, body = {}, contentType = "application/json;
   ).json();
 }
 
+export function getIndicesOf(searchStr, str, caseSensitive) {
+  var searchStrLen = searchStr.length;
+  if (searchStrLen == 0) {
+    return [];
+  }
+  var startIndex = 0,
+    index,
+    indices = [];
+  if (!caseSensitive) {
+    str = str.toLowerCase();
+    searchStr = searchStr.toLowerCase();
+  }
+  while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+    indices.push(index);
+    startIndex = index + searchStrLen;
+  }
+  return indices;
+}
+
+export function colorMatches(subStr, str, color = "red") {
+  let matchIndices = getIndicesOf(subStr, str);
+  let strToCaseOk = "";
+
+  for (let i = 0; i < str.length; i++) {
+    if (matchIndices.includes(i)) {
+      let lastIndex = subStr.length + i;
+      for (let j = i; j < lastIndex; j++) {
+        strToCaseOk += `<b style="color:${color};">${str[j]}</b>`;
+        i = j;
+      }
+    } else {
+      strToCaseOk += str[i];
+    }
+  }
+  return strToCaseOk;
+}
+
 export function equalPeriods(periodA, periodB) {
   // function to check if two periods are the same (NOT IDENTICAL) in terms of courseName, courseInfo, group, lecturerName, lecturer_id, venue, state
 

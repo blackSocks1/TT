@@ -17,6 +17,9 @@ export class Lecturer extends User {
     this.setLectecuerEventListeners();
   };
 
+  /**
+   * method to initialize lecturer variables
+   */
   userInit = async () => {
     this.sysDefaults = await this.getSysDefaults();
 
@@ -45,6 +48,9 @@ export class Lecturer extends User {
       .addEventListener("click", this.saveAvailTT);
   };
 
+  /**
+   * method to reset lecturer's attributes when he's being programmed by a coordinator
+   */
   resetTempTT = () => {
     this.schedule = [];
     this.avail = JSON.parse(JSON.stringify(this.availHolder));
@@ -55,6 +61,10 @@ export class Lecturer extends User {
     };
   };
 
+  /**
+   * method to load lecturer's default availability to availTT
+   * @param {*} avail
+   */
   loadAvail = (avail) => {
     this.availTT.periods.forEach((period, index) => {
       if (avail[index] && avail[index].state === "A") {
@@ -65,6 +75,9 @@ export class Lecturer extends User {
     });
   };
 
+  /**
+   * method to save availability in db
+   */
   saveAvailTT = async () => {
     let avail = this.availTT.compile();
     let res = await fx.postFetch("/lecturer/saveAvail", {

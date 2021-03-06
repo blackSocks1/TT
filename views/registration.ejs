@@ -12,14 +12,12 @@
                 <h3>Registration</h3>
               </div>
 
-              <form class="form" action="#" method="">
+              <form class="form" id="loginForm" action="/register" method="POST">
                 <div class="form-group mb-5">
                   <i class="fa fa-user iconU iconU-u"></i>
                   <input
                     type="text"
                     class="text-center w-100"
-                    id="name"
-                    name
                     name="name"
                     autocomplete="off"
                     placeholder="name..."
@@ -27,17 +25,34 @@
                 </div>
 
                 <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <label for="specialty">Specialty</label>
+                  <select name="specialty_id" id="specialty_id"></select>
+                </div>
+
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <label for="level">Level</label>
+                  <select name="level_id" id="level_id"></select>
+                </div>
+
+                <div class="form-group mb-5">
+                  <i class="fa fa-user iconU iconU-u"></i>
+                  <label for="group">Group</label>
+                  <select name="group_id" id="group_id"></select>
+                </div>
+
+                <div class="form-group mb-5">
                   <i class="fa fa-key iconP iconP-p"></i>
-                  <i class="fa fa-mail iconP iconP-p"></i>
                   <input
                     type="password"
                     class="text-center w-100"
-                    id="password"
                     name="password"
                     placeholder="Password..."
                   />
                   <div class="password error"></div>
                 </div>
+
                 <br />
 
                 <div class="d-grid gap-2 mb-5 submit">
@@ -53,6 +68,50 @@
       <!-- w3 animated container signup -->
     </div>
   </body>
+
+  <script defer>
+    (async () => {
+      let specialties = await (await fetch("/auth/specialties")).json();
+      console.log(specialties);
+
+      let db_data = {};
+      let loginForm = document.querySelector("#loginForm");
+      let specSelect = document.querySelector("#specialty_id");
+      let levelSelect = document.querySelector("#level_id");
+      let groupSelect = document.querySelector("#group_id");
+
+      specSelect.innerHTML = "";
+
+      specialties.forEach((spec) => {
+        db_data[spec._id] = spec;
+        specSelect.innerHTML += `<option value="${spec._id}">${spec._id}</option>`;
+      });
+
+      specSelect.addEventListener("change", (e) => {
+        levelSelect.innerHTML = groupSelect.innerHTML = "";
+
+        db_data[e.target.value].levels.forEach((level) => {
+          levelSelect.innerHTML += `<option value="${level._id}">${level._id}</option>`;
+
+          level.groups.forEach((group_id) => {
+            groupSelect.innerHTML += `<option value="${group_id}">${group_id}</option>`;
+          });
+        });
+      });
+
+      levelSelect.addEventListener("change", (e) => {
+        groupSelect.innerHTML = groupSelect.innerHTML = "";
+
+        let selected_level = db_data[specSelect.value].levels.find(
+          (level) => level._id == e.target.value
+        );
+
+        selected_level.groups.forEach((group_id) => {
+          groupSelect.innerHTML += `<option value="${group_id}">${group_id}</option>`;
+        });
+      });
+    })();
+  </script>
 
   <%- include('partials/authFooter') -%>
 </html>

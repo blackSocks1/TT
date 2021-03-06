@@ -1,9 +1,9 @@
-const { Oath } = require("../myFunctions/npm_fx");
+const { getUserCollection } = require("../myFunctions/npm_fx");
 const schemas = require("../models/schemas");
 
 let lecturerController = {
   save: async (req, res) => {
-    let lecturer = await Oath(req.body);
+    let lecturer = await getUserCollection(req.body);
     let reponse = { error: "", data: "" };
 
     try {

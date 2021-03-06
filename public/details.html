@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Details</title>
+	<link rel="stylesheet" href="css/rollCallStyle.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/jquerysctipttop.css">
+	<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="card-header" id="header">
+			<div class="card-title" id="class">Details</div>
+
+			<div style="width: 18%;" id="headerDate">Wednesday, 18/05/21 4:05</div>
+
+			<div style="width: 10%;" id="headerSpec">SWE-LEVEL 2</div>
+
+		</div>
+
+		<div class="card-body" style="max-height:550px;overflow:auto;">
+
+			<button type="button" class="btn" data-toggle="modal" data-target="#decModal" id="specB2">Description</button>
+
+			<div class="modal fade" id="decModal" tabindex="-1" aria-labelledby="decModalLabel" aria-hidden="true">
+	  		<div class="modal-dialog">
+	    		<div class="modal-content">		    	
+
+			      <div class="modal-header" id="header">
+			        <h5 class="modal-title" id="saveModalLabel">Description : </h5>
+			      </div>
+
+						<form>
+				      <div class="modal-body">
+			      		<textarea placeholder="Your Text..."></textarea>
+				      </div>
+					
+				      <div class="modal-footer">
+				        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">Close</button>
+				      </div>
+						</form>
+
+	   			 </div>
+	  		</div>
+			</div>
+
+			<table class="table table-bordered" id="viewStatTable">
+				  <thead>
+				    <tr>
+				      <th scope="col">Names</th>
+				      <th scope="col">Presence</th>
+				      <th scope="col">Remark</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				    <tr>
+				      <td>Passilia Doruche</td>
+				      <td><div class="color" id="color2"></div></td>
+				      <td>+2</td>
+				      
+				    </tr>
+				    <tr>
+				      <td>Otto Von Bermack</td>
+				      <td><div class="color" id="color2"></div></td>
+				      <td>+4</td>
+				    </tr>
+				    <tr>
+				      <td>Alice Fonucheu</td>
+				      <td><div class="color" id="color3"></div></td>
+				      <td></td>
+				    </tr>
+				    <tr>
+			    		<td>Sebine Rachelle</td> 
+			      	<td><div class="color" id="color2"></div></td>
+			      	<td>-1 Caught Cheating</td>
+				    </tr>
+				  </tbody>
+				</table>
+
+			 <button type="button" class="btn" data-toggle="modal" data-target="#forwardModal" id="forward">Forward</button>
+
+			 <button type="button" class="btn" id="delete">Delete</button>
+
+			<div class="modal fade" id="forwardModal" aria-labelledby="forwardModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">				
+
+			      <div class="modal-header" id="header">
+			        <h5 class="modal-title" id="forwardModalLabel">Forward to : </h5>
+			      </div>
+
+						<form>
+				      <div class="modal-body" style="max-height:450px;overflow:auto;">
+
+			      		<div class="md-form mt-0">
+								  <input class="form-control" type="search" placeholder="Search" aria-label="Search" id="fsearch" autocomplete="off">
+								</div>
+
+					  		<ul class="list-group list-group-flush">
+					  
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Babila Tchuenke</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Babila Tchuenke</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Antoine Deaoik</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mrs Sidonie</div></li>
+
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Qiou Yu Fong</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Douglass Benji</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mrs Adama Precious</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Franck</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Benard</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Loic</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Zidane</div></li>
+							
+								<li class="list-group-item teachersSearch"><input class="form-check-input" type="checkbox"><div class='fsearch'> Mr Archange</div></li>
+							    
+							  </ul>
+
+							  <div id="localSearch"></div>
+
+				      </div>
+
+				      <div class="modal-footer">
+				        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">Close</button>
+				        <button type="submit" class="btn" id="send">Forward</button>
+				      </div> 
+
+		       	</form>
+					</div>	
+				</div>
+			</div>
+			
+		</div>
+		
+	</div>
+
+<script src="js/jquery-3.5.1.slim.min.js"></script>
+
+<script src="js/jquery-1.12.4.min.js"></script>
+
+<script src="js/popper.min.js"></script>
+
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/jsLocalSearch.js"></script>
+
+<script>
+	$('#localSearch').jsLocalSearch({
+    "searchinput": "#fsearch", 
+    "container": "teachersSearch", 
+    "containersearch": "fsearch", 
+    "action": "Show",
+
+    "html_search": true,
+    "mark_text": "si"
+	});
+</script>
+
+</body>
+</html>

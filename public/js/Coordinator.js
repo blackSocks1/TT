@@ -9,11 +9,16 @@ import {
   Person,
   Event,
   Week,
+  AttForm,
 } from "./classes.js";
 
 import { Lecturer } from "./Lecturer.js";
 
 export class Coordinator extends Lecturer {
+  /**
+   * class to model a specialty coordinator
+   * @param {String} _id _id of coordinator
+   */
   constructor(_id) {
     super(_id);
     this.TT_Defaults; // = [{ week: {}, periods: [] }]
@@ -31,9 +36,21 @@ export class Coordinator extends Lecturer {
     this.setLectecuerEventListeners();
     this.setCoordEventListeners();
 
-    // console.log(moment().endOf("day")._d);
+    let studentNames = await fx.postFetch("/Att/get-students", { group_id: "SWE-L1-LOG" });
+
+    // sort student names
+    studentNames = studentNames.sort((a, b) => (a.name > b.name ? 1 : -1));
+
+    this.myAttFrom = new AttForm("SWE-L1-LOG", studentNames);
+
+    this.myAttFrom.show("Att-container");
+
+    document.querySelector("input#saveAtt").addEventListener("click", this.take_Att);
   };
 
+  /**
+   * method to initialize coordinator variables
+   */
   userInit = async () => {
     this.courseDb = [];
     this.lecturerDb = [];
@@ -87,6 +104,9 @@ export class Coordinator extends Lecturer {
     await this.getMyInfo();
   };
 
+  /**
+   * method for adding event listeners to elements prior to Coordinator class
+   */
   setCoordEventListeners = async () => {
     document
       .querySelector(`#${this.program_TT.nav_id}`)
@@ -105,6 +125,10 @@ export class Coordinator extends Lecturer {
     );
   };
 
+  /**
+   * method to get lecturers, courses and venues from db so as to program TT
+   * @param {String} group_id _id of group to load and display group data
+   */
   getDbData = async (group_id = "") => {
     let lastSeen = await this.getLastSeen();
     let today = new Date().getTime();
@@ -205,6 +229,11 @@ export class Coordinator extends Lecturer {
     // console.log("Getting Db data fine!");
   };
 
+  /**
+   * - method to check if the value of an input field is in coordinator database
+   * - useful for validation
+   * @param {*} e
+   */
   checkInDb = (e) => {
     // check if inputed value is in db
 
@@ -258,6 +287,9 @@ export class Coordinator extends Lecturer {
     }
   };
 
+  /**
+   * method to load venues in respective input fields' datalists
+   */
   loadVenues = () => {
     let separateCampus = document.querySelector("#separateCampus").checked;
 
@@ -336,6 +368,9 @@ export class Coordinator extends Lecturer {
     }
   };
 
+  /**
+   * method to validate coordiantor's programTT
+   */
   validate_TT = () => {
     // function to check if all programmed data is valid or not
 
@@ -369,7 +404,7 @@ export class Coordinator extends Lecturer {
     let group_id = "";
 
     // Iterating through coord TT as per day of week and period
-    for (let i = 0; i <= this.sysDefaults.weekDays - 1; i++) {
+    for (let i = 0; i <= this.sysDefaults.weekDays.length - 1; i++) {
       let counter = 0;
       let initIndex = i;
 
@@ -1046,6 +1081,9 @@ export class Coordinator extends Lecturer {
     // fx.elementDisabled("#sendGroupTT", false);
   };
 
+  /**
+   * method to send programmed TTs
+   */
   send_TT = async () => {
     if (this.TTupdatedLecturers.length > 0) {
       //Sending period data and time as JSON
@@ -1091,6 +1129,10 @@ export class Coordinator extends Lecturer {
     }
   };
 
+  /**
+   * method to cause lecturers, students concerned and all coordiantors online to fetch
+   * their data since it may have been updated
+   */
   reloadDbData = () => {
     this.socket.emit("/coordReload", {
       _id: this._id,
@@ -1112,6 +1154,10 @@ export class Coordinator extends Lecturer {
     });
     this.TT_Defaults = await this.TT_Defaults.json();
     // console.log(this.TT_Defaults)
+  };
+
+  getCustomClassList = async (group_id = "", columns = "") => {
+    return await fx.postFetch("/Att/getCustomClassList", { group_id, columns });
   };
 
   setMyDefaults = async () => {
@@ -1192,3 +1238,4 @@ export class Coordinator extends Lecturer {
 
 let Me = new Coordinator(document.querySelectorAll("output.myData")[0].value);
 Me.main();
+Me.getCustomClassList("SWE-L1-LOG", "_id name level").then((res) => console.log(res));

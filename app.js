@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
-const _ = require("lodash");
+// const _ = require("lodash");
 const express = require("express");
+// const session = require("express-session"); // check sense
 const cors = require("cors");
-const https = require("https");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+// const fs = require("fs");
+// const path = require("path");
 
 // environment variables
 require("dotenv").config();
@@ -15,42 +17,42 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const coordinatorRoutes = require("./routes/coordinatorRoutes");
 const lecturerRoutes = require("./routes/lecturerRoutes");
+const AttRoutes = require("./routes/AttRoutes");
 const socketController = require("./controllers/socketController");
+
+// Options for https server
+// const options = {
+//   key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
+//   cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
+// };
 
 const app = express();
 const http = require("http").Server(app);
+// const https = require("https").createServer(options, app);
 const io = require("socket.io")(http);
 
-let chat = io.of("/").on("connection", (socket) => {
-  socketController.handleChat(chat, socket);
-});
-
 (async () => {
-  // Creating https server
-  // const options = {
-  //   key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
-  //   cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem")),
-  // };
-
-  // const server = https.createServer(options, app);
-  // mongoose
-  //   .connect("mongodb://localhost/TimeTable", {
-  //     useNewUrlParser: true,
-  //     useUnifiedTopology: true,
-  //     useFindAndModify: false,
-  //   })
-  //   .then(() => {
-  //     console.log("Connected to db");
-  //   })
-  //   .catch("error", (error) => console.log("\nError at ", error));
-
-  // server.listen(process.env.PORT || 45000, process.env.HOST || "localhost", () =>
-  //   console.log(
-  //     `HTTPS server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
-  //   )
-  // );
-
   try {
+    let connection = mongoose.connection;
+
+    connection.once("open", async () => {
+      connection.db.listCollections().toArray((err, allColNames) => {
+        if (err) {
+          console.log(err);
+        } else {
+          allColNames.forEach((col_name) => {
+            if (col_name.name == "onlineusers") {
+              connection.dropCollection(
+                "onlineusers",
+                console.log("onlineusers was dropped with success!")
+              );
+            }
+            // console.log(col_name.name);
+          });
+        }
+      });
+    });
+
     await mongoose.connect("mongodb://localhost/TimeTable", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -59,7 +61,6 @@ let chat = io.of("/").on("connection", (socket) => {
 
     console.log("Connected to db");
 
-    // creating http server
     await http.listen(process.env.PORT || 45000, process.env.HOST || "localhost");
     console.log(
       `HTTP server listening to requests on ${process.env.HOST} via port ${process.env.PORT}`
@@ -80,14 +81,20 @@ let chat = io.of("/").on("connection", (socket) => {
   //     console.log(err);
   // });
 
+  let chat = io.of("/").on("connection", (socket) => {
+    socketController.handleChat(chat, socket);
+  });
+
   //static files
   app.use(express.static("public"));
+
+  // express-session
+  // app.use(session({ secret: "yo", resave: true, saveUninitialized: true }));
 
   // render engine
   app.set("view engine", "ejs");
 
-  // middleware
-
+  // middlewares
   app.use(cors());
 
   app.use(
@@ -100,11 +107,6 @@ let chat = io.of("/").on("connection", (socket) => {
   app.use(cookieParser());
 
   // routes
-
-  app.get("/setCookie", (req, res) => {
-    res.cookie("isEmploye", true);
-    res.end();
-  });
 
   app.get("/", (req, res) => {
     res.render("home", { title: "Home" });
@@ -119,8 +121,11 @@ let chat = io.of("/").on("connection", (socket) => {
   // lecturer routes
   app.use("/lecturer", lecturerRoutes);
 
-  // userRoutes
+  // user routes
   app.use("/user", userRoutes);
+
+  // Att routes
+  app.use("/Att", AttRoutes);
 
   // auth routes
   app.use(authRoutes);
