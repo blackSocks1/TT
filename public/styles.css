@@ -1,14 +1,6 @@
 /* theme colors: #08303d
  background-color: #0a0a23; // for dark theme */
 
-th,
-tr,
-td {
-  border: 1px solid rgb(185, 185, 185);
-  text-align: center;
-  padding: 15px;
-}
-
 body {
   background-color: white;
 }
@@ -24,18 +16,59 @@ table.timetable {
   border-bottom: 5px solid #0a4c9b;
 }
 
+table.timetable th,
+table.coordTT th {
+  border: 1px solid white;
+  text-align: center;
+  padding: 15px;
+}
+
+table.timetable tr,
+table.timetable td,
+th.sideFixed {
+  border: 2px solid rgb(185, 185, 185);
+  text-align: center;
+  padding: 15px;
+  background-color: white;
+  border-collapse: collapse;
+}
+
 table.coordTT {
   border: none;
   border-collapse: separate;
+  background-color: white;
 }
 
-table.coordTT th,
-table.coordTT td {
+/* table.coordTT div.coordPeriod {
+  border: none;
+} */
+
+table.coordTT tr {
+  background-color: white;
   border: 1px solid black;
   text-align: center;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+table.coordTT td {
+  background-color: white;
+  border: 1px solid black;
+  text-align: center;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+table.coordTT th.sideFixed {
+  background-color: white;
+  border: 1px solid black;
+  text-align: center;
+  border-collapse: separate;
+  border-spacing: 2px;
 }
 
 input.programTT_input {
+  width: 90%;
   border: none;
   border-bottom: 2px solid gray;
   text-align: center;
@@ -92,6 +125,22 @@ input[type="time"]:disabled {
   color: red;
 }
 
+.AttHistBtn {
+  color: #08303d;
+  background-color: white;
+  text-align: left;
+  padding: 10px 15px;
+  margin: 4px 2px;
+  border-radius: 4px;
+  border: 2px solid #08303d;
+}
+
+.AttHistBtn:hover {
+  color: white;
+  background-color: #08303d;
+  border: 2px solid #eee;
+}
+
 a.paginationButton {
   cursor: pointer;
   border: 5px solid #eee;
@@ -146,11 +195,6 @@ a.navLink:hover {
   cursor: pointer;
 }
 
-.ownNav {
-  overflow: hidden;
-  background-color: transparent;
-}
-
 a.navLink {
   float: left;
   display: block;
@@ -169,6 +213,16 @@ a.navLink:hover {
 
 a.navLink.active {
   border-bottom: 3px solid #2196f3;
+}
+
+nav {
+  background-color: #0a4c9b;
+}
+
+.ownNav {
+  overflow-inline: auto;
+  display: inline-flex;
+  background-color: transparent;
 }
 
 .switch {
@@ -360,9 +414,9 @@ input:checked + .slider:before {
   }
 }
 
-div.modal {
+/* div.modal {
   text-align: center;
-}
+} */
 
 /* The Modal (background) */
 .modal {
@@ -386,12 +440,37 @@ div.modal {
   margin: auto;
   padding: 0;
   border: 1px solid #888;
-  width: 35%;
+  width: 95%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
   animation-duration: 0.4s;
+}
+
+@media screen and (min-width: 480px) {
+  .modal-content {
+    width: 80%;
+  }
+
+  input[type="search"].search {
+    border-radius: 4px;
+    width: 25%;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+  }
+}
+
+@media screen and (min-width: 570px) {
+  .modal-content {
+    width: 65%;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .modal-content {
+    width: 35%;
+  }
 }
 
 /* Add Animation */
@@ -468,7 +547,7 @@ div.modal {
 
 input[type="search"].search {
   border-radius: 4px;
-  width: 25%;
+  width: 100%;
   -webkit-transition: width 0.4s ease-in-out;
   transition: width 0.4s ease-in-out;
 }
@@ -478,7 +557,7 @@ input[type="search"].search:focus {
   width: 100%;
 }
 
-input[type="text"].AttshortNote {
+input[type="text"].Att-description {
   background-color: transparent;
   outline: none;
   border: none;
@@ -489,7 +568,7 @@ input[type="text"].AttshortNote {
   transition: width 0.4s ease-in-out;
 }
 
-input[type="text"].AttshortNote:focus {
+input[type="text"].Att-description:focus {
   width: 45%;
   border-bottom: 2px solid #2196f3;
 }
@@ -530,4 +609,15 @@ input[type="text"].AttshortNote:focus {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
+}
+
+div.top-control-center,
+.top-control-center div {
+  display: inline-flex;
+  background: #0a4c9b;
+}
+
+div.bottom-control-center {
+  display: inline-flex;
+  background: #0a4c9b;
 }

@@ -9,7 +9,6 @@ import {
   Person,
   Event,
   Week,
-  AttForm,
 } from "./classes.js";
 
 import { Lecturer } from "./Lecturer.js";
@@ -27,81 +26,56 @@ export class Coordinator extends Lecturer {
   }
 
   main = async () => {
-    await this.userInit();
+    await this.lecturerInit();
+    await this.coordInit();
+
     this.connectToSocket();
     await this.getDbData();
     this.loadVenues();
 
-    this.setUserEventListener();
+    await this.setUserEventListener();
     this.setLectecuerEventListeners();
     this.setCoordEventListeners();
 
-    let studentNames = await fx.postFetch("/Att/get-students", { group_id: "SWE-L1-LOG" });
-
-    // sort student names
-    studentNames = studentNames.sort((a, b) => (a.name > b.name ? 1 : -1));
-
-    this.myAttFrom = new AttForm("SWE-L1-LOG", studentNames);
-
-    this.myAttFrom.show("Att-container");
-
-    document.querySelector("input#saveAtt").addEventListener("click", this.take_Att);
+    // console.log(this.Att);
   };
 
   /**
    * method to initialize coordinator variables
    */
-  userInit = async () => {
+  coordInit = async () => {
     this.courseDb = [];
     this.lecturerDb = [];
     this.venueDb = [];
     this.venueDbClone = [];
     this.groupDb = [];
-    this.sysDefaults = await this.getSysDefaults();
 
     // Initialization of other globals
     // ****** groupSelect is a very important global var for validation in several functions on this interface
-    let groupSelect = document.querySelector("#Groups");
+    this.groupSelect = document.querySelector("#Groups");
 
     document.querySelector("#separateCampus").addEventListener("change", this.loadVenues);
-    groupSelect.addEventListener("change", this.useGroup_TT);
+    this.groupSelect.addEventListener("change", this.useGroup_TT);
 
     // TT to program groups
-    this.program_TT = new ProgramTT("coordTT", "#coordinatorTT", this.sysDefaults);
+    this.program_TT = new ProgramTT("coordTT", "coordinatorTT", this.sysDefaults);
 
     // TT to see group TT from student perspective
     this.groupDisplay_TT = new DisplayTT(
       "group",
-      "#coordDisplayTT",
+      "coordDisplayTT",
       this.accountType,
       "coordDisplay",
       this.sysDefaults
     );
 
-    // personal TT
-    this.ownTT = new DisplayTT(
-      "myTT",
-      "#displayTTContainer",
-      this.accountType,
-      "",
-      this.sysDefaults
-    );
-
-    this.availTT = new AvailTT("myAvail", "#availTTContainer", this.sysDefaults);
-
-    this.availTT.show();
-
-    this.ownTT.show();
-
     this.program_TT.show();
 
     setInterval(() => {
-      this.program_TT.refresh(groupSelect.value, this.groupDb);
+      this.program_TT.refresh({ group_id: this.groupSelect.value, groupDb: this.groupDb });
     }, 1000);
 
     this.groupDisplay_TT.show("studProgScreen", "coordDisplay");
-
-    await this.getMyInfo();
   };
 
   /**
@@ -123,6 +97,8 @@ export class Coordinator extends Lecturer {
         .querySelectorAll("input[type='text']")
         .forEach((inputField) => inputField.addEventListener("input", this.checkInDb))
     );
+
+    this.groupDisplay_TT.editButton.addEventListener("click", this.loadTTForEditing);
   };
 
   /**
@@ -130,100 +106,98 @@ export class Coordinator extends Lecturer {
    * @param {String} group_id _id of group to load and display group data
    */
   getDbData = async (group_id = "") => {
-    let lastSeen = await this.getLastSeen();
-    let today = new Date().getTime();
-    let groupSelect = document.querySelector("#Groups");
+    let dataLecturers = await fx.postFetch("/coord/get-lecturers", { _id: this.coordinator_Ref });
 
-    if (lastSeen <= today) {
-      // console.log("System time ok!");
-      await this.setLastSeen();
-      let dataLecturers = await fx.postFetch("/coord/get-lecturers", { _id: this._id });
+    let dataVenues = await fx.postFetch("/coord/get-venues", { _id: this._id });
 
-      let dataVenues = await fx.postFetch("/coord/get-venues", { _id: this._id });
+    let dataGroups = await fx.postFetch("/coord/get-groups", { _id: this.coordinator_Ref });
 
-      let dataGroups = await fx.postFetch("/coord/get-groups", { _id: this._id });
+    this.lecturerDb = Array.from(dataLecturers).sort((a, b) => {
+      // return (a.name === b.name) ? 0 : a.name < b.name ? -1 : 1;
+      if (a.name === b.name) {
+        return 0;
+      } else {
+        return a.name < b.name ? -1 : 1;
+      }
+    });
 
-      this.lecturerDb = Array.from(dataLecturers).sort((a, b) => {
-        // return (a.name === b.name) ? 0 : a.name < b.name ? -1 : 1;
-        if (a.name === b.name) {
-          return 0;
-        } else {
-          return a.name < b.name ? -1 : 1;
-        }
-      });
+    // console.log(this.lecturerDb);
 
-      let newLects = [];
-      let preLects = "";
+    let newLects = [];
+    let preLects = "";
+    // console.log(this.lecturerDb);
 
-      for (let lecturer of this.lecturerDb) {
-        preLects += `<option value="${lecturer.name}">`;
-        let newLecturer;
+    for (let lecturer of this.lecturerDb) {
+      preLects += `<option value="${lecturer.name}">`;
+      let newLecturer;
 
-        if (lecturer.accountType === "Lecturer") {
-          newLecturer = new Lecturer(lecturer._id, lecturer.name);
-        } else {
-          newLecturer = new Coordinator(lecturer._id, lecturer.name);
-        }
-
-        newLecturer.TT = lecturer.TT;
-        newLecturer.avail = lecturer.avail;
-        newLecturer.availHolder = JSON.parse(JSON.stringify(newLecturer.avail));
-        newLecturer.accountType = lecturer.accountType;
-        newLects.push(newLecturer);
+      if (lecturer.accountType === "Lecturer") {
+        newLecturer = new Lecturer(lecturer._id);
+      } else {
+        newLecturer = new Coordinator(lecturer._id);
       }
 
-      let lecList = document.querySelector("#Lecturers");
-      lecList.innerHTML = "";
-      lecList.innerHTML = preLects;
-      this.lecturerDb = [...newLects];
-      // console.log(this.lecturerDb);
+      newLecturer.TT = lecturer.TT;
+      newLecturer.name = lecturer.name;
+      newLecturer.accountType = lecturer.accountType;
+      newLecturer.avail = lecturer.avail;
+      newLecturer.lecturer_Ref = lecturer.lecturer_Ref;
 
-      this.venueDb = Array.from(dataVenues).sort((a, b) => {
-        if (a._id === b._id) {
-          return 0;
-        } else {
-          return a._id < b._id ? -1 : 1;
-        }
-      });
-
-      this.venueDbClone = JSON.parse(JSON.stringify(this.venueDb));
-      // console.log(this.venueDb);
-
-      this.groupDb = Array.from(dataGroups).sort((a, b) => {
-        if (a._id === b._id) {
-          return 0;
-        } else {
-          return a._id < b._id ? -1 : 1;
-        }
-      });
-
-      let selectLength = groupSelect.length;
-      if (selectLength !== this.groupDb.length) {
-        let preGroup = "";
-        this.groupDb.forEach((group, index) => {
-          if (group_id == "") {
-            preGroup +=
-              index === 0
-                ? `<option value="${group._id}" selected>${group._id}</option>`
-                : `<option value="${group._id}">${group._id}</option>`;
-          } else {
-            preGroup +=
-              group_id == group._id
-                ? `<option value="${group._id}" selected>${group._id}</option>`
-                : `<option value="${group._id}">${group._id}</option>`;
-          }
-        });
-
-        let groupList = groupSelect;
-        groupList.innerHTML = "";
-        groupList.innerHTML = preGroup;
-        this.useGroup_TT(groupList);
-      }
-
-      // console.log(this.groupDb);
-    } else {
-      console.log("Invalid system time. Please fix this ASAP!");
+      newLecturer.availHolder = newLecturer.avail
+        ? JSON.parse(JSON.stringify(newLecturer.avail))
+        : {};
+      newLecturer.accountType = lecturer.accountType;
+      newLects.push(newLecturer);
     }
+
+    let lecList = document.querySelector("#Lecturers");
+    lecList.innerHTML = "";
+    lecList.innerHTML = preLects;
+    this.lecturerDb = [...newLects];
+    // console.log(this.lecturerDb);
+
+    this.venueDb = Array.from(dataVenues).sort((a, b) => {
+      if (a._id === b._id) {
+        return 0;
+      } else {
+        return a._id < b._id ? -1 : 1;
+      }
+    });
+
+    this.venueDbClone = JSON.parse(JSON.stringify(this.venueDb));
+    // console.log(this.venueDb);
+
+    this.groupDb = Array.from(dataGroups).sort((a, b) => {
+      if (a._id === b._id) {
+        return 0;
+      } else {
+        return a._id < b._id ? -1 : 1;
+      }
+    });
+
+    let selectLength = this.groupSelect.length;
+    if (selectLength !== this.groupDb.length) {
+      let preGroup = "";
+      this.groupDb.forEach((group, index) => {
+        if (group_id == "") {
+          preGroup +=
+            index === 0
+              ? `<option value="${group._id}" selected>${group._id}</option>`
+              : `<option value="${group._id}">${group._id}</option>`;
+        } else {
+          preGroup +=
+            group_id == group._id
+              ? `<option value="${group._id}" selected>${group._id}</option>`
+              : `<option value="${group._id}">${group._id}</option>`;
+        }
+      });
+
+      let groupList = this.groupSelect;
+      groupList.innerHTML = "";
+      groupList.innerHTML = preGroup;
+      this.useGroup_TT(groupList);
+    }
+    // console.log(this.groupDb);
 
     fx.elementDisabled("#sendGroupTT", true);
     // console.log("Getting Db data fine!");
@@ -291,35 +265,37 @@ export class Coordinator extends Lecturer {
    * method to load venues in respective input fields' datalists
    */
   loadVenues = () => {
-    let separateCampus = document.querySelector("#separateCampus").checked;
+    if (this.groupDb.length > 0) {
+      let separateCampus = document.querySelector("#separateCampus").checked;
 
-    let group = fx.findElement("_id", document.querySelector("#Groups").value, this.groupDb)
-      .element;
-    let preVenues = "";
+      let group = fx.findElement("_id", this.groupSelect.value, this.groupDb).element;
+      let preVenues = "";
 
-    if (separateCampus) {
-      this.venueDb.forEach((venue) => {
-        if (venue.campus === group.campus) {
+      if (separateCampus) {
+        this.venueDb.forEach((venue) => {
+          if (venue.campus === group.campus) {
+            preVenues += `<option value="${venue._id}">`;
+          }
+        });
+      } else {
+        this.venueDb.forEach((venue) => {
           preVenues += `<option value="${venue._id}">`;
-        }
-      });
-    } else {
-      this.venueDb.forEach((venue) => {
-        preVenues += `<option value="${venue._id}">`;
-      });
+        });
+      }
+
+      let venueList = document.querySelector("#Venues");
+      venueList.innerHTML = "";
+      venueList.innerHTML = preVenues;
     }
 
-    let venueList = document.querySelector("#Venues");
-    venueList.innerHTML = "";
-    venueList.innerHTML = preVenues;
+    this.program_TT.setWeek();
     // console.log("New venues loaded.");
   };
 
   useGroup_TT = () => {
     // ****** For the exam TT, select section will be a list with check boxes to select groups to program
 
-    let group = fx.findElement("_id", document.querySelector("#Groups").value, this.groupDb)
-      .element;
+    let group = fx.findElement("_id", this.groupSelect.value, this.groupDb).element;
     let courseList = document.querySelector("#Courses");
 
     let weekToProgram = new Week(new Date(this.program_TT.weekStart.value));
@@ -374,7 +350,7 @@ export class Coordinator extends Lecturer {
   validate_TT = () => {
     // function to check if all programmed data is valid or not
 
-    // let groupSelect = document.querySelector("#Groups");
+    // let groupSelect = this.groupSelect;
 
     this.TTperiods = [];
     this.TTupdatedCourses = [];
@@ -398,8 +374,7 @@ export class Coordinator extends Lecturer {
     let valid = "";
     let emptyTable = "";
     let weekToProgram = new Week(new Date(this.program_TT.weekStart.value));
-    let group = fx.findElement("_id", document.querySelector("#Groups").value, this.groupDb)
-      .element;
+    let group = fx.findElement("_id", this.groupSelect.value, this.groupDb).element;
     let docPeriods = this.program_TT.periods;
     let group_id = "";
 
@@ -566,9 +541,7 @@ export class Coordinator extends Lecturer {
                     fx.setBorderBColor(lecturerInput, color.Ok);
 
                     console.log(
-                      `Programming ${lecturer._id} for a joint class. ${
-                        document.querySelector("#Groups").value
-                      } is the first group you're programming for this class.`
+                      `Programming ${lecturer._id} for a joint class. ${this.groupSelect.value} is the first group you're programming for this class.`
                     );
                     lecturer.schedule.push(initIndex);
                   } else if (availState === "J") {
@@ -698,7 +671,7 @@ export class Coordinator extends Lecturer {
                     fx.setBorderBColor(venueInput, color.Ok);
                     // console.log(
                     //   `Programming ${venue._id} for a joint class. ${
-                    //     document.querySelector("#Groups").value
+                    //     this.groupSelect.value
                     //   } is the first group you're programming for this class.`
                     // );
                     venue.schedule.push(initIndex);
@@ -865,6 +838,7 @@ export class Coordinator extends Lecturer {
         });
         // console.log(`Old TT of ${group._id}`, oldgroupTT);
       }
+      console.log(lecturerSet);
 
       // getting all lecturers programmed on current screen into a set to avoid duplicates
       this.lecturerDb.forEach((lecturer) => {
@@ -879,6 +853,8 @@ export class Coordinator extends Lecturer {
           venueSet.add(venue._id);
         }
       });
+
+      console.log(lecturerSet);
 
       lecturerSet.forEach((lecturer_id) => {
         lecturersToCheck.push(fx.findElement("_id", lecturer_id, this.lecturerDb).element);
@@ -964,6 +940,7 @@ export class Coordinator extends Lecturer {
             periods: lecturer.tempTT.periods,
             uDate: this.TTdateMod,
             accountType: lecturer.accountType,
+            lecturer_Ref: lecturer.lecturer_Ref,
           });
           // console.log(lecturer.name);
         }
@@ -979,12 +956,14 @@ export class Coordinator extends Lecturer {
 
         this.TTperiods.forEach((period, index) => {
           let venueInput = this.program_TT.periods[index].querySelectorAll("input[type='text']")[2];
-
+          console.log(period.start, venue.programs[weekProgrammed.index].events);
           let oldEvent = fx.findElement(
             "start",
             period.start,
             venue.programs[weekProgrammed.index].events
-          ).element;
+          );
+
+          oldEvent = oldEvent ? oldEvent.element : null;
 
           if (this.TTdisabledPeriods[index]) {
             // if (disabledPeriods[index].venue_id === venue._id) {
@@ -1089,8 +1068,7 @@ export class Coordinator extends Lecturer {
       //Sending period data and time as JSON
 
       let weekToProgram = new Week(new Date(this.program_TT.weekStart.value));
-      let group = fx.findElement("_id", document.querySelector("#Groups").value, this.groupDb)
-        .element;
+      let group = fx.findElement("_id", this.groupSelect.value, this.groupDb).element;
 
       console.log(weekToProgram.toDateString(), group._id);
       console.log("Up Venues: ", this.TTupdatedVenues);
@@ -1121,6 +1099,8 @@ export class Coordinator extends Lecturer {
         });
       });
 
+      this.groupToUpdate = this.groupSelect.value;
+
       this.reloadDbData();
 
       console.log("TT sent!");
@@ -1137,7 +1117,7 @@ export class Coordinator extends Lecturer {
     this.socket.emit("/coordReload", {
       _id: this._id,
       name: this.name,
-      group_id: group._id,
+      group_id: this.groupToUpdate,
       lecturers: this.TTupdatedLecturers,
     });
   };
@@ -1206,36 +1186,34 @@ export class Coordinator extends Lecturer {
     // console.log("Last seen uoDated: ", new Date(this.lastSeen));
   };
 
-  getDrafts = async () => {
-    let req = await fetch("/coord/getDrafts", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify({
-        _id: this._id,
-      }),
+  loadTTForEditing = () => {
+    let TT = this.groupDisplay_TT.ttOnScreen;
+    let week = new Week(TT.week.firstDay);
+
+    // setting the week to program to old TT's programmed week
+    document.querySelector("#weekStart").value = week.toSubString().firstDay;
+    document.querySelector("#weekEnd").value = week.toSubString().lastDay;
+
+    // filling coord TT with required data
+    this.program_TT.periods.forEach((period, index) => {
+      period = period.querySelectorAll("input");
+      let ttPeriods = TT.periods;
+
+      period[0].value = ttPeriods[index].courseName;
+      period[1].value = ttPeriods[index].lecturerName;
+      period[2].value = ttPeriods[index].venue_id;
+      if (ttPeriods[index].state === "J") {
+        period[3].checked = true;
+      } else {
+        period[3].checked = false;
+      }
+      period[4].value = ttPeriods[index].start;
     });
 
-    this.TTdrafts = await req.json();
-  };
-
-  saveTTDrafts = async () => {
-    let req = await fetch("/coord/saveTTDrafts", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify({
-        _id: this._id,
-        TTdrafts: this.TTdrafts,
-      }),
-    });
-
-    this.TTdrafts = await req.json();
+    this.program_TT.refresh();
   };
 }
 
 let Me = new Coordinator(document.querySelectorAll("output.myData")[0].value);
 Me.main();
-Me.getCustomClassList("SWE-L1-LOG", "_id name level").then((res) => console.log(res));
+// Me.getCustomClassList("SWE-L1-LOG", "_id name level").then((res) => console.log(res));

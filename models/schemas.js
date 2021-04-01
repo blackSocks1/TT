@@ -1,116 +1,5 @@
-// const importGlobal = require('import-global');
-const extendSchema = require("mongoose-extend-schema");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
-// function extendSchema (Schema, definition, options){
-//     return new mongoose.Schema(
-//         Object.assign({},Schema.obj,definition),
-//         options
-//         );
-// }
-
-const OnlineUserSchema = new Schema({
-  online_id: {
-    type: String,
-    required: true,
-  },
-
-  accountType: {
-    type: String,
-    required: true,
-  },
-
-  network_id: {
-    type: String,
-    required: true,
-  },
-
-  name: String,
-});
-
-const UserSchema = new Schema({
-  _id: {
-    type: String,
-    required: true,
-  },
-
-  name: {
-    type: String,
-    required: true,
-  },
-
-  accountType: {
-    type: String,
-    required: true,
-  },
-
-  platform: String,
-
-  TT: [],
-
-  contacts: [],
-
-  chats: [{ type: Schema.Types.String, ref: "chat" }],
-});
-
-const LecturerSchema = extendSchema(UserSchema, {
-  avail: { weekAvail: [], defaultAvail: [] },
-});
-
-const StudentSchema = extendSchema(UserSchema, {
-  specialty: {
-    type: String,
-    ref: "specialty",
-    required: true,
-  },
-
-  group: {
-    type: Schema.Types.String,
-    ref: "group",
-    required: true,
-  },
-
-  level: {
-    type: Schema.Types.String,
-    ref: "level",
-    required: true,
-  },
-});
-
-const CoordinatorSchema = extendSchema(LecturerSchema, {
-  TT_Defaults: {
-    week: {},
-    periods: [],
-  },
-
-  specialties: [
-    {
-      type: Schema.Types.String,
-      ref: "specialty",
-    },
-  ],
-  lastSeen: Number,
-  TTdrafts: [],
-});
-
-const AdminSchema = new Schema({
-  _id: {
-    type: String,
-    required: true,
-  },
-
-  name: {
-    type: String,
-    required: true,
-  },
-
-  sysDefaults: {
-    periods: [],
-    pauses: [],
-    weekDays: [],
-  },
-});
 
 const CourseSchema = new Schema({
   _id: {
@@ -267,7 +156,7 @@ const SpecialtySchema = new Schema({
   },
 
   coordinator: {
-    type: Schema.Types.String,
+    type: Schema.Types.ObjectId,
     ref: "coordinator",
     required: true,
   },
@@ -347,7 +236,7 @@ const GroupSchema = new Schema({
 
   students: [
     {
-      type: Schema.Types.String,
+      type: Schema.Types.ObjectId,
       ref: "student",
     },
   ],
@@ -364,8 +253,6 @@ const GroupSchema = new Schema({
   notifications: [], // notification : {priority, type(default -> announcement, fees, exam), header, message, }
 });
 
-const OnlineUser = mongoose.model("onlineuser", OnlineUserSchema);
-
 const Campus = mongoose.model("campus", CampusSchema);
 const Venue = mongoose.model("venue", VenueSchema);
 
@@ -378,23 +265,13 @@ const Group = mongoose.model("group", GroupSchema);
 
 const Course = mongoose.model("course", CourseSchema);
 
-const Admin = mongoose.model("admin", AdminSchema);
-const Coordinator = mongoose.model("coordinator", CoordinatorSchema);
-const Student = mongoose.model("student", StudentSchema);
-const Lecturer = mongoose.model("lecturer", LecturerSchema);
-
 module.exports = {
-  OnlineUser,
   Sector,
   Group,
   Department,
   Cycle,
   Specialty,
   Level,
-  Admin,
-  Coordinator,
-  Student,
-  Lecturer,
   Course,
   Campus,
   Venue,

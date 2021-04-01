@@ -6,9 +6,6 @@ const _ = require("lodash");
 const uniqid = require("uniqid");
 const faker = require("faker");
 
-//models
-const schemas = require("./models/schemas");
-
 const app = express();
 
 // connection to db
@@ -49,6 +46,12 @@ class Period {
   }
 }
 
+//models
+const schemas = require("./models/schemas");
+const systemDefaults = require("./models/systemDefaults");
+const users = require("./models/users");
+const { get_db_User, gen_ID, hashPassword } = require("./Oath/passport-configs");
+
 let levelArray = ["L1", "L2"];
 
 async function createCampus(_id = "", location = "", venues = []) {
@@ -69,7 +72,7 @@ async function createCampus(_id = "", location = "", venues = []) {
   }
 }
 
-async function createVenues(campus_id = "AKWA") {
+async function createVenue(campus_id = "AKWA") {
   let letters = ["A", "B", "C", "D"];
 
   let campus = await schemas.Campus.findOne({ _id: campus_id });
@@ -159,11 +162,11 @@ async function createCycle(_id = "", department_id = "", cycles = []) {
   }
 }
 
-async function createSpecialties(_id, coordinator_id, cycle_id, courses, levels) {
+async function createSpecialty(_id, coordinator_id, cycle_id, courses, levels) {
   // ["ACC", "MAG'T", "LAW", "T & L", "FOOD Sc.", "BANK"];
   // ["CMA", "EPS", "SWE", "NWS", "TEL", "ICA"]
 
-  let coordinator = await schemas.Coordinator.findOne({ _id: coordinator_id });
+  let coordinator = await users.Coordinator.findOne({ user_Ref: coordinator_id });
 
   let cycle = await schemas.Cycle.findOne({ _id: cycle_id });
 
@@ -214,7 +217,7 @@ async function createLevels(name = "", specialty_id = "", groups = [], courses =
   }
 }
 
-async function createGroups(
+async function createGroup(
   name = "",
   level_id = "",
   campus_id = "",
@@ -248,6 +251,8 @@ async function createGroups(
   } catch (err) {
     console.log(err);
   }
+  await createCourses(group._id);
+  await createStudents(group._id, 5);
 }
 
 async function createCourses(group_id) {
@@ -339,19 +344,55 @@ async function createCourses(group_id) {
   // }
 }
 
-async function createLecturers() {
-  // generating fake lecturers and filling in db
-  for (let i = 0; i < 10; i++) {
-    let name = `${faker.name.firstName()} ${faker.name.lastName()}`;
-    let lecturer = new schemas.Lecturer({
-      _id: uniqid.time("L-"),
-      name,
-      accountType: "Lecturer",
-      TT: [],
-    });
+async function createCoordinator(_id = "coord_1") {
+  let person = {
+    _id,
+    name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+    password: await hashPassword("hey"),
+    accountType: "Coordinator",
+    TT: [],
+    TT_Defaults: {
+      week: {
+        firstDay: new Date().getTime(),
+        lastDay: new Date().getTime(),
+      },
+      periods: [],
+    },
+    specialties: [],
+    lastSeen: new Date().getTime(),
+  };
 
-    await lecturer.save();
-    console.log(`${name} was successfully registered in db with id ${lecturer._id}.`);
+  let newUser = await users.User.create({ ...person });
+  person.user_Ref = newUser;
+  delete person._id;
+
+  let newCoord = await users.Coordinator.create({ ...person });
+
+  newUser.coordinator_Ref = newCoord;
+  await newUser.save();
+
+  console.log(`${newUser.name} was successfully`);
+}
+
+async function createLecturers(num = 10) {
+  // generating fake lecturers and filling in db
+  for (let i = 0; i < num; i++) {
+    let lecturer = {
+      name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+      _id: gen_ID("-Lect"),
+      accountType: "Lecturer",
+      password: await hashPassword("hey"),
+      TT: [],
+    };
+
+    let newUser = await users.User.create({ ...lecturer });
+    lecturer.user_Ref = newUser;
+    delete lecturer._id;
+    let newLect = await users.Lecturer.create({ ...lecturer });
+    newUser.lecturer_Ref = newLect;
+    await newUser.save();
+
+    console.log(`${newUser.name} was successfully registered in db with id ${newUser._id}.`);
   }
 }
 
@@ -360,37 +401,31 @@ async function createStudents(group_id, num = 5) {
     let group = await schemas.Group.findOne({ _id: group_id });
     let level = await schemas.Level.findOne({ _id: group.level });
     let specialty = await schemas.Specialty.findOne({ _id: level.specialty });
-
-    // let specialty = await schemas.Specialty.findOne({
-    //   _id: spec,
-    // });
-
-    let name = `${faker.name.firstName()} ${faker.name.lastName()}`;
-
-    let student = new schemas.Student({
-      _id: uniqid.time("s", `-${group._id}`),
-      name,
+    let person = {
+      _id: gen_ID(group._id),
+      name: `${faker.name.firstName()} ${faker.name.lastName()}`,
       specialty,
       level,
       group,
       accountType: "Student",
-    });
+      password: await hashPassword("hey"),
+    };
 
-    await student.save();
-    group.students.push(student);
+    let newUser = await users.User.create({ ...person });
+    person.user_Ref = newUser;
+    delete person._id;
+    let newStudent = await users.Student.create({ ...person });
+
+    await newStudent.save();
+    newUser.student_Ref = newStudent;
+    await newUser.save();
+
+    group.students.push(newStudent);
     await group.save();
-    console.log(`${student.name} was registered in ${student.level._id} with id ${student._id}.`);
 
-    // let students = await schemas.Student.find({
-    //   level: level._id
-    // });
-
-    // for (let student of students) {
-    //   level.students.push(student);
-    //   await level.save();
-    //   console.log(`${ student.name } was registered in ${ student.level._id } with id ${ student._id }.`);
-
-    // }
+    console.log(
+      `${newUser.name} was registered in ${newStudent.group._id} with id ${newStudent._id}.`
+    );
   }
 }
 
@@ -398,80 +433,105 @@ async function modDbData(collection = "Group", attribute = "Att", value = []) {
   let group = await schemas[collection].find({});
 
   for (let object of group) {
-    await schemas[collection].update({ _id: object._id }, { $set: { attribute: value } });
-    console.log(object);
+    if (object[attribute]) {
+      object[attribute] = hashPassword(object.attribute);
+      object.markModified(attribute);
+      await object.save();
+    } else {
+      await schemas[collection].update({ _id: object._id }, { $set: { attribute: value } });
+    }
   }
   console.log("All good!");
 }
 
+async function modSpecific() {
+  let coords = await users.User.find({});
+  coords.forEach(async (user) => {
+    user.password = await hashPassword("hey");
+    await user.save();
+    console.log(`${user.name} pass updated`);
+  });
+}
+
 (async () => {
+  // await modSpecific();
+  let systemDefault = new systemDefaults({
+    periods: [
+      new Period("08:00", "09:50"),
+      new Period("10:10", "12:00"),
+      new Period("13:00", "14:50"),
+      new Period("15:10", "17:00"),
+      new Period("17:30", "19:30"),
+      new Period("20:00", "21:30"),
+    ],
+    weekDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"],
+    pauses: [
+      new Pause("Morning Break", 0),
+      new Pause("Long Break", 1),
+      new Pause("Afternoon Break", 2),
+      new Pause("Closing", 3),
+      new Pause("Evening Break", 4),
+    ],
+  });
+  await systemDefault.save();
+  //
   // let sysAdmin = new schemas.Admin({
   //   _id: "ROOT",
   //   name: "ROOT",
-  //   accountType: "Admin",
-  //   sysDefaults: {
-  //     periods: [
-  //       new Period("08:00", "09:50"),
-  //       new Period("10:10", "12:00"),
-  //       new Period("13:00", "14:50"),
-  //       new Period("15:10", "17:00"),
-  //       new Period("17:30", "19:30"),
-  //       new Period("20:00", "21:30"),
-  //     ],
-  //     weekDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"],
-  //     pauses: [
-  //       new Pause("Morning Pause", 0),
-  //       new Pause("Long Pause", 1),
-  //       new Pause("Afternoon Pause", 2),
-  //       new Pause("Closing", 3),
-  //       new Pause("Evening Pause", 4),
-  //     ],
-  //   },
+  //   accountType: "Admin"
   // });
   // await sysAdmin.save();
   // console.log(`${sysAdmin.name} was successfully saved`);
-  //   // Creating Coordinator
-  // let coord = new schemas.Coordinator({
-  //   _id: "coord_2",
-  //   name: "Mr Alibaba",
-  //   accountType: "Coordinator",
-  //   TT_Defaults: {
-  //     week: {
-  //       firstDay: new Date().getTime(),
-  //       lastDay: new Date().getTime(),
-  //     },
-  //     periods: [],
-  //   },
-  //   specialties: [],
-  //   lastSeen: new Date().getTime(),
-  //   TTdrafts: [],
-  // });
-  // coord.save();
-  // console.log(`${coord.name} was successfully`);
-  // await createCampus("AKWA", "Dla-Akwa", []);
-  // await createVenues("LOG");
-  // await createSector("SEAS", "School of Engineering and Applied Sciences", []);
-  // await createDepartment("Industrial & Tech.", "SEAS", []);
-  // await createCycle("BTS", "Industrial & Tech.", []);
-  // await createLecturers();
-  // await createSpecialties("FOOD Sc.", "coord_2", "HND", [], []);
-  // await createLevels("L2", "", [], []);
-  // await createGroups(
-  //   "AKWA",
-  //   "CMA-L1",
-  //   "AKWA",
-  //   (courses = []),
-  //   (students = []),
-  //   (TT = []),
-  //   (notifications = [])
-  // );
-  // await createCourses("SWE-L1-AKWA");
-  // await createStudents("SWE-L1-LOG", 35);
+  await createCoordinator("coord_1");
+  await createCampus("AKWA", "Dla-Akwa", []);
+  await createCampus("LOG", "Dla-Logbessou", []);
+  await createVenue("AKWA");
+  await createVenue("LOG");
+  await createSector("SEAS", "School of Engineering and Applied Sciences", []);
+  await createDepartment("Industrial & Tech.", "SEAS", []);
+  await createCycle("HND", "Industrial & Tech.", []);
+  await createLecturers();
+  await createSpecialty("SWE", "coord_1", "HND", [], []);
+  await createLevels("L1", "SWE", [], []);
+  await createLevels("L2", "SWE", [], []);
+  await createGroup(
+    "AKWA",
+    "SWE-L1",
+    "AKWA",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "AKWA",
+    "SWE-L2",
+    "AKWA",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "LOG",
+    "SWE-L1",
+    "LOG",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "LOG",
+    "SWE-L2",
+    "LOG",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  console.log(`\n\nDone!`);
 })();
-
-// modDbData();
-
-console.log(new Date().toDateString());
 
 app.use(
   express.urlencoded({

@@ -1,15 +1,19 @@
+// environment variables
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const mongoose = require("mongoose");
 // const _ = require("lodash");
 const express = require("express");
-// const session = require("express-session"); // check sense
+const session = require("express-session"); // check sense
+const passport = require("passport");
+const flash = require("express-flash");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 // const fs = require("fs");
 // const path = require("path");
-
-// environment variables
-require("dotenv").config();
 
 // routes
 const adminRoutes = require("./routes/adminRoutes");
@@ -81,15 +85,14 @@ const io = require("socket.io")(http);
   //     console.log(err);
   // });
 
-  let chat = io.of("/").on("connection", (socket) => {
-    socketController.handleChat(chat, socket);
-  });
-
   //static files
   app.use(express.static("public"));
 
-  // express-session
-  // app.use(session({ secret: "yo", resave: true, saveUninitialized: true }));
+  app.use(flash());
+  app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // render engine
   app.set("view engine", "ejs");
@@ -106,10 +109,13 @@ const io = require("socket.io")(http);
   app.use(express.json());
   app.use(cookieParser());
 
-  // routes
+  let chat = io.of("/").on("connection", (socket) => {
+    socketController.handleChat(chat, socket);
+  });
 
+  // routes
   app.get("/", (req, res) => {
-    res.render("home", { title: "Home" });
+    res.render("landing page", { title: "Login Page", login: true });
   });
 
   // admin routes

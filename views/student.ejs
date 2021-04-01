@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="assets/css/coordinator_interface.css" />
     <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="rollCallStyle.css" />
+    <link rel="stylesheet" href="scroll-table.css" />
+    <script src="js/moment-with-locales.js"></script>
     <script src="js/socket.io.js" defer></script>
     <script type="module" src="js/Student.js" defer></script>
 
@@ -48,6 +51,8 @@
             <a class="navLink active" data-navset="mainNav" id="normalTT-link" data-ref="TT"
               >Timetable</a
             >
+
+            <a class="navLink" id="Att-link" data-navset="mainNav" data-ref="Att">Attendance</a>
           </div>
         </div>
       </div>
@@ -81,6 +86,53 @@
       </div>
     </div>
 
+    <div class="w3-row nav-item" data-navset="mainNav" id="Att">
+      <div class="container" id="Att-main">
+        <nav>
+          <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
+            <a
+              class="navLink"
+              id="take_Att-link"
+              style="display: none"
+              data-navset="Att-nav"
+              data-ref="take_Att"
+              >New</a
+            >
+
+            <a
+              class="navLink active"
+              id="Att_history-link"
+              data-navset="Att-nav"
+              data-ref="Att_history"
+              >History</a
+            >
+          </div>
+        </nav>
+
+        <hr />
+
+        <div class="" id="header">
+          <div id="Att-coreOptions" class="toCenter">
+            <select id="Att-groupSelect"></select>
+          </div>
+          <div id="Att-varOptions"></div>
+        </div>
+
+        <div class="nav-item" style="display: none" data-navset="Att-nav" id="take_Att">
+          <h1>Take New Attendance</h1>
+          <div class="" id="Att-container"></div>
+        </div>
+        <div class="nav-item" style="display: block" data-navset="Att-nav" id="Att_history">
+          <hr />
+          <button class="myAccordion">Attendance History</button>
+          <div class="AccPanel" id="Att-hist-panel"></div>
+          <hr />
+
+          <div class="" id="Att-hist-details"></div>
+        </div>
+      </div>
+    </div>
+
     <hr />
     <br /><br />
 
@@ -106,5 +158,5 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/navigation.js"></script>
   </body>
-  <%- include('partials/authFooter') -%>
+  <!-- <%- include('partials/authFooter') -%> -->
 </html>

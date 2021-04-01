@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const AttSchema = new Schema({
   data: [], // {name, presence, remark}
 
-  note: String,
+  description: String,
 
   type: String,
 

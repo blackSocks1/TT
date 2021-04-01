@@ -1,22 +1,28 @@
-const { getUserCollection } = require("../myFunctions/npm_fx");
-const schemas = require("../models/schemas");
+const users = require("../models/users");
+const { get_db_User } = require("../Oath/passport-configs");
 
 let lecturerController = {
   save: async (req, res) => {
-    let lecturer = await getUserCollection(req.body);
+    let lecturer = await get_db_User(req.body);
     let reponse = { error: "", data: "" };
 
     try {
       let result;
 
       if (lecturer) {
-        result = await schemas[lecturer.accountType].findOne({ _id: lecturer._id });
+        if (lecturer.accountType == "Lecturer") {
+          result = await users.Lecturer.findOne({ _id: lecturer.lecturer_Ref });
+        } else {
+          result = await users.Coordinator.findOne({ _id: lecturer.coordinator_Ref });
+        }
+
         result.avail.defaultAvail = req.body.avail;
         await result.save();
       }
 
       reponse.data = result.avail.defaultAvail;
     } catch (err) {
+      console.log(err);
       reponse.error = err;
     }
 

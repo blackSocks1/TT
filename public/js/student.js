@@ -2,33 +2,18 @@ import { DisplayTT, User, color } from "./classes.js";
 
 export class Student extends User {
   // user class from interface management
-  constructor(_id, name, group_id) {
+  constructor(_id, name) {
     super(_id, name);
-    this.group_id = group_id;
     this.accountType = "Student";
+    this.canTakeAtt = false;
   }
 
   main = async () => {
+    await this.getMyInfo();
     await this.userInit();
     this.connectToSocket();
     this.setUserEventListener();
     // await this.addContact("skksdqcnu-SWE-L2-LOG", "shb bgurgus");
-  };
-
-  userInit = async () => {
-    this.sysDefaults = await this.getSysDefaults();
-
-    this.ownTT = new DisplayTT(
-      "self",
-      "#displayTTContainer",
-      this.accountType,
-      "",
-      this.sysDefaults
-    );
-
-    this.ownTT.show();
-
-    await this.getMyInfo();
   };
 }
 

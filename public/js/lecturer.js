@@ -11,7 +11,7 @@ export class Lecturer extends User {
   }
 
   main = async () => {
-    await this.userInit();
+    await this.lecturerInit();
     this.connectToSocket();
     this.setUserEventListener();
     this.setLectecuerEventListeners();
@@ -20,12 +20,16 @@ export class Lecturer extends User {
   /**
    * method to initialize lecturer variables
    */
-  userInit = async () => {
+  lecturerInit = async () => {
     this.sysDefaults = await this.getSysDefaults();
+    console.log(this.sysDefaults);
+
+    this.availTT = new AvailTT("myAvail", "#availTTContainer", this.sysDefaults);
+    this.availTT.show();
 
     this.ownTT = new DisplayTT(
       "myTT",
-      "#displayTTContainer",
+      "displayTTContainer",
       this.accountType,
       "",
       this.sysDefaults
@@ -33,11 +37,10 @@ export class Lecturer extends User {
 
     this.ownTT.show();
 
-    await this.getTT();
-
-    this.availTT = new AvailTT("myAvail", "#availTTContainer", this.sysDefaults);
-    this.availTT.show();
     await this.getMyInfo();
+    console.log("Get my info ok");
+    await this.getTT();
+    console.log("Get TT ok");
   };
 
   setLectecuerEventListeners = () => {
@@ -73,6 +76,7 @@ export class Lecturer extends User {
         period.checked = false;
       }
     });
+    console.log(this.avail);
   };
 
   /**

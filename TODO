@@ -1,0 +1,15 @@
+- authentication
+  - restrict login attempts to 4 trials then block account or ask to retry after sometime
+
+- work on Admin interface:
+  - lecturer registration by Admin
+  - system defaults format {weekDays: 7, periods: 6, breaks: 5}
+  - interface to reset account passwords
+
+- manage the Att history and remove perso Att of coords and lects
+
+- lecturers may view TT of students (groups)
+
+- coord db section:
+  - courses
+  - students (migration form one group to another, enabling some to take Att)

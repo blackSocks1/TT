@@ -71,8 +71,7 @@ input[type="password"] {
   padding: 25px 25px;
 }
 
-.signup,
-.login {
+.signup {
   background-color: #008778;
   color: white;
 }

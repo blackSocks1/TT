@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="rollCallStyle.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="scroll-table.css" />
     <script src="js/socket.io.js" defer></script>
     <script src="js/hashMap.js" defer></script>
     <script src="js/moment-with-locales.js"></script>
@@ -142,7 +144,12 @@
 
         <hr />
 
-        <div class="card-header" id="header"></div>
+        <div class="" id="header">
+          <div id="Att-coreOptions" class="toCenter">
+            <select id="Att-groupSelect"></select>
+          </div>
+          <div id="Att-varOptions"></div>
+        </div>
 
         <div class="nav-item" style="display: block" data-navset="Att-nav" id="take_Att">
           <h1>Take New Attendance</h1>
@@ -225,5 +232,5 @@
     <script src="assets/js/bootstrap.min.js"></script>
   </body>
 
-  <%- include('partials/authFooter') -%>
+  <!-- <%- include('partials/authFooter') -%> -->
 </html>

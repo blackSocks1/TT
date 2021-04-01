@@ -1,45 +1,3 @@
-const schemas = require("../models/schemas");
-const bcrypt = require("bcryptjs");
-
-const hashPassword = async (password) => {
-  const salt = await bcrypt.genSalt();
-  return await bcrypt.hash(password, salt);
-};
-
-const authUser = async (user) => {
-  let dbUser = await getUserCollection(user);
-  if (!dbUser) {
-    return null;
-  }
-  return await bcrypt.compare(user.password, dbUser.password);
-};
-
-async function getUserCollection(person) {
-  let collection = "Student";
-
-  if (person._id[0] === "L" || person._id[0] === "l") {
-    person.accountType = collection = "Lecturer";
-  } else if (person._id[0] === "s") {
-    person.accountType = collection = "Student";
-  } else if (person._id[0] === "c") {
-    person.accountType = collection = "Coordinator";
-  } else if (person._id[0] === "a") {
-    person.accountType = collection = "Admin";
-  }
-
-  let dbPerson = await schemas[collection].findOne({ _id: person._id });
-
-  if (dbPerson) {
-    dbPerson.platform = person.platform == "mobile" ? "mobile" : "web";
-  }
-
-  return dbPerson;
-}
-
-const handleErrors = (err) => {
-  // console.log(err.message, err.code);
-};
-
 function findElement(attribute = "_id", value, iterableCollection = []) {
   // function to simulate a database query from an iterable collection
   // ***** Extra module `isEquivalent` *****
@@ -68,15 +26,11 @@ function findElement(attribute = "_id", value, iterableCollection = []) {
   return undefined;
 }
 
-// function findElement(attribute = "_id", value, source) {
-//   return _.find(source, (o) => o[attribute] === value);
-// }
-
-// npm version but incomplete
-// function findElement(attribute = "_id", value, source) {
-//   return _.find(source, (o) => {
-//     return o[attribute] === value;
-//   });
+// function extendSchema (Schema, definition, options){
+//     return new mongoose.Schema(
+//         Object.assign({},Schema.obj,definition),
+//         options
+//         );
 // }
 
 // Other stuffs
@@ -110,4 +64,4 @@ function isEquivalent(first, second) {
   return true;
 }
 
-module.exports = { authUser, getUserCollection, handleErrors, findElement, isEquivalent };
+module.exports = { findElement, isEquivalent };

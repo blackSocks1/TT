@@ -9,7 +9,7 @@ function navigate() {
 
   // default selected links at runtime
   navLinks.forEach((link) => {
-    if (link.id == "normalTT-link" || link.id == "Students-link" || link.id == "take_Att-link") {
+    if (link.id == "normalTT-link" || link.id == "Students-link" || link.id == "Att_history-link") {
       link.click();
     }
   });

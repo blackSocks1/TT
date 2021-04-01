@@ -19,8 +19,20 @@ export class User {
     this.accountType;
     this.lastSeen;
     this.platform = "web";
+    this.canTakeAtt = true;
 
-    this.Att = { groups: [], result: [], history: { perso: [], group: [] } };
+    this.AttFrom = new AttForm();
+    this.DataForm = new DataForm();
+
+    this.Att = {
+      currentGroup: {},
+      groups: [],
+      currentList: [],
+      result: [],
+      history: { perso: [], group: [] },
+    };
+
+    this.AttgroupSelect = document.querySelector("#Att-groupSelect");
 
     this.socket;
     this.contacts = [];
@@ -28,90 +40,27 @@ export class User {
     this.chatGroups = [];
   }
 
-  main = async () => {};
+  userInit = async () => {
+    this.sysDefaults = await this.getSysDefaults();
 
-  take_Att = async () => {
-    let groups = await (await fetch("/Att/getGroups")).json();
-    console.log(groups);
+    this.ownTT = new DisplayTT(
+      "myTT",
+      "displayTTContainer",
+      this.accountType,
+      "",
+      this.sysDefaults
+    );
 
-    let Att_results = [];
-    let container = document.querySelector(`#${this.myAttFrom.container_id}`);
-    let all_li = container.querySelectorAll("li");
+    this.ownTT.show();
 
-    all_li.forEach((li) => {
-      Att_results.push({
-        name: li.querySelector("div").innerText,
-        presence: li.querySelector("input[type='checkbox']").checked,
-        remark: li.querySelector("input[type='text']").value,
-      });
-    });
-
-    let note = container.querySelector(".AttshortNote").value.trim();
-
-    let newAtt = {
-      data: Att_results, // {name, presence, remark}
-
-      note,
-
-      type: "Att",
-
-      group_id: "SWE-L1-LOG",
-
-      date: moment()._d.toDateString(),
-
-      time: moment().format("h:mm:ss a"),
-
-      takenBy: this._id,
-
-      owner_id: "SWE-L1-LOG",
-    };
-
-    // console.log("F.E. results", Att_results);
-    // let res = await fx.postFetch("/Att/save", newAtt);
-    // console.log("B.E. results", res);
-
-    // let AttFormContainer = document.querySelector("#Att-container");
-    // AttFormContainer.innerHTML = "";
-
-    let myDataFrom = new DataForm("SWE-L1-LOG", {
-      type: "Att",
-      data: Att_results,
-      note,
-      other: { date: newAtt.date, time: newAtt.time },
-    });
-
-    let DataFormContainer = document.querySelector("#Att-hist-details");
-
-    myDataFrom.show("Att-hist-details");
-
-    document.querySelector(`a[data-ref=${DataFormContainer.parentNode.id}]`).click();
+    await this.getTT();
   };
-
-  compile_Att = () => {};
-
-  view_Att = () => {};
-
-  save_Att = async () => {
-    let today = new Date();
-
-    let Att = {
-      data: [],
-      group_id,
-      date: today.toDateString(),
-      time: `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`,
-      takenBy: { user_id: this._id, accountType: this.accountType },
-    };
-
-    let Att_res = await fx.postFetch("/Att/save", { Att });
-  };
-
-  userInit = async () => {};
 
   /**
    * method to let a user communicate via sockect.io
    * @param {String} hostLink link of server to use for sockect connection
    */
-  connectToSocket = async (hostLink = `http://${"localhost"}:${45000}`) => {
+  connectToSocket = async (hostLink = `http://${"192.168.46.91"}:${45000}`) => {
     this.socket = io.connect(hostLink);
 
     this.socket.on("connect", async () => {
@@ -135,12 +84,11 @@ export class User {
     });
 
     this.socket.on("/reloadDbData", async (updater) => {
-      await this.getDbData(document.querySelector("#Groups").value);
+      await this.getDbData(this.groupToUpdate);
 
       let weekToProgram = new Week(new Date(this.program_TT.weekStart.value));
 
-      let group = fx.findElement("_id", document.querySelector("#Groups").value, this.groupDb)
-        .element;
+      let group = fx.findElement("_id", this.groupToUpdate, this.groupDb).element;
       this.groupDisplay_TT.TT = group.TT;
 
       let ttOfThisWeek = fx.findElement("week", weekToProgram, this.groupDisplay_TT.TT);
@@ -176,7 +124,7 @@ export class User {
    */
   getSysDefaults = async () => {
     // ******** this would be a post request so that each user can get only data available for his accountType
-    return await (await fetch("/admin/getSysDefaults")).json();
+    return await (await fetch("/user/getSysDefaults")).json();
   };
 
   getMyInfo = async () => {
@@ -185,15 +133,30 @@ export class User {
 
     if (myData) {
       Object.keys(myData).forEach((key) => {
-        if (key == "TT") {
-          this.ownTT.TT = myData.TT;
-          this.selectTT();
-          this.ownTT.display(this.ownTT.ttOnScreen, this.accountType);
+        if (
+          key == "student_Ref" ||
+          key == "lecturer_Ref" ||
+          key == "coordinator_Ref" ||
+          key == "admin_Ref"
+        ) {
+          Object.keys(myData[key]).forEach((subKey) => {
+            if (subKey == "_id") {
+              this[key] = myData[key][subKey];
+            } else {
+              if (subKey == "TT") {
+                this.ownTT.TT = myData[key][subKey];
+                this.selectTT();
+                this.ownTT.display(this.ownTT.ttOnScreen, this.accountType);
+              } else {
+                this[subKey] = myData[key][subKey];
+                if (subKey == "avail") {
+                  this.loadAvail(this.avail.defaultAvail);
+                }
+              }
+            }
+          });
         } else {
           this[key] = myData[key];
-          if (key == "avail") {
-            this.loadAvail(this.avail.defaultAvail);
-          }
         }
       });
 
@@ -203,9 +166,219 @@ export class User {
     }
 
     this.showSnackBar(message);
+    // console.log(this);
   };
 
   getAccType = async (_id) => await fx.postFetch("/user/getAccType", { _id });
+
+  // Att methods //
+
+  /**
+   * Method to get or reload Att data
+   * @param {Boolean} reload value to reload user data or not
+   */
+  getAttData = async (reload = false) => {
+    this.Att.groups = await fx.postFetch("/Att/getGroupDetails", {
+      _id: this._id,
+      group_id: this.accountType == "Student" ? this.group : null,
+      accountType: this.accountType,
+    });
+
+    console.log(this.Att);
+
+    if (this.Att.groups.length > 0) {
+      this.Att.groups = this.Att.groups.sort((a, b) => (a._id > b._id ? 1 : -1));
+
+      if (reload) {
+        this.use_Att({ target: { value: this.Att.currentGroup._id } });
+      } else {
+        this.use_Att({ target: { value: this.Att.groups[0]._id } });
+        this.AttgroupSelect.innerHTML = "";
+
+        this.Att.groups.forEach((group, index) => {
+          this.AttgroupSelect.innerHTML +=
+            index == 0
+              ? `<option value="${group._id}" selected>${group._id}</option>`
+              : `<option value="${group._id}">${group._id}</option>`;
+        });
+      }
+    }
+  };
+
+  /**
+   * Method to enable user to use Att of group in group select menu
+   * @param {*} e
+   */
+  use_Att = (e) => {
+    let group_id = e.target.value;
+
+    // Arranging Att form data
+    this.Att.currentGroup = fx.findElement("_id", group_id, this.Att.groups).element;
+
+    // sort student names
+    this.Att.currentList = this.Att.currentGroup.students.sort((a, b) =>
+      a.name > b.name ? 1 : -1
+    );
+
+    this.AttFrom.show("Att-container", this.Att.currentList);
+    this.AttFrom.searchBar.value = "";
+
+    // Arranging Att Data form data
+    let Att_hist_panel = document.querySelector("#Att-hist-panel");
+    Att_hist_panel.innerHTML = "";
+    Att_hist_panel.parentNode.querySelector("#Att-hist-details").innerHTML = "";
+
+    let groupAtt = this.Att.currentGroup.Att.sort((a, b) =>
+      new Date(a.date).getTime() > new Date(b.date).getTime() ? 1 : -1
+    );
+
+    this.Att.history.group = groupAtt.filter((Att) => Att.owner_id == group_id);
+    this.Att.history.perso = groupAtt.filter((Att) => Att.owner_id == this._id);
+
+    if (this.Att.history.group.length > 0) {
+      let groupDataForm = new DataForm();
+
+      groupDataForm.show(Att_hist_panel.id, {
+        ths: ["date", "time", "description"],
+        data: this.Att.history.group,
+        tr_id: "_id",
+      });
+
+      groupDataForm.addEvent("trs", "click", (e) => {
+        let target_id = e.target.tagName == "TR" ? e.target.id : e.target.parentNode.id;
+        let Att = fx.findElement("_id", target_id, this.Att.currentGroup.Att).element;
+        this.DataForm.show("Att-hist-details", { ...Att });
+      });
+    }
+
+    if (this.Att.history.perso.length > 0) {
+      let persoDataFrom = new DataForm();
+
+      persoDataFrom.show(Att_hist_panel.id, {
+        ths: ["date", "time", "note"],
+        data: this.Att.history.perso,
+        tr_id: "_id",
+      });
+
+      persoDataFrom.addEvent("trs", "click", (e) => {
+        let target_id = e.target.tagName == "TR" ? e.target.id : e.target.parentNode.id;
+        let Att = fx.findElement("_id", target_id, this.Att.currentGroup.Att).element;
+        this.DataForm.show("Att-hist-details", { ...Att });
+      });
+    }
+
+    // Arranging Custom Class Lists' data
+  };
+
+  /**
+   * Method to save Att in Att form
+   */
+  save_Att = async () => {
+    this.Att.result = [];
+
+    this.AttFrom.li_items.forEach((li) => {
+      this.Att.result.push({
+        name: li.querySelector("div").innerText,
+        presence: li.querySelector("input[type='checkbox']").checked,
+        remark: li.querySelector("input[type='text']").value,
+      });
+    });
+
+    let newAtt = {
+      data: this.Att.result, // {name, presence, remark}
+
+      description: this.AttFrom.description.value.trim(),
+
+      type: "Att",
+
+      group_id: this.Att.currentGroup._id,
+
+      date: moment()._d.toDateString(),
+
+      time: moment().format("h:mm:ss a"),
+
+      takenBy: this._id,
+
+      owner_id: this.Att.currentGroup._id,
+    };
+
+    let Att_res = await fx.postFetch("/Att/save", newAtt);
+    await this.getAttData(true);
+
+    this.AttFrom.unCheckAll();
+
+    this.use_Att({ target: { value: this.Att.currentGroup._id } });
+    this.DataForm.show("Att-hist-details", { ...Att_res });
+
+    let dataFormContainer = document.querySelector("#Att-hist-details");
+    document.querySelector(`a[data-ref=${dataFormContainer.parentNode.id}]`).click();
+  };
+
+  /**
+   * Method to enable / disable Student canTakeAtt attribute
+   */
+  enable_Att = () => {
+    if (this.canTakeAtt) {
+      document.querySelector("#Att").innerHTML = `
+      <div class="container" id="Att-main">
+          <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
+            <a class="navLink active" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att">New</a>
+
+            <a class="navLink" id="Att_history-link" data-navset="Att-nav" data-ref="Att_history"
+              >History</a
+            >
+          </div>
+
+        <hr />
+
+        <div class="" id="header">
+          <div id="Att-coreOptions" class="toCenter">
+            <select id="Att-groupSelect"></select>
+          </div>
+        </div>
+
+        <div class="nav-item" style="display: block" data-navset="Att-nav" id="take_Att">
+          <h1>Take New Attendance</h1>
+          <div class="" id="Att-container"></div>
+        </div>
+        <div class="nav-item" data-navset="Att-nav" id="Att_history">
+          <hr />
+          <button class="myAccordion">Attendance History</button>
+          <div class="AccPanel" id="Att-hist-panel"></div>
+          <hr />
+
+          <div class="" id="Att-hist-details"></div>
+        </div>
+      </div>
+      `;
+    } else {
+      document.querySelector("#Att").innerHTML = `
+      <div class="container" id="Att-main">
+          <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
+            <a class="navLink active" id="Att_history-link" data-navset="Att-nav" data-ref="Att_history"
+              >History</a
+            >
+          </div>
+
+        <hr />
+
+        <div class="" id="header">
+          <div id="Att-coreOptions" class="toCenter">
+            <select id="Att-groupSelect"></select>
+          </div>
+        </div>
+
+        <div class="nav-item" style="display: block" data-navset="Att-nav" id="Att_history">
+          <hr />
+          <button class="myAccordion">Attendance History</button>
+          <div class="AccPanel" id="Att-hist-panel"></div>
+          <hr />
+
+          <div class="" id="Att-hist-details"></div>
+        </div>
+      </div>`;
+    }
+  };
 
   /**
    * method to add a new contact to user contact list
@@ -230,30 +403,40 @@ export class User {
   /**
    * method for adding event listeners to elements prior to user class and children class if called
    */
-  setUserEventListener = () => {
+  setUserEventListener = async () => {
     // adding event listeners to TT elements
     document.querySelector("#getTT").addEventListener("click", this.getTT);
+    this.AttgroupSelect.addEventListener("change", this.use_Att);
+    await this.getAttData();
 
-    // if (this.accountType == "Coordinator") {
-    //   this.groupDisplay_TT.periods.forEach((period) => {
-    //     period.addEventListener("click", this.showPeriod);
-    //     period
-    //       .querySelectorAll("input.displayPeriod")
-    //       .forEach((displayField) => displayField.addEventListener("click", this.showPeriod));
-    //   });
-    // }
+    if (this.accountType != "Student") {
+      this.AttFrom.checkAllBtn.addEventListener("click", () => {
+        this.AttFrom.checkAll();
+      });
+
+      this.AttFrom.uncheckAllBtn.addEventListener("click", () => {
+        this.AttFrom.unCheckAll();
+      });
+
+      this.AttFrom.saveBtn.addEventListener("click", () => {
+        this.save_Att();
+      });
+    }
   };
 
   /**
    * method for fetching user personal TT
    */
   getTT = async () => {
+    console.log("Yooo", this);
     this.ownTT.TT = await fx.postFetch("/user/getTT", {
       _id: this._id,
       accountType: this.accountType,
-      group_id: this.group_id,
+      group_id: this.group,
       platform: this.platform,
+      stud_ref: this.student_Ref,
     });
+    console.log(this.ownTT.TT);
 
     this.selectTT();
     this.ownTT.display(this.ownTT.ttOnScreen, this.accountType);
@@ -375,7 +558,6 @@ export class Week {
   constructor(day) {
     let firstDay;
     let lastDay;
-    let dayOfWeek;
 
     if (
       day instanceof Date ||
@@ -387,9 +569,7 @@ export class Week {
       day = new Date();
     }
 
-    dayOfWeek = day.getDay();
-
-    if (dayOfWeek === 0) {
+    if (day.getDay() == 0) {
       firstDay = new Date(new Date(day).setDate(day.getDate() - 6));
       lastDay = new Date(day);
     } else {
@@ -602,28 +782,48 @@ export class Pause {
   }
 }
 
-export class AttForm {
+export class UserForms {
+  constructor() {}
+
+  addEvent(target = "trs", action = "click", callBack) {
+    this[target].forEach((tr) => {
+      tr.addEventListener(action, callBack);
+    });
+  }
+}
+
+export class AttForm extends UserForms {
   /**
    * @param {String} label AttForm label
    * @param {String} data AttForm data to manipulate
    */
-  constructor(label, data = []) {
-    this.label = label;
-    this.data = data;
+  constructor() {
+    super();
+    this.loaded = false;
   }
 
-  main() {
-    this.searchBar = document.querySelector("#AttForm-search");
+  init = () => {
+    this.saveBtn = this.container.querySelector("#saveAtt");
+    this.checkAllBtn = this.container.querySelector("#checkAll_Att");
+    this.uncheckAllBtn = this.container.querySelector("#uncheckAll_Att");
+    this.classList = this.container.querySelector("#AttForm-list");
 
-    let searchItems = document.querySelectorAll(`div[data-search="${this.searchBar.id}"]`);
+    this.li_items = this.container.querySelectorAll("li");
+
+    this.description = this.container.querySelector("#Att-description");
+    this.searchBar = this.container.querySelector("#AttForm-search");
 
     this.searchBar.addEventListener("keyup", () => {
+      // try wrapping the search function into one good piece
+
+      let searchItems = this.container.querySelectorAll(`div[data-search="${this.searchBar.id}"]`);
+
       let filter = this.searchBar.value.trim();
       if (filter) {
         searchItems.forEach((item) => {
           let originalValue = item.parentNode.querySelector("input.originalValue").value;
 
-          if (originalValue.toUpperCase().indexOf(filter.toUpperCase()) != -1) {
+          if (originalValue.toLowerCase().indexOf(filter.toLowerCase()) != -1) {
             item.innerHTML = fx.colorMatches(filter, originalValue, "#2196f3");
             item.parentNode.style.display = "";
           } else {
@@ -638,43 +838,21 @@ export class AttForm {
         });
       }
     });
-  }
+  };
 
   /**
    * @param {String} container_id container div to append AttForm in
    */
-  show(container_id) {
-    this.container_id = container_id;
-    let container = document.querySelector(`#${this.container_id}`);
-    container.innerHTML = "";
+  show = (container_id, data = []) => {
+    this.data = data;
 
-    let AttForm = document.createElement("form");
-    AttForm.setAttribute("id", "AttForm");
+    this.container = document.querySelector(`#${container_id}`);
 
-    let body = document.createElement("div");
-    let mainDiv = document.createElement("div");
+    if (this.loaded) {
+      this.classList.innerHTML = this.searchBar.innerHTML = this.description.value = "";
 
-    let searchBar = document.createElement("input");
-    searchBar.setAttribute("class", "form-control search");
-    searchBar.setAttribute("type", "search");
-    searchBar.setAttribute("placeholder", "Search");
-    searchBar.setAttribute("aria-label", "Search");
-    searchBar.setAttribute("id", "AttForm-search");
-
-    mainDiv.appendChild(searchBar);
-    mainDiv.innerHTML += "<hr>";
-    body.appendChild(mainDiv);
-
-    let classListContainer = document.createElement("div");
-
-    classListContainer.setAttribute("class", "card-body");
-    classListContainer.setAttribute("style", "max-height: 550px; overflow: auto");
-
-    let classList = document.createElement("ul");
-    classList.setAttribute("class", "list-group list-group-flush");
-
-    this.data.forEach((elt) => {
-      classList.innerHTML += `
+      this.data.forEach((elt) => {
+        this.classList.innerHTML += `
             <li class="list-group-item studentSearch AttBlock">
               <input type="checkbox" class="form-check-input"/>
               <input
@@ -685,62 +863,119 @@ export class AttForm {
                 placeholder="Remark..."
               />
               <div class="" data-search="AttForm-search">${elt.name}</div>
-              <input class="originalValue" type="text" value="${elt.name}" style="display:none;"/>
-            </li>
-    `;
+              <input class="originalValue" type="text" value="${elt.name}" style="display:none;"/>`;
+      });
+    } else {
+      this.container.innerHTML = "";
+      let AttForm = document.createElement("form");
+      AttForm.setAttribute("id", "AttForm");
+
+      this.body = document.createElement("div");
+      let mainDiv = document.createElement("div");
+
+      let searchBar = document.createElement("input");
+      searchBar.setAttribute("class", "form-control search");
+      searchBar.setAttribute("type", "search");
+      searchBar.setAttribute("placeholder", "Search");
+      searchBar.setAttribute("aria-label", "Search");
+      searchBar.setAttribute("id", "AttForm-search");
+
+      mainDiv.appendChild(searchBar);
+      mainDiv.innerHTML += "<hr>";
+      this.body.appendChild(mainDiv);
+
+      let classListContainer = document.createElement("div");
+
+      classListContainer.setAttribute("class", "card-body");
+      classListContainer.setAttribute("style", "max-height: 550px; overflow: auto");
+
+      this.classList = document.createElement("ul");
+      this.classList.setAttribute("class", "list-group list-group-flush");
+      this.classList.setAttribute("id", "AttForm-list");
+
+      this.data.forEach((elt) => {
+        this.classList.innerHTML += `
+            <li class="list-group-item studentSearch AttBlock">
+              <input type="checkbox" class="form-check-input"/>
+              <input
+                type="text"
+                class="form-control"
+                id="remark"
+                autocomplete="off"
+                placeholder="Remark..."
+              />
+              <div class="" data-search="AttForm-search">${elt.name}</div>
+              <input class="originalValue" type="text" value="${elt.name}" style="display:none;"/>`;
+      });
+
+      classListContainer.appendChild(this.classList);
+      this.body.appendChild(classListContainer);
+
+      AttForm.appendChild(this.body);
+
+      AttForm.innerHTML += `<br>
+        <div class="card-footer w3-center w3-bar">
+          <input placeholder="Add a description..." type="text" maxlength=150 id="Att-description" class="Att-description">
+          <br>
+          <div>
+            <input type="button" class="button" id="checkAll_Att" value="CHECK ALL"> | 
+            <input type="button" class="button" id="uncheckAll_Att" value="UNCHECK ALL"> | 
+            <input type="button" class="button" id="saveAtt" value="SAVE">
+          </div>
+        </div>`;
+
+      this.container.appendChild(AttForm);
+      this.container.style.display = "block";
+      this.loaded = true;
+    }
+
+    this.init();
+  };
+
+  checkAll = () => {
+    this.li_items.forEach((li) => {
+      li.querySelector("input[type='checkbox']").checked = true;
     });
+  };
 
-    classListContainer.appendChild(classList);
-    body.appendChild(classListContainer);
-
-    AttForm.appendChild(body);
-
-    AttForm.innerHTML += `<br>
-    <div class="card-footer w3-center w3-bar">
-      <input placeholder="Short note..." type="text" maxlength=150 class="AttshortNote">
-      <br>
-      <div>
-        <input type="button" class="button" id="saveAtt" value="SAVE">
-      </div>
-    </div>`;
-
-    container.appendChild(AttForm);
-    container.style.display = "block";
-    this.main();
-  }
+  unCheckAll = () => {
+    this.li_items.forEach((li) => {
+      li.querySelector("input[type='checkbox']").checked = false;
+    });
+  };
 }
 
-export class DataForm {
-  constructor(
-    label = "",
-    {
-      type = "",
-      ths = ["name", "presence", "remark"],
-      data = [
-        { name: "adbjdvb gvns wvwjv", presence: "y", remark: "sfv kj" },
-        { name: "nvksnvie rgon sdvnwj", presence: "y", remark: "sfv kj" },
-        { name: "cavn wfnwnfi wgnkwn", presence: "y", remark: "sfv kj" },
-        { name: "Adnvwvdi wnrgiwn", presence: "y", remark: "sfv kj" },
-      ],
-      note = "",
-      other = { date: "", time: "" },
-    }
-  ) {
-    this.label = label;
-    this.type = type;
-    this.ths = ths;
-    this.data = data;
-    this.note = note;
-    this.other = other;
+export class DataForm extends UserForms {
+  constructor() {
+    super();
   }
 
   /**
    * @param {String} container_id container div to append AttForm in
    */
-  show(container_id) {
-    this.container_id = container_id;
-    let container = document.querySelector(`#${this.container_id}`);
-    container.innerHTML = "";
+  show(
+    container_id,
+    {
+      type = "",
+      ths = ["name", "presence", "remark"],
+      data = [],
+      description = "",
+      tr_id = "",
+      date = "",
+      time = "",
+    }
+  ) {
+    this.type = type;
+    this.ths = ths;
+    this.data = data;
+    this.description = description;
+    this.tr_id = tr_id;
+    this.date = date;
+    this.time = time;
+
+    this.container = document.querySelector(`#${container_id}`);
+    // this.container.classList.add("table-scroll");
+    this.container.innerHTML = "";
 
     let dataForm = document.createElement("form");
 
@@ -748,9 +983,11 @@ export class DataForm {
       dataForm.innerHTML = `
     <div class="card-header" style="text-align:center;">
       <div class="card-title">
-        <span>${this.other.date}</span>
+        <span>${this.date}</span>
         <br>
-        <span>${this.other.time}</span>
+        <span>${this.time}</span>
+        <br>
+        <span>${this.description}</span>
       </div>
     </div>`;
     }
@@ -759,13 +996,17 @@ export class DataForm {
     table.setAttribute("id", "viewStatTable");
     table.setAttribute("class", "table table-bordered w3-centered");
 
-    let thead = document.createElement("tr");
+    let thead = document.createElement("thead");
+    let thead_tr = document.createElement("tr");
+    // thead_tr.setAttribute("colspan", this.sysDefaults.weekDays.length + 1);
 
-    thead.innerHTML += `<th scope="col">S/N</th>`; // serial number header
+    thead_tr.innerHTML += `<th scope="col">#</th>`; // serial number header
 
     this.ths.forEach((th) => {
-      thead.innerHTML += `<th scope="col">${th.toUpperCase()}</th>`;
+      thead_tr.innerHTML += `<th scope="col">${th.toUpperCase()}</th>`;
     });
+
+    thead.appendChild(thead_tr);
 
     table.appendChild(thead);
 
@@ -773,6 +1014,8 @@ export class DataForm {
 
     this.data.forEach((elt, index) => {
       let tr = document.createElement("tr");
+      tr.setAttribute("class", "tableRow");
+      tr.setAttribute("id", data[index][tr_id]);
 
       tr.innerHTML += `<td>${index + 1}</td>`; // serial number
 
@@ -790,17 +1033,19 @@ export class DataForm {
       tbody.appendChild(tr);
     });
 
-    tbody.innerHTML +=
-      this.type == "Att" && this.note
-        ? `<div style="text-align:left;"><b>Note: </b><br><p>${this.note}</p><br></div>`
-        : "";
+    // tbody.innerHTML +=
+    //   this.type == "Att" && this.description
+    //     ? `<div style="text-align:left;"><b>Note: </b><br><p>${this.description}</p><br></div>`
+    //     : "";
 
     table.appendChild(tbody);
 
     dataForm.appendChild(table);
 
-    container.appendChild(dataForm);
-    container.style.display = "block";
+    this.container.appendChild(dataForm);
+    this.container.style.display = "block";
+
+    this.trs = this.container.querySelectorAll("tr.tableRow");
   }
 }
 
@@ -810,6 +1055,7 @@ class TT {
 
   setHeader = (weekToProgram) => {
     // re-organising dates in table header
+
     if (weekToProgram && weekToProgram.firstDay && weekToProgram.has(Date.now())) {
       let th_days_date = new Date();
       th_days_date = th_days_date.getDay();
@@ -848,7 +1094,7 @@ export class DisplayTT extends TT {
     super();
 
     this._id = _id;
-    this.container_id = container_id;
+    this.container = document.querySelector(`#${container_id}`);
     this.userAccountType = userAccountType;
     this.nav_id = `${this._id}-nav`;
     this.pagination_id = `${this._id}-page`;
@@ -865,13 +1111,14 @@ export class DisplayTT extends TT {
    * - Method to set initialize and to set eventlisteners of instantiated object
    * - Only to be called right at the bottom of the `show()` method of this class
    */
-  main = () => {
+  init = () => {
     let thisTT = document.querySelector(`#${this._id}`);
     this.weekStart = thisTT.querySelector("#firstD");
     this.weekEnd = thisTT.querySelector("#lastD");
     this.periods = thisTT.querySelectorAll(".period");
     this.periodTime = thisTT.querySelectorAll("input.periodTime");
     this.th_days = thisTT.querySelectorAll(".dayOfWeek");
+    this.editButton = document.querySelector("#editPresentTT");
 
     // adding event listeners to display TT
     this.periods.forEach((period) => {
@@ -881,12 +1128,6 @@ export class DisplayTT extends TT {
         .forEach((displayField) => displayField.addEventListener("click", this.showPeriod));
     });
 
-    // adding event listeners to TT nav items
-    let editButton = document.querySelector("#editPresentTT");
-    if (editButton) {
-      editButton.addEventListener("click", this.loadTTForEditing);
-    }
-
     setInterval(this.refresh, 1000);
   };
 
@@ -895,24 +1136,27 @@ export class DisplayTT extends TT {
    */
   show = () => {
     // getting div container to place generated TT in
-    let container = document.querySelector(this.container_id);
-    container.innerHTML = "";
+    this.container.innerHTML = "";
+    this.container.classList.add("table-scroll");
 
     // creating table
     let table = document.createElement("table");
 
     // setting table attributes (like class || id)
     table.setAttribute("class", "timetable");
-    // table.style.color = "black";
     table.setAttribute("id", this._id);
 
     // creating table header with elements constituting table header
-    let thead = document.createElement("tr");
-    thead.innerHTML = `<th class="w3-small"> <span id="firstD"></span> <br> <span id="lastD"></span> </th>`;
+    let thead = document.createElement("thead");
+    let thead_tr = document.createElement("tr");
+    thead_tr.setAttribute("colspan", this.sysDefaults.weekDays.length + 1);
+    thead_tr.innerHTML = `<th class="w3-small"> <span id="firstD"></span> <br> <span id="lastD"></span> </th>`;
 
     this.sysDefaults.weekDays.forEach((day) => {
-      thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
+      thead_tr.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
+
+    thead.appendChild(thead_tr);
 
     // appending header to table
     table.appendChild(thead);
@@ -925,7 +1169,7 @@ export class DisplayTT extends TT {
     for (let i = 0; i < this.sysDefaults.periods.length; i++) {
       // creation of remaining table rows with their data by iteration
       let tr = document.createElement("tr");
-      tr.innerHTML = `<td class="w3-small sticky timeSection"> <br> <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].start}"readonly> <br><input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].stop}"readonly></td>`;
+      tr.innerHTML = `<th class="w3-small sticky timeSection sideFixed"> <br> <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].start}"readonly> <br><input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].stop}"readonly></th>`;
 
       for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
@@ -959,7 +1203,7 @@ export class DisplayTT extends TT {
 
     table.appendChild(tbody);
     // appending table to container div
-    container.appendChild(table);
+    this.container.appendChild(table);
 
     let navSection = document.createElement("div");
     navSection.setAttribute("id", this.nav_id);
@@ -977,9 +1221,9 @@ export class DisplayTT extends TT {
       navSection.innerHTML += `<input type="button" id="getTT" value="Check TT" class="button">`;
     }
 
-    container.parentNode.appendChild(navSection);
+    this.container.parentNode.appendChild(navSection);
 
-    this.main();
+    this.init();
   };
 
   display = (TT) => {
@@ -1104,11 +1348,7 @@ export class DisplayTT extends TT {
           Lecturer Name : ${period.lecturerName}<br>
           Group : ${period.group_id}<br>
           Venue : ${period.venue_id}<br>
-          Programmed on : ${new Date(date).toDateString()} at ${
-          new Date(date).getHours() === 0 ? "00" : new Date(date).getHours()
-        }:${new Date(date).getMinutes() === 0 ? "00" : new Date(date).getMinutes()}:${
-          new Date(date).getSeconds() === 0 ? "00" : new Date(date).getSeconds()
-        }`;
+          Programmed on : ${new Date(date).toDateString()} at ${moment(date).format("h:mm:ss a")}`;
       } else {
         // logging updated data first
         message.body = `
@@ -1120,19 +1360,7 @@ export class DisplayTT extends TT {
           Venue : ${period.venue_id}<br>
           Updated on : ${
             this.ttOnScreen.uDate ? new Date(this.ttOnScreen.uDate).toDateString() : "N\\A"
-          } at ${
-          new Date(this.ttOnScreen.uDate).getHours() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getHours()
-        }:${
-          new Date(this.ttOnScreen.uDate).getMinutes() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getMinutes()
-        }:${
-          new Date(this.ttOnScreen.uDate).getSeconds() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.uDate).getSeconds()
-        }
+          } at ${moment(this.ttOnScreen.uDate).format("h:mm:ss a")}
 
               <br>
               <hr style="color:5px solid gray;">
@@ -1145,19 +1373,7 @@ export class DisplayTT extends TT {
           Venue : ${oldPeriod.venue_id}<br>
           Programmed on : ${
             this.ttOnScreen.oDate ? new Date(this.ttOnScreen.oDate).toDateString() : "N\\A"
-          } at ${
-          new Date(this.ttOnScreen.oDate).getHours() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.oDate).getHours()
-        }:${
-          new Date(this.ttOnScreen.oDate).getMinutes() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.oDate).getMinutes()
-        }:${
-          new Date(this.ttOnScreen.oDate).getSeconds() === 0
-            ? "00"
-            : new Date(this.ttOnScreen.oDate).getSeconds()
-        }`;
+          } at ${moment(this.ttOnScreen.oDate).format("h:mm:ss a")}`;
       }
     } else {
       message.body = "No Programmed TT yet.";
@@ -1167,41 +1383,6 @@ export class DisplayTT extends TT {
     this.displayModal.body.innerHTML = message.body;
     this.displayModal.footer.innerHTML = message.footer;
     this.displayModal.show();
-  };
-
-  loadTTForEditing = (e) => {
-    // function to load a previous TT for editing
-
-    // getting periods of coord TT
-    let docPeriods = document.querySelectorAll(".coordPeriod");
-
-    // getting TT to display from TT on screen in display TT of coordinator
-    let TT = this.ttOnScreen;
-    let week = TT.week;
-
-    // setting the week to program to old TT's programmed week
-    document.querySelector("#weekStart").value = new Date(week.firstDay)
-      .toISOString()
-      .substring(0, 10);
-    document.querySelector("#weekEnd").value = new Date(week.lastDay)
-      .toISOString()
-      .substring(0, 10);
-
-    // filling coord TT with required data
-    docPeriods.forEach((period, index) => {
-      period = period.querySelectorAll("input");
-      let ttPeriods = TT.periods;
-
-      period[0].value = ttPeriods[index].courseName;
-      period[1].value = ttPeriods[index].lecturerName;
-      period[2].value = ttPeriods[index].venue_id;
-      if (ttPeriods[index].state === "J") {
-        period[3].checked = true;
-      } else {
-        period[3].checked = false;
-      }
-      period[4].value = ttPeriods[index].start;
-    });
   };
 
   refresh = () => {
@@ -1223,75 +1404,30 @@ export class ProgramTT extends TT {
     super();
 
     this._id = _id;
-    this.container_id = container_id;
+    this.container = document.querySelector(`#${container_id}`);
+
     this.nav_id = `${this._id}-nav`;
     this.sysDefaults = sysDefaults;
-    // this.pagination_id = `${this._id}-page`;
 
     this.TT = [];
     this.ttOnScreen = {};
     this.index;
   }
 
-  setPeriodDefaults = () => {
-    // method to set date and time to each period on program TT
-
-    let weekToProgram = new Week(new Date(this.weekStart.value));
-
-    for (let i = 0; i <= 6; i++) {
-      let counter = 0;
-      let a = 0;
-      let initIndex = i;
-      let periodTime = this.periodTime;
-
-      while (counter < periodTime.length / 2) {
-        let startTime = periodTime[a].value;
-        let stopTime = periodTime[a + 1].value;
-
-        // end of trouble
-        let start = new Date(
-          new Date(weekToProgram.firstDay).getFullYear(),
-          new Date(weekToProgram.firstDay).getMonth(),
-          new Date(weekToProgram.firstDay).getDate() + i,
-          Number(startTime.slice(0, 2)),
-          Number(startTime.slice(3)),
-          0,
-          0
-        );
-
-        let stop = new Date(
-          new Date(weekToProgram.firstDay).getFullYear(),
-          new Date(weekToProgram.firstDay).getMonth(),
-          new Date(weekToProgram.firstDay).getDate() + i,
-          Number(stopTime.slice(0, 2)),
-          Number(stopTime.slice(3)),
-          0,
-          0
-        );
-
-        let period = this.periods[initIndex];
-        period.querySelector("input.start").value = start.getTime();
-        period.querySelector("input.stop").value = stop.getTime();
-
-        counter++;
-        initIndex += 7;
-        a += 2;
-      }
-    }
-  };
-
-  main = () => {
-    /**
-     * only to be called right at the bottom of the this.show() method
-     */
-
+  /**
+   * Only to be called right at the bottom of the this.show() method
+   */
+  init = () => {
     let thisTT = document.querySelector(`#${this._id}`);
 
     this.weekStart = thisTT.querySelector("#weekStart");
     this.weekEnd = thisTT.querySelector("#weekEnd");
 
-    this.weekStart.value = new Week().toSubString().firstDay;
-    this.weekEnd.value = new Week().toSubString().lastDay;
+    this.setWeek();
+    this.weekStart.addEventListener("change", () => {
+      this.setWeek();
+      this.refresh();
+    });
 
     this.periods = thisTT.querySelectorAll(".coordPeriod");
 
@@ -1313,20 +1449,24 @@ export class ProgramTT extends TT {
    * method to generate coordinator's TT
    */
   show = () => {
-    // container div where TT will be inserted
-    let container = document.querySelector(this.container_id);
+    this.container.innerHTML = "";
+    this.container.classList.add("table-scroll");
 
     let table = document.createElement("table");
     table.setAttribute("id", this._id);
-    table.setAttribute("class", "coordTT timetable w3-centered");
+    table.setAttribute("class", "coordTT");
 
-    let thead = document.createElement("tr");
-
-    thead.innerHTML = `<th class="w3-small"><input type="date" id="weekStart" placeholder="week start"><br><input type="date" id="weekEnd" placeholder="week end" readonly></th>`;
+    // creating table header with elements constituting table header
+    let thead = document.createElement("thead");
+    let thead_tr = document.createElement("tr");
+    thead_tr.setAttribute("colspan", this.sysDefaults.weekDays.length + 1);
+    thead_tr.innerHTML = `<th class="w3-small"><input type="date" id="weekStart" placeholder="week start"><br><input type="date" id="weekEnd" placeholder="week end" readonly></th>`;
 
     this.sysDefaults.weekDays.forEach((day) => {
-      thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
+      thead_tr.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
+
+    thead.appendChild(thead_tr);
 
     table.appendChild(thead);
 
@@ -1334,12 +1474,12 @@ export class ProgramTT extends TT {
     for (let i = 0; i < this.sysDefaults.periods.length; i++) {
       let tr = document.createElement("tr");
       tr.innerHTML += `
-      <td class="w3-small sticky timeSection">
+      <th class="w3-small sticky timeSection sideFixed">
         <br>
         <input class="periodTime" type="time" value="${this.sysDefaults.periods[timer].start}"readonly>
         <br>
         <input class="periodTime" type="time" value="${this.sysDefaults.periods[timer].stop}"readonly>
-      </td>`;
+      </th>`;
 
       for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
@@ -1376,7 +1516,7 @@ export class ProgramTT extends TT {
       timer += 1;
     }
 
-    container.appendChild(table);
+    this.container.appendChild(table);
 
     let navSection = document.createElement("div");
 
@@ -1386,9 +1526,9 @@ export class ProgramTT extends TT {
     navSection.innerHTML = `
           <input class="button" id="clearGroupTT" type="button" value="CLEAR"> | <input class="button" id="validateGroupTT" type="button" value="VALIDATE"> | <input class="button" id="sendGroupTT" type="button" value="SEND" disabled>`;
 
-    container.parentNode.appendChild(navSection);
+    this.container.parentNode.appendChild(navSection);
 
-    this.main();
+    this.init();
   };
 
   clear = () => {
@@ -1410,27 +1550,77 @@ export class ProgramTT extends TT {
     console.log("All periods cleared!");
   };
 
-  refresh = (group_id = "", groupDb = []) => {
-    // method to match actual date and time with date and time of this TT for accuracy
-
-    let weekToProgram;
-
+  setWeek = () => {
     if (Date.parse(this.weekStart.value)) {
-      weekToProgram = new Week(new Date(this.weekStart.value));
+      this.weekToProgram = new Week(new Date(this.weekStart.value));
     } else {
-      weekToProgram = new Week();
+      this.weekToProgram = new Week();
     }
 
-    this.weekStart.value = weekToProgram.toSubString().firstDay;
-    this.weekEnd.value = weekToProgram.toSubString().lastDay;
+    this.weekStart.value = this.weekToProgram.toSubString().firstDay;
+    this.weekEnd.value = this.weekToProgram.toSubString().lastDay;
+  };
+
+  /**
+   * method to set date and time to each period on program TT
+   */
+  setPeriodDefaults = () => {
+    if (this.weekToProgram.toDateString().firstDay != this.weekStart.value) {
+      this.weekToProgram = new Week(new Date(this.weekStart.value));
+    }
+
+    for (let i = 0; i <= 6; i++) {
+      let counter = 0;
+      let a = 0;
+      let initIndex = i;
+      let periodTime = this.periodTime;
+
+      while (counter < periodTime.length / 2) {
+        let startTime = periodTime[a].value;
+        let stopTime = periodTime[a + 1].value;
+
+        // end of trouble
+        let start = new Date(
+          new Date(this.weekToProgram.firstDay).getFullYear(),
+          new Date(this.weekToProgram.firstDay).getMonth(),
+          new Date(this.weekToProgram.firstDay).getDate() + i,
+          Number(startTime.slice(0, 2)),
+          Number(startTime.slice(3)),
+          0,
+          0
+        );
+
+        let stop = new Date(
+          new Date(this.weekToProgram.firstDay).getFullYear(),
+          new Date(this.weekToProgram.firstDay).getMonth(),
+          new Date(this.weekToProgram.firstDay).getDate() + i,
+          Number(stopTime.slice(0, 2)),
+          Number(stopTime.slice(3)),
+          0,
+          0
+        );
+
+        let period = this.periods[initIndex];
+        period.querySelector("input.start").value = start.getTime();
+        period.querySelector("input.stop").value = stop.getTime();
+
+        counter++;
+        initIndex += 7;
+        a += 2;
+      }
+    }
+  };
+
+  refresh = ({ group_id = "", groupDb = [] } = { group_id: "", groupDb: [] }) => {
+    // method to match actual date and time with date and time of this TT for accuracy
 
     this.setPeriodDefaults();
 
     let today = new Date().getTime();
 
-    weekToProgram.has(today) ? this.setHeader(weekToProgram) : this.setHeader();
+    this.weekToProgram.has(today) ? this.setHeader(this.weekToProgram) : this.setHeader();
 
-    if (weekToProgram.has(today)) {
+    if (this.weekToProgram.has(today)) {
       // console.log("This Week");
 
       // first disable periods not to program again
@@ -1473,7 +1663,7 @@ export class ProgramTT extends TT {
 
         // search for TT with same week in given collection
         if (group) {
-          prevTT = fx.findElement("week", weekToProgram, group.TT);
+          prevTT = fx.findElement("week", this.weekToProgram, group.TT);
         }
 
         if (prevTT) {
@@ -1507,7 +1697,7 @@ export class ProgramTT extends TT {
           });
         }
       }
-    } else if (new Week().getNextWeek().firstDay === weekToProgram.firstDay) {
+    } else if (new Week().getNextWeek().firstDay === this.weekToProgram.firstDay) {
       // console.log("Programming Tt for next week");
 
       this.periods.forEach((period) => {
@@ -1519,9 +1709,9 @@ export class ProgramTT extends TT {
         period[3].disabled = false;
       });
     } else {
-      console.log(
-        "Either trying to program more than 1 week ahead or trying to program a past week. Not Possible!"
-      );
+      // console.log(
+      //   "Either trying to program more than 1 week ahead or trying to program a past week. Not Possible!"
+      // );
 
       this.periods.forEach((period) => {
         period = period.querySelectorAll("input");
@@ -1568,7 +1758,7 @@ export class AvailTT {
     this.index;
   }
 
-  main = () => {
+  init = () => {
     let thisTT = document.querySelector(`#${this._id}`);
     this.periods = thisTT.querySelectorAll(".availPeriod");
 
@@ -1585,25 +1775,27 @@ export class AvailTT {
    */
   show = () => {
     // getting div container to place generated TT in
-    let container = document.querySelector(this.container_id);
-    container.innerHTML = "";
+    this.container = document.querySelector(this.container_id);
+    this.container.classList.add("table-scroll");
 
     // creating table
     let table = document.createElement("table");
 
     // setting table attributes (like class || id)
-    table.setAttribute("class", "table table-bordered timetable");
-    // table.style.color = "black";
+    table.setAttribute("class", "timetable");
     table.setAttribute("id", this._id);
 
     // creating table header with elements constituting table header
-    let thead = document.createElement("tr");
-
-    thead.innerHTML = `<th class="w3-small"> TIME </th>`;
+    let thead = document.createElement("thead");
+    let thead_tr = document.createElement("tr");
+    thead_tr.setAttribute("colspan", this.sysDefaults.weekDays.length + 1);
+    thead_tr.innerHTML = `<th class="w3-small"> TIME</th>`;
 
     this.sysDefaults.weekDays.forEach((day) => {
-      thead.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
+      thead_tr.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
     });
+
+    thead.appendChild(thead_tr);
 
     // appending header to table
     table.appendChild(thead);
@@ -1617,10 +1809,10 @@ export class AvailTT {
 
       let tr = document.createElement("tr");
       tr.innerHTML = `
-      <td class="w3-small sticky timeSection"><br>
+      <th class="w3-small sticky timeSection sideFixed"><br>
         <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].start}" readonly><br>
         <input class="periodTime" type="text" value="${this.sysDefaults.periods[timer].stop}" readonly>
-      </td>`;
+      </th>`;
 
       for (let j = 0; j < this.sysDefaults.weekDays.length; j++) {
         tr.innerHTML += `
@@ -1649,7 +1841,7 @@ export class AvailTT {
 
     // appending table to container div
     table.appendChild(tbody);
-    container.appendChild(table);
+    this.container.appendChild(table);
 
     let navSection = document.createElement("div");
 
@@ -1658,8 +1850,8 @@ export class AvailTT {
 
     navSection.innerHTML = `<input type="button" id="resetAvailTT" value="RESET" class="button"> | <input type="button" id="saveAvailOnScreen" value="SAVE" class="button">`;
 
-    container.parentNode.appendChild(navSection);
-    this.main();
+    this.container.parentNode.appendChild(navSection);
+    this.init();
   };
 
   reset = () => {

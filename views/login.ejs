@@ -12,11 +12,12 @@
                 <h3>Log In</h3>
               </div>
 
-              <form name="logInForm" action="/login" method="POST">
+              <form id="logInForm">
                 <div class="form-group mb-5">
                   <i class="fa fa-user iconU iconU-u"></i>
                   <!-- <input type="text" class="text-center w-100" id="username" name="username" autocomplete="off" placeholder="Username..."> -->
                   <input
+                    id="login_id"
                     type="text"
                     class="text-center w-100"
                     placeholder="User ID"
@@ -31,7 +32,7 @@
                   <input
                     type="password"
                     class="text-center w-100"
-                    id="password"
+                    id="login_password"
                     name="password"
                     placeholder="Password..."
                   />
@@ -64,6 +65,34 @@
       </div>
       <!-- w3 animated container signup -->
     </div>
+    <script type="module" defer>
+      document.querySelector("#loginBtn").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        let logInForm = document.querySelector("#logInForm");
+        let user = {
+          _id: logInForm.querySelector("#login_id").value,
+          password: logInForm.querySelector("#login_password").value,
+        };
+        console.log(user);
+
+        let logInReq = await (
+          await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json;charset=utf-8",
+            },
+            body: JSON.stringify(user),
+          })
+        ).json();
+
+        console.log(logInReq);
+
+        if (logInReq.accountType) {
+          location.assign(logInReq.accountType);
+        }
+      });
+    </script>
   </body>
 
   <%- include('partials/authFooter.ejs') -%>

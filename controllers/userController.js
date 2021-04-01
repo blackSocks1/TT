@@ -1,24 +1,36 @@
 const schemas = require("../models/schemas");
-const { getUserCollection } = require("../myFunctions/npm_fx");
+const users = require("../models/users");
+const {
+  get_db_User,
+  get_RefData,
+  gen_ID,
+  hashPassword,
+  unHashAndCompare,
+  handleErrors,
+  initializePassport,
+} = require("../Oath/passport-configs");
+
+const systemDefaults = require("../models/systemDefaults");
 
 let userController = {
   getTT: async (req, res) => {
     let person = req.body;
-    let source;
+    let TT;
 
     if (person.accountType === "Student") {
-      source = await schemas.Group.findOne({
+      let data = await schemas.Group.findOne({
         _id: person.group_id,
       });
+      TT = data.TT;
     } else {
-      source = await schemas[person.accountType].findOne({
-        _id: person._id,
-      });
+      let user = await get_db_User(person._id, true);
+
+      TT = get_RefData(user, "TT");
     }
 
-    if (source) {
+    if (TT) {
       if (person.platform === "web") {
-        res.end(JSON.stringify(source.TT));
+        res.end(JSON.stringify(TT));
       } else {
         let root = await schemas.Admin.findOne({
           name: "ROOT",
@@ -27,7 +39,7 @@ let userController = {
         let noOfPeriods = root.sysDefaults.periods.length;
         let TT = [];
 
-        for (let bigIndex = 0; bigIndex < source.TT.length; bigIndex++) {
+        for (let bigIndex = 0; bigIndex < TT.TT.length; bigIndex++) {
           let daysOfWeek = [[], [], [], [], [], [], []];
 
           for (let i = 0; i <= 6; i++) {
@@ -35,7 +47,7 @@ let userController = {
             let initIndex = i;
 
             while (counter < noOfPeriods) {
-              daysOfWeek[i].push(source.TT[bigIndex].periods[initIndex]);
+              daysOfWeek[i].push(TT.TT[bigIndex].periods[initIndex]);
               counter++;
               initIndex += 7;
             }
@@ -43,7 +55,7 @@ let userController = {
 
           TT.push({
             periods: daysOfWeek,
-            week: source.TT[bigIndex].week,
+            week: TT.TT[bigIndex].week,
           });
         }
 
@@ -54,17 +66,18 @@ let userController = {
 
   getMyInfo: async (req, res) => {
     let person = req.body;
-    let user = await getUserCollection(person);
-    if (user && user.accountType == "Student") {
-      let group = await schemas.Group.findOne({ _id: user.group });
-      user.TT = group.TT;
-    }
+    let user = await get_db_User(person, true);
     res.json(user);
   },
 
   getAccType: async (req, res) => {
-    let user = await getUserCollection(req.body);
+    let user = await get_db_User(req.body);
     res.json(user ? user.accountType : null);
+  },
+
+  getSysDefaults: async (req, res) => {
+    let defaults = await systemDefaults.find({});
+    res.json(defaults[0]);
   },
 };
 

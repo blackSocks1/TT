@@ -12,8 +12,15 @@ export async function postFetch(url, body = {}, contentType = "application/json;
   ).json();
 }
 
-export function getIndicesOf(searchStr, str, caseSensitive) {
-  var searchStrLen = searchStr.length;
+/**
+ * - Function to get indices of all matching paterns of a string in another
+ * - `Read: Get all indices of {subStr} in {str} using {caseSensitive}`
+ * @param {String} subStr String to get indices
+ * @param {String} str String to get indices from
+ * @param {Boolean} caseSensitive Boolean value to check if required matches should be case sensitive or not
+ */
+export function getIndicesOf(subStr, str, caseSensitive) {
+  var searchStrLen = subStr.length;
   if (searchStrLen == 0) {
     return [];
   }
@@ -22,15 +29,22 @@ export function getIndicesOf(searchStr, str, caseSensitive) {
     indices = [];
   if (!caseSensitive) {
     str = str.toLowerCase();
-    searchStr = searchStr.toLowerCase();
+    subStr = subStr.toLowerCase();
   }
-  while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+  while ((index = str.indexOf(subStr, startIndex)) > -1) {
     indices.push(index);
     startIndex = index + searchStrLen;
   }
   return indices;
 }
 
+/**
+ * - Function to color all matching patterns of a string in another
+ * - `Read: Apply color {color} to all matching patterns of {subStr} in {str}`
+ * @param {String} subStr String pattern to highlight
+ * @param {String} str Full string
+ * @param {String} color color to apply
+ */
 export function colorMatches(subStr, str, color = "red") {
   let matchIndices = getIndicesOf(subStr, str);
   let strToCaseOk = "";

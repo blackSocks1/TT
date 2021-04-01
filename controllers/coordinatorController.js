@@ -1,6 +1,7 @@
 //models
 const schemas = require("../models/schemas");
 const { findElement } = require("../myFunctions/npm_fx");
+const users = require("../models/users");
 
 let coordinatorController = {
   // updates
@@ -72,13 +73,13 @@ let coordinatorController = {
     //   let index = coord.index;
     //   coord = coord.element;
     //   lecturerBD.splice(index, 1);
-    //   let db_coord = await schemas.Coordinator.findOne({ _id: coord._id });
+    //   let db_coord = await users.Coordinator.findOne({ _id: coord._id });
     // }
 
     for (let lecturer of lecturerBD) {
       // we're fetching the lecturer form schemas[lecturer.accountType] because a lecturer could also be a coordinator
 
-      let result = await schemas[lecturer.accountType].findOne({ _id: lecturer._id });
+      let result = await users.Lecturer.findOne({ _id: lecturer.lecturer_Ref });
       let answer = findElement("week", lecturer.week, result.TT);
 
       if (answer) {
@@ -161,10 +162,34 @@ let coordinatorController = {
   },
 
   getLecturers: async (req, res) => {
-    let coord = await schemas.Coordinator.findOne({ _id: req.body._id });
-    let lecturers = await schemas.Lecturer.find({});
-    lecturers.push(coord);
-    res.json(lecturers);
+    let toSend = [];
+    let coord = await users.Coordinator.findOne({ _id: req.body._id });
+    let coordUserData = await users.User.findOne({ _id: coord.user_Ref });
+
+    toSend.push({
+      _id: coordUserData._id,
+      name: coordUserData.name,
+      avail: coord.avail,
+      TT: coord.TT,
+      accountType: coordUserData.accountType,
+      lecturer_Ref: coord._id,
+    });
+
+    let lecturers = await users.Lecturer.find({});
+
+    for (let lecturer of lecturers) {
+      let userLecturer = await users.User.findOne({ _id: lecturer.user_Ref });
+      toSend.push({
+        _id: userLecturer._id,
+        name: userLecturer.name,
+        avail: lecturer.avail,
+        TT: lecturer.TT,
+        accountType: userLecturer.accountType,
+        lecturer_Ref: lecturer._id,
+      });
+    }
+
+    res.json(toSend);
   },
 
   getVenues: async (req, res) => {
@@ -195,10 +220,10 @@ let coordinatorController = {
   },
 
   getMyDefaults: async (req, res) => {
-    let coord = await schemas.Coordinator.findOne({
+    let coord = await users.Coordinator.findOne({
       _id: req.body._id,
     });
-    let root = await schemas.Admin.findOne({
+    let root = await users.Admin.findOne({
       _id: "ROOT",
     });
     res.end(
@@ -211,7 +236,7 @@ let coordinatorController = {
   },
 
   setMyDefaults: async (req, res) => {
-    let coord = await schemas.Coordinator.findOne({
+    let coord = await users.Coordinator.findOne({
       _id: req.body._id,
     });
     coord.TT_Defaults = req.body.TT_Defaults;
@@ -221,7 +246,7 @@ let coordinatorController = {
 
   setLastSeen: async (req, res) => {
     let Me = req.body;
-    let result = await schemas.Coordinator.findOne({
+    let result = await users.Coordinator.findOne({
       _id: Me._id,
     });
     result.lastSeen = Me.lastSeen;
@@ -231,7 +256,7 @@ let coordinatorController = {
 
   getLastSeen: async (req, res) => {
     let Me = req.body;
-    let result = await schemas.Coordinator.findOne({
+    let result = await users.Coordinator.findOne({
       _id: Me._id,
     });
     res.end(JSON.stringify(result.lastSeen));
@@ -239,7 +264,7 @@ let coordinatorController = {
 
   getDrafts: async (req, res) => {
     let Me = req.body;
-    let result = await schemas.Coordinator.findOne({
+    let result = await users.Coordinator.findOne({
       _id: Me._id,
     });
     res.end(JSON.stringify(result.TTdrafts));
@@ -247,7 +272,7 @@ let coordinatorController = {
 
   saveTTDrafts: async (req, res) => {
     let Me = req.body;
-    let result = await schemas.Coordinator.findOne({
+    let result = await users.Coordinator.findOne({
       _id: Me._id,
     });
     result.TTdrafts = Me.TTdrafts;

@@ -9,6 +9,6 @@ Router.post("/get", AttController.getAtt);
 
 Router.post("/getCustomClassList", AttController.getCustomClassList);
 
-Router.get("/getGroups", AttController.getGroups);
+Router.post("/getGroupDetails", AttController.getGroupDetails);
 
 module.exports = Router;

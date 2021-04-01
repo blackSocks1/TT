@@ -1,8 +1,58 @@
-const { getUserCollection, handleErrors } = require("../myFunctions/npm_fx");
 const schemas = require("../models/schemas");
-const uniqid = require("uniqid");
+const users = require("../models/users");
+const passport = require("passport");
+const {
+  get_db_User,
+  gen_ID,
+  hashPassword,
+  unHashAndCompare,
+  handleErrors,
+  initializePassport,
+} = require("../Oath/passport-configs");
+
+const checkAuth = require("../Oath/authMiddleware");
+
+const jwt = require("jsonwebtoken");
+
+const maxAge = 3 * 24 * 60 * 60; // 3 days in secs
+
+const createToken = (id) => {
+  return jwt.sign({ id }, "school management", { expiresIn: maxAge });
+};
+
+const oldOauth = async (req, res) => {
+  let person = req.body;
+  let user = await get_db_User(person._id, true);
+  console.log(person);
+
+  if (user) {
+    // first check if user is already online at login
+
+    // let online = await users.OnlineUser.findOne({ online_id: user._id });
+
+    let match = await unHashAndCompare(person.password, user.password);
+
+    if (match) {
+      const token = createToken(user._id);
+      res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+
+      res.locals.user = req.session.user = user;
+      // res.json(user);
+      res.render(user.accountType, user);
+    } else {
+      res.json({ message: "Password not correct!" });
+    }
+  } else {
+    res.json({
+      _id: person._id,
+      password: person.password,
+      found: false,
+    });
+  }
+};
 
 /**
+ *
  * Authentication Controller
  */
 let authController = {
@@ -16,60 +66,64 @@ let authController = {
     let level = await schemas.Level.findOne({ _id: group.level });
     let specialty = await schemas.Specialty.findOne({ _id: level.specialty });
 
-    let student = new schemas.Student({
-      _id: uniqid.time("s", `-${group._id}`),
+    person.password = await hashPassword(person.password);
+
+    person = {
+      _id: gen_ID(group._id),
       name: person.name,
       specialty,
       level,
       group,
       accountType: "Student",
-    });
+      password: person.password,
+    };
 
-    await student.save();
-    group.students.push(student);
+    let newUser = await users.User.create({ ...person });
+    person.user_Ref = newUser;
+    delete person._id;
+    let newStudent = await users.Student.create({ ...person });
+
+    await newStudent.save();
+    newUser.student_Ref = newStudent;
+    await newUser.save();
+
+    group.students.push(newStudent);
     await group.save();
-    console.log(`${student.name} was registered in ${student.level._id} with id ${student._id}.`);
 
-    res.locals.user = student;
+    console.log(
+      `${newUser.name} was registered in ${newStudent.group._id} with id ${newStudent._id}.`
+    );
 
-    res.render(student.accountType);
+    // res.json({newUser, newStudent});
+    res.end("OK!");
   },
 
   // log in
   login_Get: (req, res) => res.render("login", { title: "Login" }),
 
-  login_Post: async (req, res) => {
-    let person = req.body;
-    let user = await getUserCollection(person);
+  login_Post: oldOauth,
 
-    if (user) {
-      // first check if user is already online at login
-      let online = await schemas.OnlineUser.findOne({ online_id: user._id });
-
-      if (!online) {
-        if (person.plaform == "mobile") {
-          res.json(user);
-        } else {
-          // **** to be reviewed since we should never send sensitive data like passwords
-          res.locals.user = user;
-          res.render(user.accountType);
-          // req.session.user = user
-        }
-      } else {
-        res.json({ _id: online.online_id, message: "This user is already online" });
-      }
-    } else {
-      res.end(
-        JSON.stringify({
-          _id: person._id,
-          password: person.password,
-          found: false,
-        })
-      );
-    }
+  renderStudent: (req, res) => {
+    res.locals.user = req.session.user;
+    res.render("Student");
+  },
+  renderLecturer: (req, res) => {
+    res.locals.user = req.session.user;
+    res.render("Lecturer");
+  },
+  renderCoordinator: (req, res) => {
+    res.locals.user = req.session.user;
+    res.render("Coordinator");
+  },
+  renderAdmin: (req, res) => {
+    res.locals.user = req.session.user;
+    res.render("Admin");
   },
 
-  logOut: (req, res) => {},
+  logOut: (req, res) => {
+    req.logOut();
+    req.redirect("/login");
+  },
 
   get_specialties: async (req, res) => {
     let specialties = await schemas.Specialty.find({})

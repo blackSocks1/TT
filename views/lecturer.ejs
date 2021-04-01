@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="assets/css/lecturer_interface.css" />
     <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
+    <link rel="stylesheet" href="rollCallStyle.css" />
+    <link rel="stylesheet" href="scroll-table.css" />
     <script src="js/socket.io.js" defer></script>
+    <script src="js/moment-with-locales.js"></script>
     <script type="module" src="js/lecturerMain.js" defer></script>
 
     <title><%= user.accountType %> | <%= user.name %></title>
@@ -115,39 +117,47 @@
     </div>
 
     <div class="w3-row nav-item" data-navset="mainNav" id="Att">
-      <div class="container">
-        <select id="Att-group"></select>
-      </div>
-      <hr />
       <div class="container" id="Att-main">
-        <!-- <div
-        class="modal fade"
-        id="saveModal"
-        tabindex="-1"
-        aria-labelledby="saveModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header" id="header">
-              <h5 class="modal-title" id="saveModalLabel">Description :</h5>
-            </div>
+        <nav>
+          <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
+            <a class="navLink" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att">New</a>
 
-            <form>
-              <div class="modal-body">
-                <textarea placeholder="Type Here..."></textarea>
-              </div>
+            <a class="navLink" id="Att_history-link" data-navset="Att-nav" data-ref="Att_history"
+              >History</a
+            >
 
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close">
-                  Close
-                </button>
-                <button type="submit" class="btn" id="send">Save</button>
-              </div>
-            </form>
+            <a class="navLink" id="classList-link" data-navset="Att-nav" data-ref="Att_classLists"
+              >Class lists</a
+            >
           </div>
+        </nav>
+
+        <hr />
+
+        <div class="" id="header">
+          <div id="Att-coreOptions" class="toCenter">
+            <select id="Att-groupSelect"></select>
+          </div>
+          <div id="Att-varOptions"></div>
         </div>
-      </div> -->
+
+        <div class="nav-item" style="display: block" data-navset="Att-nav" id="take_Att">
+          <h1>Take New Attendance</h1>
+          <div class="" id="Att-container"></div>
+        </div>
+        <div class="nav-item" data-navset="Att-nav" id="Att_history">
+          <hr />
+          <button class="myAccordion">Attendance History</button>
+          <div class="AccPanel" id="Att-hist-panel"></div>
+          <hr />
+
+          <div class="" id="Att-hist-details"></div>
+        </div>
+        <div class="nav-item" data-navset="Att-nav" id="Att_classLists">
+          <h1>Custom Class Lists</h1>
+          <hr />
+          <div class="" id="Att-classList"></div>
+        </div>
       </div>
     </div>
 
@@ -178,5 +188,5 @@
     <script src="assets/jquery/jquery.min.js"></script>
   </body>
 
-  <%- include('partials/authFooter') -%>
+  <!-- <%- include('partials/authFooter') -%> -->
 </html>
