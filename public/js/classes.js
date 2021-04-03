@@ -60,13 +60,14 @@ export class User {
    * method to let a user communicate via sockect.io
    * @param {String} hostLink link of server to use for sockect connection
    */
-  connectToSocket = async (hostLink = `http://${"192.168.46.91"}:${45000}`) => {
+  connectToSocket = async (hostLink = `http://${"localhost"}:${45000}`) => {
     this.socket = io.connect(hostLink);
 
     this.socket.on("connect", async () => {
       this.socket.emit("/book-me", {
         _id: this._id,
         name: this.name,
+        group_id: this.group,
         accountType: this.accountType,
       });
     });

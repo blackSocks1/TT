@@ -838,7 +838,7 @@ export class Coordinator extends Lecturer {
         });
         // console.log(`Old TT of ${group._id}`, oldgroupTT);
       }
-      console.log(lecturerSet);
+      // console.log(lecturerSet);
 
       // getting all lecturers programmed on current screen into a set to avoid duplicates
       this.lecturerDb.forEach((lecturer) => {
@@ -854,7 +854,7 @@ export class Coordinator extends Lecturer {
         }
       });
 
-      console.log(lecturerSet);
+      // console.log(lecturerSet);
 
       lecturerSet.forEach((lecturer_id) => {
         lecturersToCheck.push(fx.findElement("_id", lecturer_id, this.lecturerDb).element);
@@ -954,9 +954,30 @@ export class Coordinator extends Lecturer {
 
         let weekProgrammed = fx.findElement("week", weekToProgram, venue.programs);
 
+        if (!weekProgrammed) {
+          // fx.setBorderBColor(venueInput, color.Ok);
+
+          venue.tempProgram = new Program(weekToProgram, fx.arrayInit("event")); // ***** surely to be deleted
+          venue.programs.push(new Program(weekToProgram, fx.arrayInit("event")));
+
+          docPeriods.forEach((docPeriod, index) => {
+            venue.programs[venue.programs.length - 1].events[index].start = Number(
+              docPeriod.querySelector("input.start").value
+            );
+            venue.programs[venue.programs.length - 1].events[index].stop = Number(
+              docPeriod.querySelector("input.stop").value
+            );
+          });
+
+          weekProgrammed = {
+            element: venue.programs[venue.programs.length - 1],
+            index: venue.programs.length - 1,
+          };
+        }
+
         this.TTperiods.forEach((period, index) => {
           let venueInput = this.program_TT.periods[index].querySelectorAll("input[type='text']")[2];
-          console.log(period.start, venue.programs[weekProgrammed.index].events);
+
           let oldEvent = fx.findElement(
             "start",
             period.start,

@@ -14,7 +14,7 @@
     <div id="container">
       <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand">
             <img src="assets/images/icon.png" alt="" width="30" height="24" />
           </a>
 
@@ -32,15 +32,8 @@
 
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav ms-auto p-2 bd-highlight">
-              <a
-                class="nav-link"
-                aria-current="page"
-                id="signupLink"
-                href="#"
-                onclick="displaySignup()"
-                >Sign Up</a
-              >
-              <a class="nav-link" id="loginLink" href="#" onclick="displayLogin()">Log In</a>
+              <a class="nav-link" id="signupLink" onclick="displaySignup()">Sign Up</a>
+              <a class="nav-link" id="loginLink" onclick="displayLogin()">Log In</a>
             </div>
           </div>
         </div>
@@ -131,9 +124,11 @@
               <div class="card-body">
                 <div class="card-title text-center mb-5 head">
                   <h3>Log In</h3>
+                  <br /><br />
+                  <div class="error text-center" id="logInError"></div>
                 </div>
 
-                <form class="form" id="logInForm" action="/login" method="POST">
+                <form class="form" id="logInForm">
                   <div class="form-group mb-5">
                     <i class="fa fa-user iconU iconU-u"></i>
                     <input
@@ -143,6 +138,7 @@
                       name="_id"
                       autocomplete="off"
                       placeholder="User ID"
+                      required
                     />
                   </div>
 
@@ -154,7 +150,9 @@
                       id="login_password"
                       name="password"
                       placeholder="Password..."
+                      required
                     />
+                    <i class="fa fa-eye iconP iconP-p" id="loginTogglePass"></i>
                   </div>
 
                   <div class="form-check mb-5 remember">
@@ -180,35 +178,6 @@
     <!--container navbar,slidetext,signup,login-->
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-
-    <script type="module" defer>
-      // document.querySelector("#loginBtn").addEventListener("click", async (e) => {
-      //   e.preventDefault();
-
-      //   let logInForm = document.querySelector("#logInForm");
-      //   let user = {
-      //     _id: logInForm.querySelector("#login_id").value,
-      //     password: logInForm.querySelector("#login_password").value,
-      //   };
-      //   console.log(user);
-
-      //   let logInReq = await (
-      //     await fetch("/login", {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-Type": "application/json;charset=utf-8",
-      //       },
-      //       body: JSON.stringify(user),
-      //     })
-      //   ).json();
-
-      //   console.log(logInReq);
-
-      //   if (logInReq.accountType) {
-      //     location.assign(logInReq.accountType);
-      //   }
-      // });
-    </script>
 
     <script type="text/javascript">
       close1 = document.querySelector("#close1");
@@ -304,6 +273,54 @@
           }
         }
       }
+    </script>
+
+    <script defer>
+      let loginTogglePass = document.querySelector("#loginTogglePass");
+      loginTogglePass.addEventListener("click", (e) => {
+        let passInput = e.target.parentNode.querySelector("input");
+
+        if (passInput.type == "password") {
+          passInput.type = "text";
+          e.target.classList.remove("fa-eye");
+          e.target.classList.add("fa-eye-slash");
+        } else {
+          passInput.type = "password";
+          e.target.classList.remove("fa-eye-slash");
+          e.target.classList.add("fa-eye");
+        }
+      });
+    </script>
+
+    <script defer>
+      document.querySelector("#logInForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        let logInForm = document.querySelector("#logInForm");
+        let errorDiv = document.querySelector("div#logInError");
+        errorDiv.innerHTML = "";
+
+        let logInResponse = await (
+          await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json;charset=utf-8",
+            },
+            body: JSON.stringify({
+              _id: logInForm.querySelector("#login_id").value,
+              password: logInForm.querySelector("#login_password").value,
+            }),
+          })
+        ).json();
+
+        if (logInResponse.error) {
+          errorDiv.innerHTML = `<p>${logInResponse.error}</p>`;
+        } else if (logInResponse.accountType) {
+          logInForm.action = "/userDashboard";
+          logInForm.method = "POST";
+          logInForm.submit();
+        }
+      });
     </script>
 
     <% if(login){ %>

@@ -1,5 +1,5 @@
 const users = require("../models/users");
-const { get_db_User } = require("../Oath/passport-configs");
+const { get_db_User } = require("../middlewares/authMiddleware");
 
 let lecturerController = {
   save: async (req, res) => {

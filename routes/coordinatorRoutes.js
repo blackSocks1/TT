@@ -1,13 +1,10 @@
 // coordinatorController
 const router = require("express").Router();
 const coordinatorController = require("../controllers/coordinatorController");
-
-router.get("/", (req, res) => {
-  res.render("coord");
-});
+const { requireAuth } = require("../middlewares/authMiddleware");
 
 // gets
-router.get("/get-specialties", coordinatorController.getSpecialties);
+router.get("/get-specialties", requireAuth, coordinatorController.getSpecialties);
 router.post("/get-venues", coordinatorController.getVenues);
 
 // posts

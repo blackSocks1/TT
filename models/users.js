@@ -22,6 +22,8 @@ const onlineUserSchema = new Schema({
   },
 
   name: String,
+
+  group_id: String,
 });
 
 const userSchema = new Schema({

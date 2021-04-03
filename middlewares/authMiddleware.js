@@ -1,37 +1,29 @@
-const localStrategy = require("passport-local").Strategy;
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
 const users = require("../models/users");
 const uniqid = require("uniqid");
-// const passport = require("passport");
 
-function initializePassport(passport, get_db_User) {
-  const authUser = async (_id, password, done) => {
-    const user = await get_db_User(_id);
+// const maxAge = 3 * 24 * 60 * 60; // 3 days in secs
 
-    if (user == null) {
-      return done(null, false, { message: `No user with id ${_id} was found` });
-    }
+const requireAuth = (req, res, next) => {
+  const token = req.cookies.jwt;
 
-    try {
-      if (await bcrypt.compare(password, user.password)) {
-        return done(null, user);
+  if (token) {
+    jwt.verify(token, "school management", (err, decodedToken) => {
+      if (err) {
+        res.redirect("/login");
       } else {
-        done(null, false, { message: `Wrong password` });
+        next();
       }
-    } catch {
-      done(e);
-    }
-  };
+    });
+  } else {
+    res.redirect("/login");
+  }
+};
 
-  passport.use(new localStrategy({ usernameField: "_id" }, authUser));
-
-  passport.serializeUser((user, done) => done(null, user._id));
-
-  passport.deserializeUser(async (user, done) => {
-    return done(null, await get_db_User(user._id));
-  });
-}
+const createToken = (id) => {
+  return jwt.sign({ id }, "school management", { expiresIn: "1d" });
+};
 
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt();
@@ -77,36 +69,16 @@ const unHashAndCompare = async (userPassword, dbUserPassword) => {
   return await bcrypt.compare(userPassword, dbUserPassword);
 };
 
-const handleErrors = (err) => {
-  // console.log(err.message, err.code);
-};
-
 const gen_ID = (endPattern = "") => {
   return endPattern ? uniqid.time("u", `-${endPattern}`) : uniqid.time("u");
 };
 
-const checkAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect("/login");
-};
-
-const checkNotAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return res.redirect(`${req.user.accountType}`);
-  }
-  next();
-};
-
 module.exports = {
-  initializePassport,
+  requireAuth,
+  createToken,
   hashPassword,
-  handleErrors,
   get_db_User,
   get_RefData,
   gen_ID,
   unHashAndCompare,
-  checkAuthenticated,
-  checkNotAuthenticated,
 };

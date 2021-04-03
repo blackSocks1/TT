@@ -135,9 +135,8 @@ let coordinatorController = {
   updateVenue: async (req, res) => {
     let { week, venue } = req.body;
 
-    // for (let venue of venueDb) {
     let dbVenue = await schemas.Venue.findOne({ _id: venue._id });
-    console.log(dbVenue._id);
+    // console.log(dbVenue._id);
 
     let newProgram = findElement("week", week, dbVenue.programs);
 
@@ -149,8 +148,8 @@ let coordinatorController = {
       }
       dbVenue.programs.push(findElement("week", week, venue.programs).element);
     }
+
     dbVenue.save();
-    // }
     res.json(venue);
   },
 
@@ -216,6 +215,7 @@ let coordinatorController = {
         }
       }
     }
+
     res.json(groupsToSend);
   },
 
@@ -226,48 +226,41 @@ let coordinatorController = {
     let root = await users.Admin.findOne({
       _id: "ROOT",
     });
-    res.end(
-      JSON.stringify({
-        week: coord.TT_Defaults.week,
-        periods: coord.TT_Defaults.periods,
-        weekDays: root.sysDefaults.weekDays,
-      })
-    );
+
+    res.json({
+      week: coord.TT_Defaults.week,
+      periods: coord.TT_Defaults.periods,
+      weekDays: root.sysDefaults.weekDays,
+    });
   },
 
   setMyDefaults: async (req, res) => {
-    let coord = await users.Coordinator.findOne({
-      _id: req.body._id,
-    });
+    let coord = await users.Coordinator.findOne({ _id: req.body._id });
+
     coord.TT_Defaults = req.body.TT_Defaults;
     coord.save();
-    res.end(JSON.stringify(coord.TT_Defaults));
+    res.json(coord.TT_Defaults);
   },
 
   setLastSeen: async (req, res) => {
     let Me = req.body;
-    let result = await users.Coordinator.findOne({
-      _id: Me._id,
-    });
+    let result = await users.Coordinator.findOne({ _id: Me._id });
+
     result.lastSeen = Me.lastSeen;
     await result.save();
-    res.end(JSON.stringify(result.lastSeen));
+    res.json(result.lastSeen);
   },
 
   getLastSeen: async (req, res) => {
     let Me = req.body;
-    let result = await users.Coordinator.findOne({
-      _id: Me._id,
-    });
-    res.end(JSON.stringify(result.lastSeen));
+    let result = await users.Coordinator.findOne({ _id: Me._id });
+    res.json(result.lastSeen);
   },
 
   getDrafts: async (req, res) => {
     let Me = req.body;
-    let result = await users.Coordinator.findOne({
-      _id: Me._id,
-    });
-    res.end(JSON.stringify(result.TTdrafts));
+    let result = await users.Coordinator.findOne({ _id: Me._id });
+    res.json(result.TTdrafts);
   },
 
   saveTTDrafts: async (req, res) => {
@@ -277,7 +270,7 @@ let coordinatorController = {
     });
     result.TTdrafts = Me.TTdrafts;
     await result.save();
-    res.end(JSON.stringify(result.TTdrafts));
+    res.json(result.TTdrafts);
   },
 };
 

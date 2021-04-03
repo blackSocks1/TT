@@ -25,6 +25,7 @@ module.exports.handleChat = async (endPoint, socket) => {
         accountType: user.accountType,
         network_id: socket.id,
         name: user.name,
+        group_id: user.group_id,
       });
 
       message = `${onlineUser.name} is online @${socket.id}`;
@@ -66,8 +67,8 @@ module.exports.handleChat = async (endPoint, socket) => {
       });
     });
 
-    console.log(
-      `Coordinator ${updater.name} with _id: ${updater._id} says all other coords should reload their data because he just updated the TT of ${updater.group_id}`
-    );
+    // console.log(
+    //   `Coordinator ${updater.name} with _id: ${updater._id} says all other coords should reload their data because he just updated the TT of ${updater.group_id}`
+    // );
   });
 };

@@ -1,55 +1,15 @@
 const schemas = require("../models/schemas");
 const users = require("../models/users");
-const passport = require("passport");
 const {
+  checkAuth,
+  createToken,
   get_db_User,
   gen_ID,
   hashPassword,
   unHashAndCompare,
-  handleErrors,
-  initializePassport,
-} = require("../Oath/passport-configs");
-
-const checkAuth = require("../Oath/authMiddleware");
-
-const jwt = require("jsonwebtoken");
+} = require("../middlewares/authMiddleware");
 
 const maxAge = 3 * 24 * 60 * 60; // 3 days in secs
-
-const createToken = (id) => {
-  return jwt.sign({ id }, "school management", { expiresIn: maxAge });
-};
-
-const oldOauth = async (req, res) => {
-  let person = req.body;
-  let user = await get_db_User(person._id, true);
-  console.log(person);
-
-  if (user) {
-    // first check if user is already online at login
-
-    // let online = await users.OnlineUser.findOne({ online_id: user._id });
-
-    let match = await unHashAndCompare(person.password, user.password);
-
-    if (match) {
-      const token = createToken(user._id);
-      res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
-
-      res.locals.user = req.session.user = user;
-      // res.json(user);
-      res.render(user.accountType, user);
-    } else {
-      res.json({ message: "Password not correct!" });
-    }
-  } else {
-    res.json({
-      _id: person._id,
-      password: person.password,
-      found: false,
-    });
-  }
-};
 
 /**
  *
@@ -99,25 +59,37 @@ let authController = {
   },
 
   // log in
-  login_Get: (req, res) => res.render("login", { title: "Login" }),
+  login_Get: (req, res) => res.render("landing page", { title: "Login Page", login: true }),
 
-  login_Post: oldOauth,
+  login_Post: async (req, res) => {
+    let person = req.body;
+    let user = await get_db_User(person._id, true);
+    let authResponse = {};
 
-  renderStudent: (req, res) => {
-    res.locals.user = req.session.user;
-    res.render("Student");
+    if (user) {
+      // first check if user is already online at login
+      // let online = await users.OnlineUser.findOne({ online_id: user._id });
+
+      let match = await unHashAndCompare(person.password, user.password);
+
+      if (match) {
+        authResponse.accountType = user.accountType;
+      } else {
+        authResponse.error = "Invalid user id or password";
+      }
+    } else {
+      authResponse.error = "Invalid user id or password";
+    }
+    res.json(authResponse);
   },
-  renderLecturer: (req, res) => {
-    res.locals.user = req.session.user;
-    res.render("Lecturer");
-  },
-  renderCoordinator: (req, res) => {
-    res.locals.user = req.session.user;
-    res.render("Coordinator");
-  },
-  renderAdmin: (req, res) => {
-    res.locals.user = req.session.user;
-    res.render("Admin");
+
+  renderDashboard: async (req, res) => {
+    let user = await get_db_User(req.body._id, true);
+
+    const token = createToken(user._id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 3000 });
+    res.locals.user = user;
+    res.render(user.accountType);
   },
 
   logOut: (req, res) => {

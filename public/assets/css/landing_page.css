@@ -3,15 +3,15 @@
   margin: 0;
 }
 
-div a {
+div a.nav-link {
   color: white;
   font-weight: bold;
   font-size: 20px;
 }
 
-div a:hover {
+div a.nav-link:hover {
   font-size: 21px;
-  color: #008778;
+  color: #0a4c9b;
 }
 
 div.container-signup,
@@ -35,16 +35,16 @@ p {
 div i {
   float: right;
   cursor: pointer;
-  color: #008778;
+  color: #0a4c9b;
 }
 
 .head {
-  color: #008778;
+  color: #0a4c9b;
   padding: 5px;
 }
 
 .remember {
-  color: #008778;
+  color: #0a4c9b;
 }
 
 #container {
@@ -56,14 +56,14 @@ div i {
 
 .iconU,
 .iconP {
-  color: #008778;
+  color: #0a4c9b;
   position: absolute;
 }
 
 input[type="text"],
 input[type="password"] {
   border: none;
-  border-bottom: 1px solid #008778;
+  border-bottom: 1px solid #0a4c9b;
   outline: 0 none;
 }
 
@@ -72,8 +72,21 @@ input[type="password"] {
 }
 
 .signup {
-  background-color: #008778;
+  background-color: #0a4c9b;
   color: white;
+}
+
+div.error {
+  background-color: #ffdddd;
+  border-radius: 0px 5px 5px 0px;
+  border-left: 5px solid red;
+}
+
+div.error p {
+  color: black;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
 }
 
 @media screen and (max-width: 570px) {

@@ -1,6 +1,6 @@
 //models
-const schemas = require("../models/schemas");
-const Admin = schemas.Admin;
+const users = require("../models/users");
+const Admin = users.Admin;
 
 let adminController = {};
 

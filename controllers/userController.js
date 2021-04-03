@@ -1,14 +1,6 @@
 const schemas = require("../models/schemas");
-const users = require("../models/users");
-const {
-  get_db_User,
-  get_RefData,
-  gen_ID,
-  hashPassword,
-  unHashAndCompare,
-  handleErrors,
-  initializePassport,
-} = require("../Oath/passport-configs");
+// const users = require("../models/users");
+const { get_db_User, get_RefData } = require("../middlewares/authMiddleware");
 
 const systemDefaults = require("../models/systemDefaults");
 
