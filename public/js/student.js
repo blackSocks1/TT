@@ -19,5 +19,5 @@ export class Student extends User {
 
 // getting user data and constructing student
 let props = document.querySelectorAll("output.myData");
-let Me = new Student(props[0].value, props[1].value, props[2].value);
+let Me = new Student(props[0].value, props[1].value);
 Me.main();

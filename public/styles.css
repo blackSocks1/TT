@@ -324,6 +324,7 @@ input:checked + .slider:before {
 
 /* Toggle this class - hide and show the popup */
 .programPopup .show {
+  z-index: 10;
   visibility: visible;
   -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s;
@@ -414,9 +415,33 @@ input:checked + .slider:before {
   }
 }
 
-/* div.modal {
+input[type="search"].search {
+  border-radius: 4px;
+  width: 100%;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+/* When the input field gets focus, change its width to 100% */
+input[type="search"].search:focus {
+  width: 100%;
+}
+
+input[type="text"].Att-description {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  width: 20%;
   text-align: center;
-} */
+  border-bottom: 2px solid #08303d;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+input[type="text"].Att-description:focus {
+  width: 45%;
+  border-bottom: 2px solid #2196f3;
+}
 
 /* The Modal (background) */
 .modal {
@@ -543,34 +568,6 @@ input:checked + .slider:before {
 .toCenter {
   display: grid;
   place-items: center;
-}
-
-input[type="search"].search {
-  border-radius: 4px;
-  width: 100%;
-  -webkit-transition: width 0.4s ease-in-out;
-  transition: width 0.4s ease-in-out;
-}
-
-/* When the input field gets focus, change its width to 100% */
-input[type="search"].search:focus {
-  width: 100%;
-}
-
-input[type="text"].Att-description {
-  background-color: transparent;
-  outline: none;
-  border: none;
-  width: 20%;
-  text-align: center;
-  border-bottom: 2px solid #08303d;
-  -webkit-transition: width 0.4s ease-in-out;
-  transition: width 0.4s ease-in-out;
-}
-
-input[type="text"].Att-description:focus {
-  width: 45%;
-  border-bottom: 2px solid #2196f3;
 }
 
 .myAccordion {

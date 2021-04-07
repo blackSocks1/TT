@@ -1,7 +1,6 @@
 const schemas = require("../models/schemas");
 const users = require("../models/users");
 const {
-  checkAuth,
   createToken,
   get_db_User,
   gen_ID,

@@ -185,8 +185,6 @@ export class User {
       accountType: this.accountType,
     });
 
-    console.log(this.Att);
-
     if (this.Att.groups.length > 0) {
       this.Att.groups = this.Att.groups.sort((a, b) => (a._id > b._id ? 1 : -1));
 
@@ -429,7 +427,6 @@ export class User {
    * method for fetching user personal TT
    */
   getTT = async () => {
-    console.log("Yooo", this);
     this.ownTT.TT = await fx.postFetch("/user/getTT", {
       _id: this._id,
       accountType: this.accountType,
@@ -437,7 +434,7 @@ export class User {
       platform: this.platform,
       stud_ref: this.student_Ref,
     });
-    console.log(this.ownTT.TT);
+    // console.log(this.ownTT.TT);
 
     this.selectTT();
     this.ownTT.display(this.ownTT.ttOnScreen, this.accountType);
@@ -858,8 +855,7 @@ export class AttForm extends UserForms {
               <input type="checkbox" class="form-check-input"/>
               <input
                 type="text"
-                class="form-control"
-                id="remark"
+                class="form-control Att-remark"
                 autocomplete="off"
                 placeholder="Remark..."
               />
@@ -900,8 +896,7 @@ export class AttForm extends UserForms {
               <input type="checkbox" class="form-check-input"/>
               <input
                 type="text"
-                class="form-control"
-                id="remark"
+                class="form-control Att-remark"
                 autocomplete="off"
                 placeholder="Remark..."
               />
@@ -1443,7 +1438,10 @@ export class ProgramTT extends TT {
     // adding event listeners to TT nav items
     let thisTT_nav = document.querySelector(`#${this.nav_id}`);
 
-    thisTT_nav.querySelector("#clearGroupTT").addEventListener("click", this.clear);
+    this.sendBtn = thisTT_nav.querySelector("#sendGroupTT");
+    this.clearBtn = thisTT_nav.querySelector("#clearGroupTT");
+    this.validateBtn = thisTT_nav.querySelector("#validateGroupTT");
+    this.clearBtn.addEventListener("click", this.clear);
   };
 
   /**
@@ -1532,23 +1530,26 @@ export class ProgramTT extends TT {
     this.init();
   };
 
+  /**
+   * Method to reset all periods of programTT to empty
+   */
   clear = () => {
-    // method to clear this TT
+    this.sendBtn.disabled = true;
 
     this.periods.forEach((period) => {
-      period = period.querySelectorAll("input");
-
-      period[0].value = "";
-      period[0].disabled = false;
-      period[1].value = "";
-      period[1].disabled = false;
-      period[2].value = "";
-      period[2].disabled = false;
-      period[3].checked = false;
-      period[3].disabled = false;
+      period.querySelectorAll("input").forEach((inputField, index) => {
+        if (index == 3) {
+          inputField.checked = false;
+        } else {
+          inputField.value = "";
+          inputField.parentNode.querySelector("span.popuptext").classList.remove("show");
+          fx.setBorderBColor(inputField, color.Ok);
+        }
+        inputField.disabled = false;
+      });
     });
 
-    console.log("All periods cleared!");
+    // console.log("All periods cleared!");
   };
 
   setWeek = () => {
@@ -1768,7 +1769,8 @@ export class AvailTT {
 
     // adding event listeners to TT nav items
     let thisTT_nav = document.querySelector(`#${this.nav_id}`);
-    thisTT_nav.querySelector("#resetAvailTT").addEventListener("click", this.reset);
+    this.resetBtn = thisTT_nav.querySelector("#resetAvailTT");
+    this.saveBtn = thisTT_nav.querySelector("#saveAvailOnScreen");
   };
 
   /**
@@ -1856,21 +1858,15 @@ export class AvailTT {
   };
 
   reset = () => {
-    // mehtod to uncheck all avail periods
-
-    let result = [];
     this.periods.forEach((period) => {
       period.checked = false;
-      result.push(new Avail("N\\A"));
     });
-    console.log("AvailTT reset with success:", result);
   };
 
   compile = () => {
     // method to distinguish between checked and unchecked avail periods
 
     let result = [];
-
     this.periods.forEach((period) =>
       result.push(period.checked ? new Avail("A") : new Avail("N\\A"))
     );

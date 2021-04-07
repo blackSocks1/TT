@@ -23,9 +23,9 @@
     <title><%= user.accountType %> | <%= user.name %></title>
   </head>
   <body>
-    <div class="accInfo">
-      <output class="myData" style="display: none"><%=user._id %></output>
-      <output class="myData" style="display: none"><%=user.name %></output>
+    <div class="accInfo" style="display: none">
+      <output class="myData"><%=user._id %></output>
+      <output class="myData"><%=user.name %></output>
     </div>
 
     <div class="datalist">
@@ -58,7 +58,9 @@
           <div class="ownNav" id="mainNav">
             <!-- <a id="home-link" data-ref="Home">Home</a> -->
 
-            <a class="navLink" data-navset="mainNav" id="normalTT-link" data-ref="TT">Timetable</a>
+            <a class="navLink active" data-navset="mainNav" id="normalTT-link" data-ref="TT"
+              >Timetable</a
+            >
 
             <a class="navLink" id="availableTT-link" data-navset="mainNav" data-ref="availTT"
               >Availability</a
@@ -70,13 +72,15 @@
 
             <a class="navLink" id="Att-link" data-navset="mainNav" data-ref="Att">Attendance</a>
 
-            <a class="navLink" id="db_data-link" data-navset="mainNav" data-ref="db_data">DB</a>
+            <a class="navLink" id="db_data-link" data-navset="mainNav" data-ref="db_data"
+              >Database</a
+            >
           </div>
         </div>
       </div>
     </nav>
 
-    <div class="w3-row nav-item" data-navset="mainNav" id="TT" style="display: block">
+    <div class="w3-row nav-item" data-navset="mainNav" id="TT">
       <div class="w3-container w3-animate-right">
         <div class="w3-round-large">
           <h1>WEEKLY SCHEDULE</h1>
@@ -130,7 +134,9 @@
       <div class="container" id="Att-main">
         <nav>
           <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
-            <a class="navLink" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att">New</a>
+            <a class="navLink active" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att"
+              >New</a
+            >
 
             <a class="navLink" id="Att_history-link" data-navset="Att-nav" data-ref="Att_history"
               >History</a
@@ -151,7 +157,7 @@
           <div id="Att-varOptions"></div>
         </div>
 
-        <div class="nav-item" style="display: block" data-navset="Att-nav" id="take_Att">
+        <div class="nav-item" data-navset="Att-nav" id="take_Att">
           <h1>Take New Attendance</h1>
           <div class="" id="Att-container"></div>
         </div>
@@ -179,19 +185,19 @@
               >Lecturers</a
             >
 
-            <a class="navLink" id="Groups-link" data-navset="dbNav" data-ref="group_data">DB</a>
-
             <a class="navLink" id="Students-link" data-navset="dbNav" data-ref="stud_data"
               >Students</a
+            >
+
+            <a class="navLink" id="Groups-link" data-navset="dbNav" data-ref="group_data"
+              >Courses</a
             >
           </div>
         </nav>
 
-        <div class="nav-item" style="display: block" data-navset="dbNav" id="lect_data">
-          <h1>Lecturers</h1>
-        </div>
-        <div class="nav-item" data-navset="dbNav" id="group_data"><h1>Groups</h1></div>
+        <div class="nav-item" data-navset="dbNav" id="lect_data"><h1>Lecturers</h1></div>
         <div class="nav-item" data-navset="dbNav" id="stud_data"><h1>Students</h1></div>
+        <div class="nav-item" data-navset="dbNav" id="group_data"><h1>Courses</h1></div>
       </div>
     </div>
 

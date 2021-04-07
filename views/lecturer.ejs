@@ -7,40 +7,26 @@
     <link rel="icon" type="image/png" href="assets/images/icon.png" />
     <link rel="stylesheet" type="text/css" href="assets/css/wc3.css" />
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="assets/css/lecturer_interface.css" />
+    <link rel="stylesheet" href="assets/css/coordinator_interface.css" />
     <link rel="stylesheet" href="wc3.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="rollCallStyle.css" />
+    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="scroll-table.css" />
     <script src="js/socket.io.js" defer></script>
+    <script src="js/hashMap.js" defer></script>
     <script src="js/moment-with-locales.js"></script>
     <script type="module" src="js/lecturerMain.js" defer></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script> -->
 
     <title><%= user.accountType %> | <%= user.name %></title>
   </head>
   <body>
-    <div class="accInfo">
-      <output class="myData" style="display: none"><%=user._id %></output>
-      <output class="myData" style="display: none"><%=user.name %></output>
+    <div class="accInfo" style="display: none">
+      <output class="myData"><%=user._id %></output>
+      <output class="myData"><%=user.name %></output>
     </div>
-
-    <!-- <nav id="paginationStyled" aria-label="Page navigation example">
-      <ul class="pagination justify-content-center mt-2">
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-    </nav> -->
 
     <nav class="navbar navbar-expand-lg timetableNav">
       <div class="container-fluid">
@@ -71,31 +57,13 @@
             <a class="navLink" id="availableTT-link" data-navset="mainNav" data-ref="availTT"
               >Availability</a
             >
-
             <a class="navLink" id="Att-link" data-navset="mainNav" data-ref="Att">Attendance</a>
           </div>
         </div>
       </div>
     </nav>
 
-    <!-- <div class="w3-row mainNav" id="Home" style="display: block">
-      <h1>Home page</h1>
-
-      <br />
-
-      <div class="w3-quarter w3-container w3-hide-small">
-        <div class="w3-card-4 w3-round-large w3-animate-top">
-          <div class="w3-container notice">
-            <p class="mt-4">
-              <span>Welcome <%= user.name %></span><br />
-              You can view the most recent timetable by clicking on the get timetable button
-            </p>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-    <div class="w3-row nav-item" data-navset="mainNav" id="TT" style="display: block">
+    <div class="w3-row nav-item" data-navset="mainNav" id="TT">
       <div class="w3-container w3-animate-right">
         <div class="w3-round-large">
           <h1>WEEKLY SCHEDULE</h1>
@@ -120,7 +88,9 @@
       <div class="container" id="Att-main">
         <nav>
           <div class="ownNav" id="Att-nav" style="background-color: #0a4c9b">
-            <a class="navLink" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att">New</a>
+            <a class="navLink active" id="take_Att-link" data-navset="Att-nav" data-ref="take_Att"
+              >New</a
+            >
 
             <a class="navLink" id="Att_history-link" data-navset="Att-nav" data-ref="Att_history"
               >History</a
@@ -141,7 +111,7 @@
           <div id="Att-varOptions"></div>
         </div>
 
-        <div class="nav-item" style="display: block" data-navset="Att-nav" id="take_Att">
+        <div class="nav-item" data-navset="Att-nav" id="take_Att">
           <h1>Take New Attendance</h1>
           <div class="" id="Att-container"></div>
         </div>
@@ -186,6 +156,16 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/navigation.js"></script>
     <script src="assets/jquery/jquery.min.js"></script>
+
+    <!-- new -->
+
+    <script src="assets/js/jquery-3.5.1.slim.min.js"></script>
+
+    <script src="assets/js/jquery-1.12.4.min.js"></script>
+
+    <script src="assets/js/popper.min.js"></script>
+
+    <script src="assets/js/bootstrap.min.js"></script>
   </body>
 
   <!-- <%- include('partials/authFooter') -%> -->

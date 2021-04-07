@@ -82,15 +82,9 @@ export class Coordinator extends Lecturer {
    * method for adding event listeners to elements prior to Coordinator class
    */
   setCoordEventListeners = async () => {
-    document
-      .querySelector(`#${this.program_TT.nav_id}`)
-      .querySelector("#validateGroupTT")
-      .addEventListener("click", this.validate_TT);
+    this.program_TT.validateBtn.addEventListener("click", this.validate_TT);
 
-    document
-      .querySelector(`#${this.program_TT.nav_id}`)
-      .querySelector("#sendGroupTT")
-      .addEventListener("click", this.send_TT);
+    this.program_TT.sendBtn.addEventListener("click", this.send_TT);
 
     this.program_TT.periods.forEach((period) =>
       period
@@ -864,8 +858,8 @@ export class Coordinator extends Lecturer {
         venuesToCheck.push(fx.findElement("_id", venue_id, this.venueDb).element);
       });
 
-      // console.log(`Lecturers to check are `, lecturersToCheck);
-      console.log(`Venues to check are `, venuesToCheck);
+      console.log(`Lecturers to check are `, lecturersToCheck);
+      // console.log(`Venues to check are `, venuesToCheck);
 
       // processing of lecturers' data
       lecturersToCheck.forEach((lecturer) => {

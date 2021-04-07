@@ -22,7 +22,7 @@ export class Lecturer extends User {
    */
   lecturerInit = async () => {
     this.sysDefaults = await this.getSysDefaults();
-    console.log(this.sysDefaults);
+    // console.log(this.sysDefaults);
 
     this.availTT = new AvailTT("myAvail", "#availTTContainer", this.sysDefaults);
     this.availTT.show();
@@ -38,17 +38,16 @@ export class Lecturer extends User {
     this.ownTT.show();
 
     await this.getMyInfo();
-    console.log("Get my info ok");
     await this.getTT();
-    console.log("Get TT ok");
   };
 
   setLectecuerEventListeners = () => {
     // Adding event listeners to avail TT
-    document
-      .querySelector(`#${this.availTT.nav_id}`)
-      .querySelector("#saveAvailOnScreen")
-      .addEventListener("click", this.saveAvailTT);
+    this.availTT.saveBtn.addEventListener("click", this.saveAvailTT);
+    this.availTT.resetBtn.addEventListener("click", () => {
+      this.availTT.reset();
+      this.showSnackBar("Availability reset");
+    });
   };
 
   /**
@@ -76,7 +75,7 @@ export class Lecturer extends User {
         period.checked = false;
       }
     });
-    console.log(this.avail);
+    // console.log(this.avail);
   };
 
   /**

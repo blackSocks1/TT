@@ -46,7 +46,7 @@ div#class {
   padding: 5px;
 }
 
-#remark {
+.Att-remark {
   width: 20%;
   float: right;
 }
@@ -247,7 +247,7 @@ textarea {
     width: 1%;
   }
 
-  #remark {
+  .Att-remark {
     width: 100%;
   }
 

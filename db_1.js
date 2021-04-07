@@ -164,7 +164,7 @@ async function createCycle(_id = "", department_id = "", cycles = []) {
 
 async function createSpecialty(_id, coordinator_id, cycle_id, courses, levels) {
   // ["ACC", "MAG'T", "LAW", "T & L", "FOOD Sc.", "BANK"];
-  // ["CMA", "EPS", "SWE", "NWS", "TEL", "ICA"]
+  // ["CMA", "EPS", "NWS", "NWS", "TEL", "ICA"]
 
   let coordinator = await users.Coordinator.findOne({ user_Ref: coordinator_id });
 
@@ -258,22 +258,22 @@ async function createGroup(
 async function createCourses(group_id) {
   let courseList = [
     "English Language",
-    // "Physics",
-    "Logic",
+    "Physics",
+    // "Logic",
     // "C Programming",
     // "Web Programming",
     // "Computer Networks",
     // "Math Lab.",
     // "Cisco",
-    "Graphics Design",
-    // "Algorithms & Data Structures",
-    // "Digital Electronics",
-    "Civil Law",
-    "Civics & Ethics",
-    // "Operating Systems",
-    "Economics",
-    "Data Analysis",
-    "Probability and Statistics for Engineers",
+    // "Graphics Design",
+    "Algorithms & Data Structures",
+    "Digital Electronics",
+    // "Civil Law",
+    // "Civics & Ethics",
+    "Operating Systems",
+    // "Economics",
+    // "Data Analysis",
+    // "Probability and Statistics for Engineers",
     // "Construction Methods and Management",
     "Water Resources Engineering",
     // "Introduction to Civil Engineering",
@@ -281,20 +281,20 @@ async function createCourses(group_id) {
     // "Solid Mechanics",
     "Technical Writing",
     // "Dynamics",
-    "Intro to Surveying and CAD",
-    "General Chemistry",
-    "General Physics",
-    "Calculus",
-    // "Materials Science",
+    // "Intro to Surveying and CAD",
+    // "General Chemistry",
+    // "General Physics",
+    // "Calculus",
+    "Materials Science",
     "Computer Science",
-    // "Engineering Math",
-    // "Structural Analysis",
+    "Engineering Math",
+    "Structural Analysis",
     "Structural Design",
-    // "Soil Mechanics",
-    // "Geotechnical Engineering",
-    // "Environmental Engineering",
-    "Fluid Mechanics",
-    "Transportation Engineering",
+    "Soil Mechanics",
+    "Geotechnical Engineering",
+    "Environmental Engineering",
+    // "Fluid Mechanics",
+    // "Transportation Engineering",
   ].sort();
 
   // let specialties = await schemas.Specialty.find({ coordinator: "coord_2" });
@@ -454,49 +454,13 @@ async function modSpecific() {
 }
 
 (async () => {
-  // await modSpecific();
-  let systemDefault = new systemDefaults({
-    periods: [
-      new Period("08:00", "09:50"),
-      new Period("10:10", "12:00"),
-      new Period("13:00", "14:50"),
-      new Period("15:10", "17:00"),
-      new Period("17:30", "19:30"),
-      new Period("20:00", "21:30"),
-    ],
-    weekDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"],
-    pauses: [
-      new Pause("Morning Break", 0),
-      new Pause("Long Break", 1),
-      new Pause("Afternoon Break", 2),
-      new Pause("Closing", 3),
-      new Pause("Evening Break", 4),
-    ],
-  });
-  await systemDefault.save();
-  //
-  // let sysAdmin = new schemas.Admin({
-  //   _id: "ROOT",
-  //   name: "ROOT",
-  //   accountType: "Admin"
-  // });
-  // await sysAdmin.save();
-  // console.log(`${sysAdmin.name} was successfully saved`);
-  await createCoordinator("coord_1");
-  await createCampus("AKWA", "Dla-Akwa", []);
-  await createCampus("LOG", "Dla-Logbessou", []);
-  await createVenue("AKWA");
-  await createVenue("LOG");
-  await createSector("SEAS", "School of Engineering and Applied Sciences", []);
-  await createDepartment("Industrial & Tech.", "SEAS", []);
-  await createCycle("HND", "Industrial & Tech.", []);
-  await createLecturers();
-  await createSpecialty("SWE", "coord_1", "HND", [], []);
-  await createLevels("L1", "SWE", [], []);
-  await createLevels("L2", "SWE", [], []);
+  await createCoordinator("coord_2");
+  await createSpecialty("NWS", "coord_2", "HND", [], []);
+  await createLevels("L1", "NWS", [], []);
+  await createLevels("L2", "NWS", [], []);
   await createGroup(
     "AKWA",
-    "SWE-L1",
+    "NWS-L1",
     "AKWA",
     (courses = []),
     (students = []),
@@ -505,7 +469,7 @@ async function modSpecific() {
   );
   await createGroup(
     "AKWA",
-    "SWE-L2",
+    "NWS-L2",
     "AKWA",
     (courses = []),
     (students = []),
@@ -514,7 +478,7 @@ async function modSpecific() {
   );
   await createGroup(
     "LOG",
-    "SWE-L1",
+    "NWS-L1",
     "LOG",
     (courses = []),
     (students = []),
@@ -523,7 +487,7 @@ async function modSpecific() {
   );
   await createGroup(
     "LOG",
-    "SWE-L2",
+    "NWS-L2",
     "LOG",
     (courses = []),
     (students = []),
