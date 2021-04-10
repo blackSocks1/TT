@@ -283,10 +283,14 @@ export class User {
       });
     });
 
+    let present = this.Att.result.filter((stud_data) => stud_data.presence == true);
+    let percent = 100 * (present.length / this.Att.result.length);
+    percent = percent.toString().length <= 2 ? percent.toFixed(2) : percent.toFixed(0);
+
     let newAtt = {
       data: this.Att.result, // {name, presence, remark}
 
-      description: this.AttFrom.description.value.trim(),
+      description: `${this.AttFrom.description.value.trim()} (${percent}%)`,
 
       type: "Att",
 
@@ -811,31 +815,8 @@ export class AttForm extends UserForms {
     this.description = this.container.querySelector("#Att-description");
     this.searchBar = this.container.querySelector("#AttForm-search");
 
-    this.searchBar.addEventListener("keyup", () => {
-      // try wrapping the search function into one good piece
-
-      let searchItems = this.container.querySelectorAll(`div[data-search="${this.searchBar.id}"]`);
-
-      let filter = this.searchBar.value.trim();
-      if (filter) {
-        searchItems.forEach((item) => {
-          let originalValue = item.parentNode.querySelector("input.originalValue").value;
-
-          if (originalValue.toLowerCase().indexOf(filter.toLowerCase()) != -1) {
-            item.innerHTML = fx.colorMatches(filter, originalValue, "#2196f3");
-            item.parentNode.style.display = "";
-          } else {
-            item.innerHTML = originalValue;
-            item.parentNode.style.display = "none";
-          }
-        });
-      } else {
-        searchItems.forEach((item) => {
-          item.innerHTML = item.parentNode.querySelector("input.originalValue").value;
-          item.parentNode.style.display = "";
-        });
-      }
-    });
+    this.searchBar.addEventListener("keyup", this.handleSearch);
+    this.searchBar.addEventListener("change", this.handleSearch);
   };
 
   /**
@@ -926,6 +907,32 @@ export class AttForm extends UserForms {
     }
 
     this.init();
+  };
+
+  handleSearch = (e) => {
+    // try wrapping the search function into one good piece
+
+    let searchItems = this.container.querySelectorAll(`div[data-search="${this.searchBar.id}"]`);
+
+    let filter = this.searchBar.value.trim();
+    if (filter) {
+      searchItems.forEach((item) => {
+        let originalValue = item.parentNode.querySelector("input.originalValue").value;
+
+        if (originalValue.toLowerCase().indexOf(filter.toLowerCase()) != -1) {
+          item.innerHTML = fx.colorMatches(filter, originalValue, "#2196f3");
+          item.parentNode.style.display = "";
+        } else {
+          item.innerHTML = originalValue;
+          item.parentNode.style.display = "none";
+        }
+      });
+    } else {
+      searchItems.forEach((item) => {
+        item.innerHTML = item.parentNode.querySelector("input.originalValue").value;
+        item.parentNode.style.display = "";
+      });
+    }
   };
 
   checkAll = () => {
@@ -1372,7 +1379,7 @@ export class DisplayTT extends TT {
           } at ${moment(this.ttOnScreen.oDate).format("h:mm:ss a")}`;
       }
     } else {
-      message.body = "No Programmed TT yet.";
+      message.body = "Nothing to show";
     }
 
     this.displayModal.header.innerHTML = message.header;
@@ -1792,7 +1799,7 @@ export class AvailTT {
     let thead = document.createElement("thead");
     let thead_tr = document.createElement("tr");
     thead_tr.setAttribute("colspan", this.sysDefaults.weekDays.length + 1);
-    thead_tr.innerHTML = `<th class="w3-small"> TIME</th>`;
+    thead_tr.innerHTML = `<th class="w3-small">PERIOD</th>`;
 
     this.sysDefaults.weekDays.forEach((day) => {
       thead_tr.innerHTML += `<th class="w3-small dayOfWeek">${day}</th>`;
@@ -1883,18 +1890,19 @@ export class DisplayModal {
     this.footer = document.querySelector("#modalFooter");
   }
 
+  /**
+   * mehtod to make modal visible on screen
+   */
   show = () => {
-    // mehtod to make modal visible on screen
-
     let thisModal = document.querySelector(`#${this._id}`);
     thisModal.style.display = "block";
-
     document.querySelector("#modalClose").addEventListener("click", this.close);
   };
 
+  /**
+   * method to close modal
+   */
   close = () => {
-    // method to close modal
-
     document.querySelector(`#${this._id}`).style.display = "none";
   };
 }

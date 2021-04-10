@@ -26,7 +26,28 @@ let lecturerController = {
       reponse.error = err;
     }
 
-    res.end(JSON.stringify(reponse));
+    res.json(reponse);
+  },
+
+  getAvail: async (req, res) => {
+    let lecturer = await get_db_User(req.body);
+    let reponse;
+
+    try {
+      let result;
+      if (lecturer) {
+        if (lecturer.accountType == "Lecturer") {
+          result = await users.Lecturer.findOne({ _id: lecturer.lecturer_Ref });
+        } else {
+          result = await users.Coordinator.findOne({ _id: lecturer.coordinator_Ref });
+        }
+        response = result.avail.defaultAvail;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    res.json(reponse);
   },
 };
 

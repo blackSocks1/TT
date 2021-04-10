@@ -1,4 +1,8 @@
-import { Period, Avail, Event, color } from "./classes.js";
+import { Period, Avail, Event } from "./classes.js";
+
+export function clone(data) {
+  return JSON.parse(JSON.stringify(data));
+}
 
 export async function postFetch(url, body = {}, contentType = "application/json;charset=utf-8") {
   return await (

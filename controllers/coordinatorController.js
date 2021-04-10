@@ -66,20 +66,12 @@ let coordinatorController = {
 
   updateLecturers: async (req, res) => {
     let lecturerBD = req.body.lecturers;
-    let coord_id = req.body.coord_id;
-
-    // let coord = findElement("_id", coord_id, lecturerBD);
-    // if (coord) {
-    //   let index = coord.index;
-    //   coord = coord.element;
-    //   lecturerBD.splice(index, 1);
-    //   let db_coord = await users.Coordinator.findOne({ _id: coord._id });
-    // }
 
     for (let lecturer of lecturerBD) {
       // we're fetching the lecturer form schemas[lecturer.accountType] because a lecturer could also be a coordinator
 
-      let result = await users.Lecturer.findOne({ _id: lecturer.lecturer_Ref });
+      let result = await users[lecturer.accountType].findOne({ _id: lecturer._Ref });
+
       let answer = findElement("week", lecturer.week, result.TT);
 
       if (answer) {
@@ -171,7 +163,7 @@ let coordinatorController = {
       avail: coord.avail,
       TT: coord.TT,
       accountType: coordUserData.accountType,
-      lecturer_Ref: coord._id,
+      coordinator_Ref: coord._id,
     });
 
     let lecturers = await users.Lecturer.find({});

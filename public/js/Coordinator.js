@@ -127,15 +127,16 @@ export class Coordinator extends Lecturer {
 
       if (lecturer.accountType === "Lecturer") {
         newLecturer = new Lecturer(lecturer._id);
+        newLecturer.lecturer_Ref = lecturer.lecturer_Ref;
       } else {
         newLecturer = new Coordinator(lecturer._id);
+        newLecturer.coordinator_Ref = lecturer.coordinator_Ref;
       }
 
       newLecturer.TT = lecturer.TT;
       newLecturer.name = lecturer.name;
       newLecturer.accountType = lecturer.accountType;
       newLecturer.avail = lecturer.avail;
-      newLecturer.lecturer_Ref = lecturer.lecturer_Ref;
 
       newLecturer.availHolder = newLecturer.avail
         ? JSON.parse(JSON.stringify(newLecturer.avail))
@@ -230,7 +231,7 @@ export class Coordinator extends Lecturer {
         }
 
         fx.setBorderBColor(e.target, bbColor);
-        fx.setPopupText(e.target, message, true);
+        fx.setPopupText(e.target, message, false);
       } else if (e.target.list.id === "Lecturers") {
         let lecturer = fx.findElement("name", e.target.value.trim(), this.lecturerDb);
 
@@ -362,8 +363,8 @@ export class Coordinator extends Lecturer {
     });
 
     this.lecturerDb.forEach((lecturer) => lecturer.resetTempTT());
-    this.venueDb = JSON.parse(JSON.stringify(this.venueDbClone));
-    this.courseDb = JSON.parse(JSON.stringify(this.courseDbClone));
+    this.venueDb = fx.clone(this.venueDbClone);
+    this.courseDb = fx.clone(this.courseDbClone);
 
     let valid = "";
     let emptyTable = "";
@@ -815,7 +816,6 @@ export class Coordinator extends Lecturer {
           ].hoursLeft;
         course.time.week[refWeek.index].timeEnd = course.time.left;
       });
-
       // console.log(this.TTupdatedCourses);
 
       // if old TT, get all lecturers and venues programmed in that TT
@@ -858,8 +858,8 @@ export class Coordinator extends Lecturer {
         venuesToCheck.push(fx.findElement("_id", venue_id, this.venueDb).element);
       });
 
-      console.log(`Lecturers to check are `, lecturersToCheck);
-      // console.log(`Venues to check are `, venuesToCheck);
+      // console.table(lecturersToCheck);
+      // console.table(venuesToCheck);
 
       // processing of lecturers' data
       lecturersToCheck.forEach((lecturer) => {
@@ -872,15 +872,14 @@ export class Coordinator extends Lecturer {
         if (oldTT) {
           oldTT = oldTT.element;
           lecturer.tempTT.periods = [...oldTT.periods];
-          // console.log("Old TT loaded for tempTT", oldTT);
-        } else {
-          this.TTperiods.forEach((period, index) => {
-            lecturer.tempTT.periods[index] = period.empty();
-          });
         }
 
+        // console.log(lecturer.name, lecturer.schedule);
         this.TTperiods.forEach((period, index) => {
           // at every iteration we set start and stop times for lecturers' TT
+          if (!oldTT) {
+            lecturer.tempTT.periods[index] = period.empty();
+          }
 
           lecturer.tempTT.periods[index].start = Number(
             docPeriods[index].querySelector("input.start").value
@@ -892,7 +891,6 @@ export class Coordinator extends Lecturer {
           let weekProgrammed = fx.findElement("week", weekToProgram, lecturer.avail.weekAvail);
 
           // computation of periods to update and programmed periods
-
           if (this.TTdisabledPeriods[index]) {
             // if (disabledPeriods[index].lecturer_id === lecturer._id) {
             //   console.log("Unaffected period", lecturer.name, lecturer.tempTT.periods[index]);
@@ -909,7 +907,7 @@ export class Coordinator extends Lecturer {
             };
             // console.log(lecturer.name, "Programmed period", index);
           } else if (
-            lecturer.tempTT.periods[index].group === group._id &&
+            lecturer.tempTT.periods[index].group_id === group._id &&
             !lecturer.schedule.includes(index)
           ) {
             lecturer.tempTT.periods[index] = period.empty();
@@ -934,11 +932,15 @@ export class Coordinator extends Lecturer {
             periods: lecturer.tempTT.periods,
             uDate: this.TTdateMod,
             accountType: lecturer.accountType,
-            lecturer_Ref: lecturer.lecturer_Ref,
+            _Ref:
+              lecturer.accountType == "Coordinator"
+                ? lecturer.coordinator_Ref
+                : lecturer.lecturer_Ref,
           });
           // console.log(lecturer.name);
         }
       });
+      console.log(clearedPeriods, this.TTprogrammedPeriods);
 
       venueSet.clear();
 

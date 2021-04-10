@@ -43,6 +43,9 @@ module.exports.handleChat = async (endPoint, socket) => {
       if (allCoordsOnline.length > 0) {
         allCoordsOnline.forEach((coord) => {
           endPoint.to(coord.network_id).emit("/reloadDbData", updater);
+          if (coord.online_id == updater._id) {
+            endPoint.to(coord.network_id).emit("/newTT", updater);
+          }
         });
       }
     });
