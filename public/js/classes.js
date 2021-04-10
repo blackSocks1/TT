@@ -815,8 +815,7 @@ export class AttForm extends UserForms {
     this.description = this.container.querySelector("#Att-description");
     this.searchBar = this.container.querySelector("#AttForm-search");
 
-    this.searchBar.addEventListener("keyup", this.handleSearch);
-    this.searchBar.addEventListener("change", this.handleSearch);
+    this.searchBar.addEventListener("input", this.handleSearch);
   };
 
   /**
@@ -1500,7 +1499,7 @@ export class ProgramTT extends TT {
                   <br>
 
                   <div class="programPopup">
-                    <input class="programTT_input" list="Lecturers" type="text" placeholder="Lecturer">
+                    <input class="programTT_input" list="Lecturers" type="text" placeholder="Lecturer name">
                     <span class="popuptext"></span>
                   </div>
                   <br>
@@ -1755,12 +1754,13 @@ export class AvailTT {
    * @param {*} container_id target div in which this TT will place itself
    * @param {*} sysDefaults data from db needed to generate this TT
    */
-  constructor(_id, container_id, sysDefaults) {
+  constructor(_id, container_id, sysDefaults, controlPanel = true) {
     this._id = _id;
     this.container_id = container_id;
     this.nav_id = `${this._id}-nav`;
     this.pagination_id = `${this._id}-page`;
     this.sysDefaults = sysDefaults;
+    this.controlPanel = controlPanel;
 
     this.TT = [];
     this.ttOnScreen = {};
@@ -1776,7 +1776,8 @@ export class AvailTT {
 
     // adding event listeners to TT nav items
     let thisTT_nav = document.querySelector(`#${this.nav_id}`);
-    this.resetBtn = thisTT_nav.querySelector("#resetAvailTT");
+    this.untickAll = thisTT_nav.querySelector("#untickAll-AvailTT");
+    this.tickAll = thisTT_nav.querySelector("#tickAll-AvailTT");
     this.saveBtn = thisTT_nav.querySelector("#saveAvailOnScreen");
   };
 
@@ -1858,15 +1859,17 @@ export class AvailTT {
     navSection.setAttribute("class", "w3-center w3-bar");
     navSection.setAttribute("id", this.nav_id);
 
-    navSection.innerHTML = `<input type="button" id="resetAvailTT" value="RESET" class="button"> | <input type="button" id="saveAvailOnScreen" value="SAVE" class="button">`;
+    if (this.controlPanel) {
+      navSection.innerHTML = `<input type="button" id="tickAll-AvailTT" value="TICK ALL" class="button"> | <input type="button" id="untickAll-AvailTT" value="UNTICK ALL" class="button"> | <input type="button" id="saveAvailOnScreen" value="SAVE" class="button">`;
+    }
 
     this.container.parentNode.appendChild(navSection);
     this.init();
   };
 
-  reset = () => {
+  multipleticks = (value = false) => {
     this.periods.forEach((period) => {
-      period.checked = false;
+      period.checked = value;
     });
   };
 

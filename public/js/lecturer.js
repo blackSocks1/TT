@@ -44,9 +44,14 @@ export class Lecturer extends User {
   setLectecuerEventListeners = () => {
     // Adding event listeners to avail TT
     this.availTT.saveBtn.addEventListener("click", this.saveAvailTT);
-    this.availTT.resetBtn.addEventListener("click", () => {
-      this.availTT.reset();
-      this.showSnackBar("Availability reset");
+    this.availTT.untickAll.addEventListener("click", () => {
+      this.availTT.multipleticks(false);
+      this.showSnackBar("Not available throughout");
+    });
+
+    this.availTT.tickAll.addEventListener("click", () => {
+      this.availTT.multipleticks(true);
+      this.showSnackBar("Now available throughout");
     });
   };
 

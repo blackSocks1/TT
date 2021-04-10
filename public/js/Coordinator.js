@@ -93,6 +93,32 @@ export class Coordinator extends Lecturer {
     );
 
     this.groupDisplay_TT.editButton.addEventListener("click", this.loadTTForEditing);
+
+    // consult lects avail TT
+    this.consultAvail = new AvailTT(
+      "consult-lects-Avail",
+      "#avail-consult-TT",
+      this.sysDefaults,
+      false
+    );
+
+    document.querySelector("#consultAvail").addEventListener("click", () => {
+      document.querySelector("#avail-displayModal").style.display = "block";
+    });
+
+    document.querySelector("#avail-modalClose").addEventListener("click", () => {
+      document.querySelector("#avail-displayModal").style.display = "none";
+      this.consultAvail.nameInputField.value = "";
+      this.consultAvail.periods.forEach((period) => (period.checked = false));
+    });
+
+    this.consultAvail.nameInputField = document.querySelector("#avail-lect-names");
+    this.consultAvail.nameInputField.addEventListener("input", this.checkInDb);
+
+    this.consultAvail.show();
+    this.consultAvail.periods.forEach((period) => {
+      period.disabled = true;
+    });
   };
 
   /**
@@ -237,6 +263,40 @@ export class Coordinator extends Lecturer {
 
         bbColor = lecturer ? color.Ok : color.Danger;
         message = lecturer ? "" : `${e.target.value.trim()} not found in Lectuer list!`;
+
+        if (e.target.id == "avail-lect-names") {
+          if (lecturer) {
+            lecturer = lecturer.element;
+            this.consultAvail.periods.forEach((period, index) => {
+              if (
+                lecturer.avail.defaultAvail[index] &&
+                lecturer.avail.defaultAvail[index].state === "A"
+              ) {
+                period.checked = true;
+              } else {
+                period.checked = false;
+              }
+            });
+            let thisWeek = fx.findElement(
+              "week",
+              this.program_TT.weekToProgram,
+              lecturer.avail.weekAvail
+            );
+
+            if (thisWeek) {
+              thisWeek = thisWeek.element;
+              this.consultAvail.periods.forEach((period, index) => {
+                if (thisWeek.periods[index].state === "A") {
+                  period.checked = true;
+                } else {
+                  period.checked = false;
+                }
+              });
+            }
+          } else {
+            this.consultAvail.periods.forEach((period, index) => (period.checked = false));
+          }
+        }
 
         fx.setBorderBColor(e.target, bbColor);
         fx.setPopupText(e.target, message, true);

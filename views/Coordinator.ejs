@@ -111,7 +111,8 @@
             <input id="separateCampus" type="checkbox" checked />
             <span class="slider round"></span>
           </label>
-          <span>&nbsp Separeted Campus</span>
+          <span>&nbsp; Separeted Campus</span>
+          <button id="consultAvail">Consult Availability</button>
         </div>
 
         <br />
@@ -225,6 +226,31 @@
         <div class="modal-footer">
           <h3 id="modalFooter">Modal Footer</h3>
         </div>
+      </div>
+    </div>
+
+    <div id="avail-displayModal" class="availModal">
+      <!-- Modal content -->
+      <div class="avail-modal-content">
+        <div class="modal-header">
+          <h2 id="modalHeader">Availability</h2>
+          <span class="close" id="avail-modalClose">&times;</span>
+        </div>
+
+        <div class="programPopup">
+          <input
+            class="programTT_input"
+            id="avail-lect-names"
+            list="Lecturers"
+            type="text"
+            placeholder="Lecturer name"
+          />
+          <span class="popuptext"></span>
+        </div>
+
+        <br />
+
+        <div id="avail-consult-TT"></div>
       </div>
     </div>
 
