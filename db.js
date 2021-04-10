@@ -20,6 +20,21 @@ mongoose
   })
   .catch("error", (error) => console.log("\nError at ", error));
 
+class Avail {
+  /**
+   * class to model a lecturer's availability
+   * @param {String} state state of availability
+   * @param {*} param1
+   */
+  constructor(
+    state = "N\\A",
+    { coordinator = { _id: "", name: "" } } = { coordinator: { _id: "", name: "" } }
+  ) {
+    this.state = state;
+    this.coordinator = coordinator;
+  }
+}
+
 function userTTInit(noCells = 42, initValue = "A") {
   let arr = [];
   for (let i = 0; i < noCells; i++) {
@@ -191,29 +206,25 @@ async function createSpecialty(_id, coordinator_id, cycle_id, courses, levels) {
   }
 }
 
-async function createLevels(name = "", specialty_id = "", groups = [], courses = []) {
-  // let specialty = await schemas.Specialty.findOne({ _id: specialty_id });
+async function createLevel(name = "", specialty_id = "", groups = [], courses = []) {
+  let specialty = await schemas.Specialty.findOne({ _id: specialty_id });
 
-  let specialties = await schemas.Specialty.find();
+  let level = new schemas.Level({
+    _id: `${specialty._id}-${name}`,
+    specialty,
+    groups,
+    courses,
+  });
 
-  for (let specialty of specialties) {
-    let level = new schemas.Level({
-      _id: `${specialty._id}-${name}`,
-      specialty,
-      groups,
-      courses,
-    });
+  try {
+    specialty.levels.push(level);
 
-    try {
-      specialty.levels.push(level);
+    await level.save();
+    await specialty.save();
 
-      await level.save();
-      await specialty.save();
-
-      console.log(`${level._id} was created under ${specialty._id} successfully.`);
-    } catch (err) {
-      console.log(err);
-    }
+    console.log(`${level._id} was created under ${specialty._id} successfully.`);
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -366,6 +377,7 @@ async function createCoordinator(_id = "coord_1") {
   person.user_Ref = newUser;
   delete person._id;
 
+  person.avail = { weekAvail: [], defaultAvail: userTTInit(42, new Avail()) };
   let newCoord = await users.Coordinator.create({ ...person });
 
   newUser.coordinator_Ref = newCoord;
@@ -388,6 +400,8 @@ async function createLecturers(num = 10) {
     let newUser = await users.User.create({ ...lecturer });
     lecturer.user_Ref = newUser;
     delete lecturer._id;
+    lecturer.avail = { weekAvail: [], defaultAvail: userTTInit(42, new Avail()) };
+
     let newLect = await users.Lecturer.create({ ...lecturer });
     newUser.lecturer_Ref = newLect;
     await newUser.save();
@@ -492,8 +506,8 @@ async function modSpecific() {
   await createCycle("HND", "Industrial & Tech.", []);
   await createLecturers();
   await createSpecialty("SWE", "coord_1", "HND", [], []);
-  await createLevels("L1", "SWE", [], []);
-  await createLevels("L2", "SWE", [], []);
+  await createLevel("L1", "SWE", [], []);
+  await createLevel("L2", "SWE", [], []);
   await createGroup(
     "AKWA",
     "SWE-L1",
@@ -530,6 +544,49 @@ async function modSpecific() {
     (TT = []),
     (notifications = [])
   );
+
+  // part 2
+  await createCoordinator("coord_2");
+  await createSpecialty("NWS", "coord_2", "HND", [], []);
+  await createLevel("L1", "NWS", [], []);
+  await createLevel("L2", "NWS", [], []);
+  await createGroup(
+    "AKWA",
+    "NWS-L1",
+    "AKWA",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "AKWA",
+    "NWS-L2",
+    "AKWA",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "LOG",
+    "NWS-L1",
+    "LOG",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+  await createGroup(
+    "LOG",
+    "NWS-L2",
+    "LOG",
+    (courses = []),
+    (students = []),
+    (TT = []),
+    (notifications = [])
+  );
+
   console.log(`\n\nDone!`);
 })();
 

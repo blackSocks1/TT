@@ -940,7 +940,7 @@ export class Coordinator extends Lecturer {
           // console.log(lecturer.name);
         }
       });
-      console.log(clearedPeriods, this.TTprogrammedPeriods);
+      // console.log(clearedPeriods, this.TTprogrammedPeriods);
 
       venueSet.clear();
 
