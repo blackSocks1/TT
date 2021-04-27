@@ -20,7 +20,7 @@ router.post("/login", authController.login_Post);
 
 router.get("/auth/specialties", authController.get_specialties);
 
-router.post("/userDashboard", authController.renderDashboard);
+router.post("/userDashboard", authController.login_Post);
 
 // logout
 // router.get('/logout', authController.logout);

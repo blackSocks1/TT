@@ -1,5 +1,9 @@
+:root {
+  --theme-color: #0a4c9b;
+}
+
 #header {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   height: 95px;
 }
@@ -17,7 +21,7 @@ div#class {
 
 #specb {
   border-radius: 15px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   margin-bottom: 10px;
   padding: 12px;
@@ -25,7 +29,7 @@ div#class {
 
 #specb2 {
   border-radius: 15px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   margin-bottom: 10px;
   padding: 12px;
@@ -59,13 +63,13 @@ div#class {
 
 #send {
   border-radius: 15px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
 }
 
 #save {
   border-radius: 15px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   width: 40%;
   height: 6vh;
@@ -75,14 +79,14 @@ div#class {
 }
 
 #speciality {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   margin-top: 3px;
   margin-bottom: 15px;
 }
 
 #specB {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   font-size: 17px;
   width: 90%;
@@ -98,12 +102,12 @@ i {
 li i {
   position: relative;
   left: 4%;
-  color: #0a4c9b;
+  color: var(--theme-color);
   cursor: pointer;
 }
 
 #stat {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   margin-top: 25px;
   margin-bottom: 25px;
   position: relative;
@@ -114,7 +118,7 @@ li i {
 }
 
 #viewStatTable th {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
 }
 
@@ -151,7 +155,7 @@ li i {
 }
 
 #specB1 {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   margin-bottom: 15px;
   outline: none;
@@ -160,20 +164,20 @@ li i {
 }
 
 #specB2 {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   border-radius: 15px;
   margin-bottom: 15px;
 }
 
 #forward {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   border-radius: 15px;
 }
 
 #delete {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   border-radius: 15px;
   float: right;
@@ -274,12 +278,12 @@ textarea {
 }
 
 #dropdownSpeciality:hover {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
 }
 
 a.actif {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   padding: 10px 10px;
   color: white;
 }

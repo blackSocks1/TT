@@ -1,19 +1,59 @@
-import { Period, Avail, Event } from "./classes.js";
+import { Period, Avail, Event, Week } from "./classes.js";
 
 export function clone(data) {
   return JSON.parse(JSON.stringify(data));
 }
 
-export async function postFetch(url, body = {}, contentType = "application/json;charset=utf-8") {
-  return await (
-    await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": contentType,
-      },
-      body: JSON.stringify(body),
-    })
-  ).json();
+class DataCom {
+  constructor() {}
+
+  get = async (url, params = {}) => {
+    return await (await fetch(url)).json();
+  };
+
+  post = async (url, body = {}, contentType = "application/json;charset=utf-8") => {
+    return await (
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": contentType,
+        },
+        body: JSON.stringify(body),
+      })
+    ).json();
+  };
+}
+
+export const dataCom = Object.freeze(new DataCom());
+
+/**
+ * method to reset lecturer's attributes when he's being programmed by a coordinator
+ */
+export function resetTempTT(lecturer) {
+  lecturer.schedule = [];
+  lecturer.avail = clone(lecturer.availHolder);
+  lecturer.tempTT = {
+    week: new Week(),
+    periods: arrayInit("period"),
+    uDate: "",
+  };
+}
+
+/**
+ * method to get a free period
+ */
+export function emptyPeriod(period) {
+  return {
+    courseName: "",
+    courseInfo: "",
+    lecturerName: "",
+    group_id: "",
+    venue_id: "",
+    state: "",
+    lecturer_id: "",
+    start: period.start,
+    stop: period.stop,
+  };
 }
 
 /**

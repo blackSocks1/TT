@@ -1,5 +1,6 @@
-/* theme colors: #08303d
- background-color: #0a0a23; // for dark theme */
+:root {
+  --theme-color: #0a4c9b;
+}
 
 body {
   background-color: white;
@@ -13,7 +14,7 @@ table.timetable {
   background-color: white;
   border: none;
   border-collapse: collapse;
-  border-bottom: 5px solid #0a4c9b;
+  border-bottom: 5px solid var(--theme-color);
 }
 
 table.timetable th,
@@ -172,7 +173,7 @@ td.period:hover {
 }
 
 th.w3-small {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   border-color: white;
   color: white;
 }
@@ -216,7 +217,7 @@ a.navLink.active {
 }
 
 nav {
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
 }
 
 .ownNav {
@@ -567,7 +568,7 @@ input[type="text"].Att-description:focus {
 
 .modal-header {
   padding: 2px 16px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   text-align: center;
 }
@@ -579,7 +580,7 @@ input[type="text"].Att-description:focus {
 
 .modal-footer {
   padding: 2px 16px;
-  background-color: #0a4c9b;
+  background-color: var(--theme-color);
   color: white;
   text-align: center;
 }
@@ -640,10 +641,10 @@ input[type="text"].Att-description:focus {
 div.top-control-center,
 .top-control-center div {
   display: inline-flex;
-  background: #0a4c9b;
+  background: var(--theme-color);
 }
 
 div.bottom-control-center {
   display: inline-flex;
-  background: #0a4c9b;
+  background: var(--theme-color);
 }

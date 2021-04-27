@@ -16,11 +16,12 @@ let lecturerController = {
           result = await users.Coordinator.findOne({ _id: lecturer.coordinator_Ref });
         }
 
-        result.avail.defaultAvail = req.body.avail;
+        result.avail = req.body.avail;
+        result.markModified("avail");
         await result.save();
       }
 
-      reponse.data = result.avail.defaultAvail;
+      reponse.data = result.avail;
     } catch (err) {
       console.log(err);
       reponse.error = err;
@@ -41,7 +42,7 @@ let lecturerController = {
         } else {
           result = await users.Coordinator.findOne({ _id: lecturer.coordinator_Ref });
         }
-        response = result.avail.defaultAvail;
+        response = result.avail;
       }
     } catch (err) {
       console.log(err);

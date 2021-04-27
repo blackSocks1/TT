@@ -84,37 +84,6 @@ export class User {
       }
     });
 
-    this.socket.on("/reloadDbData", async (updater) => {
-      await this.getDbData(this.groupToUpdate);
-
-      let weekToProgram = new Week(new Date(this.program_TT.weekStart.value));
-
-      let group = fx.findElement("_id", this.groupToUpdate, this.groupDb).element;
-      this.groupDisplay_TT.TT = group.TT;
-
-      let ttOfThisWeek = fx.findElement("week", weekToProgram, this.groupDisplay_TT.TT);
-
-      if (ttOfThisWeek) {
-        this.groupDisplay_TT.index = ttOfThisWeek.index;
-      } else if (this.groupDisplay_TT.TT.length > 0) {
-        this.groupDisplay_TT.index = this.groupDisplay_TT.TT.length - 1;
-      }
-
-      this.groupDisplay_TT.ttOnScreen = this.groupDisplay_TT.TT[this.groupDisplay_TT.index];
-
-      this.groupDisplay_TT.display(this.groupDisplay_TT.ttOnScreen);
-
-      if (this.groupDisplay_TT.TT.length > 0) {
-        fx.elementDisabled("#editPresentTT", false);
-      } else {
-        fx.elementDisabled("#editPresentTT", true);
-      }
-
-      fx.elementDisabled("#sendGroupTT", true);
-
-      this.showSnackBar(`My data has been reloaded because ${updater.name} updated some TTs`);
-    });
-
     this.socket.on("/newTT", async (updater) => {
       await this.getTT();
     });
@@ -129,7 +98,10 @@ export class User {
   };
 
   getMyInfo = async () => {
-    let myData = await fx.postFetch("/user/getMyInfo", { _id: this._id, platform: this.platform });
+    let myData = await fx.dataCom.post("/user/getMyInfo", {
+      _id: this._id,
+      platform: this.platform,
+    });
     let message;
 
     if (myData) {
@@ -170,7 +142,7 @@ export class User {
     // console.log(this);
   };
 
-  getAccType = async (_id) => await fx.postFetch("/user/getAccType", { _id });
+  getAccType = async (_id) => await fx.dataCom.post("/user/getAccType", { _id });
 
   // Att methods //
 
@@ -179,7 +151,7 @@ export class User {
    * @param {Boolean} reload value to reload user data or not
    */
   getAttData = async (reload = false) => {
-    this.Att.groups = await fx.postFetch("/Att/getGroupDetails", {
+    this.Att.groups = await fx.dataCom.post("/Att/getGroupDetails", {
       _id: this._id,
       group_id: this.accountType == "Student" ? this.group : null,
       accountType: this.accountType,
@@ -305,7 +277,7 @@ export class User {
       owner_id: this.Att.currentGroup._id,
     };
 
-    let Att_res = await fx.postFetch("/Att/save", newAtt);
+    let Att_res = await fx.dataCom.post("/Att/save", newAtt);
     await this.getAttData(true);
 
     this.AttFrom.unCheckAll();
@@ -431,7 +403,7 @@ export class User {
    * method for fetching user personal TT
    */
   getTT = async () => {
-    this.ownTT.TT = await fx.postFetch("/user/getTT", {
+    this.ownTT.TT = await fx.dataCom.post("/user/getTT", {
       _id: this._id,
       accountType: this.accountType,
       group_id: this.group,
@@ -639,6 +611,8 @@ export class Week {
     return new Week(new Date(this.firstDay).setDate(new Date(this.firstDay).getDate() + 7 * num));
   };
 
+  isPast = (week) => this.lastDay > week.lastDay;
+
   /**
    * method to get time difference between instanciated week and week to compare
    * @param {{}} week week to compare
@@ -693,13 +667,6 @@ export class Period {
     this.start = start; // period start time
     this.stop = stop; // period stop time
   }
-
-  /**
-   * method to get a free period
-   */
-  empty = () => {
-    return new Period("", "", "", "", "", "A", "", this.start, this.stop);
-  };
 }
 
 export class Event {
@@ -762,7 +729,7 @@ export class Avail {
    * @param {*} param1
    */
   constructor(
-    state = "A",
+    state = "N\\A",
     { coordinator = { _id: "", name: "" } } = { coordinator: { _id: "", name: "" } }
   ) {
     this.state = state;
@@ -1510,7 +1477,7 @@ export class ProgramTT extends TT {
                   </div>
                   <br><br>
 
-                  <input type="checkbox" class="form-check-input"/> Joint Class
+                  <input type="checkbox" class="form-check-input" id="check-${i}-${j}"/> <label for="check-${i}-${j}">Joint Class</label>
                   
                   <input class="start" style="display:none;"></input>
                   <input class="stop" style="display:none;"></input>

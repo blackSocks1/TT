@@ -7,6 +7,7 @@ const {
   hashPassword,
   unHashAndCompare,
 } = require("../middlewares/authMiddleware");
+const { request } = require("express");
 
 const maxAge = 3 * 24 * 60 * 60; // 3 days in secs
 
@@ -61,6 +62,7 @@ let authController = {
   login_Get: (req, res) => res.render("landing page", { title: "Login Page", login: true }),
 
   login_Post: async (req, res) => {
+    console.log(req.path);
     let person = req.body;
     let user = await get_db_User(person._id, true);
     let authResponse = {};
@@ -71,24 +73,30 @@ let authController = {
 
       let match = await unHashAndCompare(person.password, user.password);
 
+      if (req.path == "/userDashboard" && match) {
+        const token = createToken(user._id);
+        res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 3000 });
+        res.locals.user = user;
+        res.render(user.accountType);
+        return;
+      } else if (req.path == "/userDashboard" && !match) {
+        res.render("404");
+        return;
+      }
+
       if (match) {
         authResponse.accountType = user.accountType;
       } else {
         authResponse.error = "Invalid user id or password";
       }
     } else {
+      if (req.path == "/userDashboard") {
+        res.render("404");
+        return;
+      }
       authResponse.error = "Invalid user id or password";
     }
     res.json(authResponse);
-  },
-
-  renderDashboard: async (req, res) => {
-    let user = await get_db_User(req.body._id, true);
-
-    const token = createToken(user._id);
-    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 3000 });
-    res.locals.user = user;
-    res.render(user.accountType);
   },
 
   logOut: (req, res) => {

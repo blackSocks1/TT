@@ -74,4 +74,17 @@ module.exports.handleChat = async (endPoint, socket) => {
     //   `Coordinator ${updater.name} with _id: ${updater._id} says all other coords should reload their data because he just updated the TT of ${updater.group_id}`
     // );
   });
+
+  socket.on("/availUpdated", async (lecturer) => {
+    let updater = await users.OnlineUser.find({ online_id: lecturer._id });
+    if (updater && updater?.accountType == "Coordinator") {
+      endPoint.to(updater.network_id).emit("/updateAvail", lecturer);
+    } else {
+      users.OnlineUser.find({ accountType: "Coordinator" }).then((allCoordsOnline) => {
+        allCoordsOnline.forEach((coord) => {
+          endPoint.to(coord.network_id).emit("/updateAvail", lecturer);
+        });
+      });
+    }
+  });
 };

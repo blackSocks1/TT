@@ -56,19 +56,6 @@ export class Lecturer extends User {
   };
 
   /**
-   * method to reset lecturer's attributes when he's being programmed by a coordinator
-   */
-  resetTempTT = () => {
-    this.schedule = [];
-    this.avail = JSON.parse(JSON.stringify(this.availHolder));
-    this.tempTT = {
-      week: new Week(),
-      periods: fx.arrayInit("period"),
-      uDate: "",
-    };
-  };
-
-  /**
    * method to load lecturer's default availability to availTT
    * @param {*} avail
    */
@@ -87,18 +74,29 @@ export class Lecturer extends User {
    * method to save availability in db
    */
   saveAvailTT = async () => {
-    let avail = this.availTT.compile();
-    let res = await fx.postFetch("/lecturer/saveAvail", {
+    this.avail.defaultAvail = this.availTT.compile();
+
+    this.avail.weekAvail.forEach((weekAvail) => {
+      weekAvail.periods.forEach((availPeriod, index) => {
+        availPeriod.state =
+          availPeriod.state == "N\\A" && this.avail.defaultAvail[index].state == "A"
+            ? "A"
+            : availPeriod.state;
+      });
+    });
+
+    let res = await fx.dataCom.post("/lecturer/saveAvail", {
       _id: this._id,
       accountType: this.accountType,
-      avail,
+      avail: this.avail,
     });
 
     if (res.error) {
       this.showSnackBar(`Availability could not be set because of ${res.error}`);
     } else {
-      this.loadAvail(res.data);
-      this.showSnackBar(`Availability set with success`);
+      this.loadAvail(res.data.defaultAvail);
+      this.socket.emit("/availUpdated", { _id: this._id, avail: this.avail.defaultAvail });
+      this.showSnackBar(`Availability updated with success`);
     }
     // console.log(res);
   };
